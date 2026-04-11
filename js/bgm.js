@@ -215,10 +215,7 @@ const BGM = (() => {
   // ─── 公開API ─────────────────────────────────────────────────────────────
 
   function init() {
-    // 初回ユーザー操作で起動（ブラウザの自動再生ポリシー対応）
-    document.addEventListener('click', () => {
-      if (!running) start();
-    }, { once: true });
+    // 自動起動しない。🔊ボタンから手動で start() を呼ぶ。
   }
 
   function start() {
@@ -248,7 +245,8 @@ const BGM = (() => {
     return muted;
   }
 
-  function isMuted() { return muted; }
+  function isMuted()   { return muted; }
+  function isRunning() { return running; }
 
-  return { init, start, toggle, isMuted };
+  return { init, start, toggle, isMuted, isRunning };
 })();

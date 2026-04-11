@@ -1056,11 +1056,18 @@ const UI = (() => {
       if (e.target === $('equip-picker')) hide('equip-picker');
     });
 
-    // BGM
+    // BGM — 初回クリックで起動して 🔇 表示、以降はトグル
     $('btn-bgm')?.addEventListener('click', () => {
-      const muted = BGM.toggle();
-      $('btn-bgm').textContent = muted ? '🔇' : '🔊';
-      $('btn-bgm').classList.toggle('muted', muted);
+      const btn = $('btn-bgm');
+      if (!BGM.isRunning()) {
+        BGM.start();
+        btn.textContent = '🔇';
+        btn.classList.remove('muted');
+      } else {
+        const muted = BGM.toggle();
+        btn.textContent = muted ? '🔊' : '🔇';
+        btn.classList.toggle('muted', muted);
+      }
     });
 
     // ─── クラウド設定 ────────────────────────────────────────────────────────
