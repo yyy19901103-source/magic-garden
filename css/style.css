@@ -293,6 +293,7 @@ body {
   border: 1px solid var(--border-lt);
   padding: 20px; max-width: 360px; width: 94%;
   max-height: 80vh; overflow-y: auto;
+  background-size: cover; background-position: center;
   animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
 }
 .result-banner {
@@ -345,13 +346,15 @@ body {
 
 /* ─── クラウド設定 ────────────────────────────────────────────────────────── */
 
-.btn-cloud-icon {
+.hd-icons { display: flex; align-items: center; gap: 2px; }
+.btn-icon, .btn-cloud-icon {
   background: none; border: none; font-size: 18px; cursor: pointer;
   padding: 2px 6px; border-radius: var(--radius-xs); line-height: 1;
   opacity: 0.7; transition: opacity .2s;
 }
-.btn-cloud-icon:hover { opacity: 1; }
+.btn-icon:hover, .btn-cloud-icon:hover { opacity: 1; }
 .btn-cloud-icon.connected { opacity: 1; filter: drop-shadow(0 0 4px #60a5fa); }
+.btn-icon.muted { opacity: 0.4; }
 
 .cloud-modal-card { width: 100%; max-width: 360px; }
 .cloud-modal-desc { font-size: 12px; color: var(--text-mid); margin-bottom: 14px; line-height: 1.6; }
@@ -382,6 +385,21 @@ body {
 }
 .chapter-tab.active { background: var(--primary-lt); color: var(--primary); border-color: var(--primary); }
 
+/* 章バナー */
+.chapter-banner {
+  width: 100%; height: 130px; border-radius: var(--radius);
+  overflow: hidden; position: relative; margin-bottom: 4px;
+}
+.chapter-banner img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.chapter-banner-title {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,.75));
+  color: #fff; padding: 20px 12px 8px;
+  font-size: 14px; font-weight: bold; letter-spacing: .5px;
+}
+
 /* ステージリスト */
 .stage-list { display: flex; flex-direction: column; gap: 8px; }
 .stage-item {
@@ -397,6 +415,10 @@ body {
 .stage-item.locked   { opacity: .45; }
 .stage-item.boss     { border-left-color: var(--red); }
 .stage-status { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.stage-boss-img {
+  width: 44px; height: 58px; object-fit: cover;
+  border-radius: 6px; flex-shrink: 0; border: 1px solid var(--border);
+}
 .stage-info   { flex: 1; min-width: 0; }
 .stage-name   { font-size: 13px; font-weight: bold; line-height: 1.3; }
 .stage-enemies{ font-size: 16px; margin-top: 2px; }
@@ -621,6 +643,7 @@ body {
 .boss-card.boss-hard   { border-left-color: var(--red); }
 .boss-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .boss-emoji       { font-size: 36px; }
+.boss-card-img    { width: 72px; height: 96px; object-fit: cover; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border); }
 .boss-name        { font-size: 15px; font-weight: bold; }
 .boss-difficulty-label { font-size: 11px; color: var(--text-dim); }
 .boss-rewards     { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }

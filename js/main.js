@@ -190,6 +190,22 @@ const UI = (() => {
       if (!el) return;
       el.innerHTML = '';
 
+      // 章背景バナー
+      const bgNames = ['ch1_forest', 'ch2_castle', 'ch3_temple', 'ch4_dragon', 'ch5_sky'];
+      const bgName = bgNames[this.currentChapter] || 'ch1_forest';
+      const banner = document.createElement('div');
+      banner.className = 'chapter-banner';
+      banner.innerHTML = `
+        <img src="assets/backgrounds/${bgName}.png" alt="${ch.name}" onerror="this.style.display='none'">
+        <div class="chapter-banner-title">${ch.name}</div>`;
+      el.appendChild(banner);
+
+      // ステージボス画像マップ
+      const stageBossImg = {
+        '1-5': 'boss_ancient_tree', '2-3': 'boss_demon_king',
+        '3-6': 'boss_ancient_goddess', '4-6': 'boss_dragon_king', '5-5': 'boss_sky_guardian'
+      };
+
       ch.stages.forEach(stage => {
         const idx       = allIds.indexOf(stage.id);
         const isCleared = cleared.includes(stage.id);
@@ -204,8 +220,14 @@ const UI = (() => {
           ? `<button class="btn-battle" data-stage="${stage.id}">⚔️ 戦闘</button>`
           : `<button class="btn-battle" disabled>🔒</button>`;
 
+        const bossKey = stageBossImg[stage.id];
+        const bossImgHtml = bossKey
+          ? `<img src="assets/bosses/${bossKey}.png" class="stage-boss-img" alt="${stage.name}" onerror="this.style.display='none'">`
+          : '';
+
         div.innerHTML = `
           <span class="stage-status">${statusIcon}</span>
+          ${bossImgHtml}
           <div class="stage-info">
             <div class="stage-name">${stage.isBoss?'👑 ':''}${stage.id} ${stage.name}</div>
             <div class="stage-enemies">${stage.enemies.map(e=>e.emoji).join(' ')}</div>
@@ -228,13 +250,18 @@ const UI = (() => {
       const el = $('boss-cards');
       if (!el) return;
       el.innerHTML = '';
+      const dailyImgMap = { 'boss_easy': 'daily_easy', 'boss_normal': 'daily_normal', 'boss_hard': 'daily_hard' };
       DAILY_BOSS_DATA.forEach(boss => {
         const card = document.createElement('div');
         const disabled = bossState.attemptsLeft <= 0;
         card.className = `boss-card boss-${boss.difficulty}`;
+        const bossImg = dailyImgMap[boss.id] || '';
+        const imgHtml = bossImg
+          ? `<img src="assets/bosses/${bossImg}.png" class="boss-card-img" alt="${boss.name}" onerror="this.outerHTML='<span class=\\'boss-emoji\\'>${boss.emoji}</span>'">`
+          : `<span class="boss-emoji">${boss.emoji}</span>`;
         card.innerHTML = `
           <div class="boss-card-header">
-            <span class="boss-emoji">${boss.emoji}</span>
+            ${imgHtml}
             <div>
               <div class="boss-name">${boss.name}</div>
               <div class="boss-difficulty-label">難易度：${boss.label}</div>
@@ -285,6 +312,18 @@ const UI = (() => {
 
     showBattleResult(id, result, isBoss) {
       const win = result.win;
+
+      // チャプター背景を result-panel に適用
+      const resultPanel = document.querySelector('#battle-result .result-panel');
+      const bgNames = ['ch1_forest', 'ch2_castle', 'ch3_temple', 'ch4_dragon', 'ch5_sky'];
+      if (resultPanel && !isBoss && id && id.includes('-')) {
+        const chIdx = parseInt(id[0]) - 1;
+        const bg = bgNames[chIdx] || 'ch1_forest';
+        resultPanel.style.backgroundImage = `linear-gradient(rgba(8,8,18,.88), rgba(8,8,18,.88)), url(assets/backgrounds/${bg}.png)`;
+      } else if (resultPanel) {
+        resultPanel.style.backgroundImage = '';
+      }
+
       const banner = $('result-banner');
       banner.className = 'result-banner';         // クラス一旦リセット（再アニメ用）
       banner.textContent = win ? '🎉 勝利！' : '💀 敗北…';
@@ -1017,6 +1056,13 @@ const UI = (() => {
       if (e.target === $('equip-picker')) hide('equip-picker');
     });
 
+    // BGM
+    $('btn-bgm')?.addEventListener('click', () => {
+      const muted = BGM.toggle();
+      $('btn-bgm').textContent = muted ? '🔇' : '🔊';
+      $('btn-bgm').classList.toggle('muted', muted);
+    });
+
     // ─── クラウド設定 ────────────────────────────────────────────────────────
     $('btn-cloud-settings')?.addEventListener('click', () => CloudModal.open());
     $('cloud-close-btn')?.addEventListener('click',   () => hide('cloud-modal'));
@@ -1124,6 +1170,8 @@ const UI = (() => {
       if (Storage.isConfigured()) {
         $('btn-cloud-settings')?.classList.add('connected');
       }
+
+      BGM.init();  // 最初のクリックで自動起動
 
       if (idleEarned > 0) {
         $('idle-reward-text').textContent = `🪙 ${idleEarned.toLocaleString()} コインを集めておいたよ！`;
