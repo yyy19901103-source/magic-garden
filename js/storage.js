@@ -63,15 +63,15 @@ const Storage = (() => {
     const { endpoint, playerId } = getConfig();
     if (!endpoint || !playerId) return;
     try {
-      // no-cors: プリフライトなしで送信（GASのCORS制限を回避）
-      // Content-Type を省略すると text/plain 扱いになりプリフライト不要
-      await fetch(endpoint, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({ action: 'save', playerId, data: state })
-      });
+      // GAS は CORS 対応 GET で保存（no-cors POST はリダイレクトを通過できない）
+      const url = `${endpoint}?action=save`
+        + `&playerId=${encodeURIComponent(playerId)}`
+        + `&data=${encodeURIComponent(JSON.stringify(state))}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      if (!json.ok) console.warn('[Storage] Cloud save error:', json.error);
     } catch (e) {
-      console.warn('[Storage] Cloud save failed (offline?):', e.message);
+      console.warn('[Storage] Cloud save failed:', e.message);
     }
   }
 
