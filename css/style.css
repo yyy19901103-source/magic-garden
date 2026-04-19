@@ -564,6 +564,12 @@ body {
 .skill-name   { font-size: 13px; font-weight: bold; color: var(--primary); }
 .skill-sp     { font-size: 11px; background: var(--primary-lt); color: var(--primary); padding: 1px 6px; border-radius: 99px; }
 .skill-desc   { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
+.skill-preview {
+  font-size: 11px; color: var(--text-dim); margin-top: 4px;
+  background: rgba(139,92,246,.08); border-radius: 4px; padding: 2px 6px; display: inline-block;
+}
+.skill-preview strong { color: var(--primary); }
+.preview-next { color: var(--green); margin-left: 2px; }
 
 .equip-slot-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -1401,13 +1407,8 @@ body {
 .game-header,
 .tab-nav      { user-select: none; -webkit-user-select: none; }
 
-/* ─── ダッシュボード：横並びが崩れない最小幅 ────────────────────────────── */
+/* ─── ダッシュボード：小画面で2列化 ────────────────────────────────────── */
 
-.home-dashboard {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
 .dash-chip { min-width: 0; }
 
 @media (max-width: 340px) {

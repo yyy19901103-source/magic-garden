@@ -800,6 +800,16 @@ const UI = (() => {
                    ▲ ${matMd?.emoji||'?'}×${cost.count} <small>(${have}/${cost.count})</small>
                  </button>`
               : `<span class="skill-lv-max">MAX</span>`;
+            const effectPower = sk.power * (1 + (skLv - 1) * 0.1);
+            const nextPower   = sk.power * (1 + skLv * 0.1);
+            const isHeal      = sk.type?.startsWith('heal');
+            const isAll       = sk.type?.endsWith('_all');
+            const isBuff      = sk.type?.startsWith('buff') || sk.type?.startsWith('debuff');
+            const typeLabel   = isHeal ? '回復' : isBuff ? '効果' : (isAll ? '全体威力' : '威力');
+            const previewHtml = isBuff ? '' : `<div class="skill-preview">
+              ${typeLabel} <strong>×${effectPower.toFixed(2)}</strong>
+              ${skLv < 10 ? `<span class="preview-next"> → Lv${skLv+1}: ×${nextPower.toFixed(2)}</span>` : `<span class="preview-next"> (MAX)</span>`}
+            </div>`;
             return `
             <div class="skill-row">
               <div class="skill-header">
@@ -810,6 +820,7 @@ const UI = (() => {
                 </div>
               </div>
               <p class="skill-desc">${sk.description}</p>
+              ${previewHtml}
               <div class="skill-upgrade-row">${upBtn}</div>
             </div>`;
           }).join('')}
