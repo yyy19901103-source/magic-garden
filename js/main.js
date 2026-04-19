@@ -28,11 +28,16 @@ const UI = (() => {
     const r = Game.getState().resources;
     $('coins').textContent    = Math.floor(r.coins).toLocaleString();
     $('crystals').textContent = Math.floor(r.crystals);
-    const st = Game.getStamina();
+    const st   = Game.getStamina();
     const stEl = $('stamina-display');
     if (stEl) {
-      stEl.textContent = `⚡ ${st.current}/${st.max}`;
-      stEl.title = st.current < st.max ? `${st.nextRegenMin}分後に回復` : '満タン';
+      const pct = Math.min(100, Math.round(st.current / st.max * 100));
+      stEl.innerHTML = `
+        <span class="st-label">⚡ ${st.current}/${st.max}</span>
+        <span class="st-bar-wrap"><span class="st-bar-fill" style="width:${pct}%"></span></span>`;
+      stEl.title = st.current < st.max
+        ? `${st.nextRegenMin}分後に+1回復`
+        : '満タン！';
       stEl.classList.toggle('stamina-low', st.current <= 5);
     }
   }
@@ -66,17 +71,41 @@ const UI = (() => {
     renderDashboard() {
       const el = $('home-dashboard');
       if (!el) return;
-      const state    = Game.getState();
-      const cleared  = state.progress.clearedStages.length;
-      const total    = getAllStageIds().length;
-      const pct      = Math.floor(cleared / total * 100);
-      const power    = Math.floor(Game.calcTeamPower());
-      const rate     = Math.floor(Game.getIdleRate());
+      const state   = Game.getState();
+      const cleared = state.progress.clearedStages.length;
+      const total   = getAllStageIds().length;
+      const pct     = Math.round(cleared / total * 100);
+      const power   = Math.floor(Game.calcTeamPower());
+      const rate    = Math.floor(Game.getIdleRate());
+      const genCnt  = Object.keys(state.generals).length;
+
+      // ステージクリア進捗バー付きチップ
+      const clearBar = `<div class="dash-progress-wrap">
+        <div class="dash-progress-bar" style="width:${pct}%"></div>
+      </div><span class="dash-pct">${pct}%</span>`;
+
       el.innerHTML = `
-        <div class="dash-chip"><span class="dash-icon">🏆</span><span class="dash-val">${cleared}/${total}</span><span class="dash-lbl">クリア</span></div>
-        <div class="dash-chip"><span class="dash-icon">💪</span><span class="dash-val">${power.toLocaleString()}</span><span class="dash-lbl">戦力</span></div>
-        <div class="dash-chip"><span class="dash-icon">🪙</span><span class="dash-val">${rate}/分</span><span class="dash-lbl">放置収益</span></div>
-        <div class="dash-chip"><span class="dash-icon">👥</span><span class="dash-val">${Object.keys(state.generals).length}/12</span><span class="dash-lbl">副将</span></div>`;
+        <div class="dash-chip dash-chip--clear">
+          <span class="dash-icon">🏆</span>
+          <span class="dash-val">${cleared}<span class="dash-total">/${total}</span></span>
+          <span class="dash-lbl">クリア</span>
+          ${clearBar}
+        </div>
+        <div class="dash-chip dash-chip--power">
+          <span class="dash-icon">⚔️</span>
+          <span class="dash-val">${power >= 10000 ? (power/1000).toFixed(1)+'K' : power.toLocaleString()}</span>
+          <span class="dash-lbl">戦力</span>
+        </div>
+        <div class="dash-chip dash-chip--idle">
+          <span class="dash-icon">🪙</span>
+          <span class="dash-val">${rate}</span>
+          <span class="dash-lbl">毎分収益</span>
+        </div>
+        <div class="dash-chip dash-chip--generals">
+          <span class="dash-icon">👥</span>
+          <span class="dash-val">${genCnt}<span class="dash-total">/12</span></span>
+          <span class="dash-lbl">副将</span>
+        </div>`;
     },
 
     renderFormation() {
