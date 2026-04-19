@@ -388,6 +388,20 @@ const UI = (() => {
         }
       }
 
+      // バトル統計サマリー
+      const statsEl = $('result-stats');
+      if (statsEl) {
+        const st = result.stats;
+        if (st) {
+          statsEl.innerHTML = `
+            <span class="bstat">⏱ ${result.turns}ターン</span>
+            <span class="bstat">⚔️ ${st.teamDmg.toLocaleString()}ダメ</span>
+            ${st.skillCount > 0 ? `<span class="bstat">✨ スキル${st.skillCount}回</span>` : ''}`;
+        } else {
+          statsEl.innerHTML = `<span class="bstat">⏱ ${result.turns}ターン</span>`;
+        }
+      }
+
       const logEl = $('result-log');
       logEl.innerHTML = '';
       BattleEngine.extractHighlights(result.log, 7).forEach((entry, i) => {
@@ -471,17 +485,21 @@ const UI = (() => {
       });
 
       sorted.forEach(gid => {
-        const def = GENERALS_DATA[gid];
-        const gs  = state.generals[gid];
-        const card = document.createElement('div');
+        const def   = GENERALS_DATA[gid];
+        const gs    = state.generals[gid];
+        const stats = Game.getCharStats(gid);
+        const power = stats ? Math.floor(stats.hp*0.1 + stats.atk*2 + stats.def*1.5 + stats.spd) : 0;
+        const card  = document.createElement('div');
         card.className = `general-card rarity-${def.rarity}`;
         const starsStr = '⭐'.repeat(gs.stars || 1);
+        const inFm  = inFormation.includes(gid);
         card.innerHTML = `
           ${makePortrait(def,'md')}
-          ${inFormation.includes(gid) ? '<span class="formation-badge">編成中</span>' : ''}
+          ${inFm ? '<span class="formation-badge">編成中</span>' : ''}
           <div class="card-footer">
             <div class="card-name">${def.name}</div>
-            <div class="card-lv">Lv.${gs.level} <span class="card-stars">${starsStr}</span></div>
+            <div class="card-lv">Lv.${gs.level} <span class="card-stars" style="font-size:9px">${starsStr}</span></div>
+            <div class="card-power">⚔️${power >= 1000 ? (power/1000).toFixed(1)+'K' : power}</div>
           </div>`;
         card.addEventListener('click', () => this.showDetail(gid));
         el.appendChild(card);

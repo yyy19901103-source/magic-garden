@@ -175,11 +175,12 @@ const BattleEngine = (() => {
 
       if (aliveTeam.length === 0) {
         log.push({ type: 'result', text: '⚡ 敗北…' });
-        return { win: false, log, turns: turn + 1 };
+        const totalDmg = log.filter(e=>e.dmg && !fighters.find(f=>!f.isEnemy && f.name===e.actorName)).reduce((s,e)=>s+(e.dmg||0),0);
+        return { win: false, log, turns: turn + 1, stats: _calcStats(log, fighters) };
       }
       if (aliveEnemies.length === 0) {
         log.push({ type: 'result', text: '🎉 勝利！' });
-        return { win: true, log, turns: turn + 1 };
+        return { win: true, log, turns: turn + 1, stats: _calcStats(log, fighters) };
       }
 
       // SPD順に行動
@@ -214,7 +215,7 @@ const BattleEngine = (() => {
           const target = enemies[Math.floor(Math.random() * enemies.length)];
           const dmg = calcDamage(actor.stats.atk, target.stats.def);
           target.currentHp -= dmg;
-          log.push({ type: 'attack', text: `⚔️ ${actor.name}の攻撃！ ${target.name}に ${fmtN(dmg)} ダメージ！`, dmg });
+          log.push({ type: 'attack', text: `⚔️ ${actor.name}の攻撃！ ${target.name}に ${fmtN(dmg)} ダメージ！`, dmg, isEnemyAttacker: actor.isEnemy });
           if (target.currentHp <= 0) {
             log.push({ type: 'defeat', text: `💀 ${target.name}が倒れた！`, isEnemy: target.isEnemy });
           }
@@ -224,7 +225,20 @@ const BattleEngine = (() => {
 
     // タイムアウト = 敗北
     log.push({ type: 'result', text: '⏰ 時間切れ…' });
-    return { win: false, log, turns: MAX_TURNS };
+    return { win: false, log, turns: MAX_TURNS, stats: _calcStats(log, fighters) };
+  }
+
+  function _calcStats(log, fighters) {
+    let teamDmg = 0, enemyDmg = 0, skillCount = 0, defeatedEnemies = 0;
+    log.forEach(e => {
+      if (e.type === 'attack' || e.type === 'skill') {
+        if (e.isEnemyAttacker) enemyDmg += (e.dmg || 0);
+        else teamDmg += (e.dmg || 0);
+      }
+      if (e.type === 'skill') skillCount++;
+      if (e.type === 'defeat' && e.isEnemy) defeatedEnemies++;
+    });
+    return { teamDmg, enemyDmg, skillCount, defeatedEnemies };
   }
 
   // ─── ユーティリティ ──────────────────────────────────────────────────────
