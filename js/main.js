@@ -1308,6 +1308,24 @@ const UI = (() => {
 
   // ─── イベントバインド ────────────────────────────────────────────────────
 
+  // LINE通知UIを設定状態に合わせて更新
+  function _refreshLineNotifyUI() {
+    const toggle = $('cs-line-toggle');
+    const input  = $('cs-line-userid');
+    const status = $('cs-line-status');
+    if (_lineUserId) {
+      // マスキング表示: 先頭4文字 + ... + 末尾3文字
+      const masked = _lineUserId.slice(0, 4) + '...' + _lineUserId.slice(-3);
+      if (toggle) toggle.textContent = `▾ LINE通知 ✅ ${masked}`;
+      if (input)  input.placeholder  = _lineUserId; // 既存IDをプレースホルダーに
+      if (status) { status.textContent = '✅ LINE通知 有効'; status.className = 'cs-line-status ok'; }
+    } else {
+      if (toggle) toggle.textContent = '▸ LINE通知を設定する（スタミナ・日課リセット）';
+      if (input)  input.placeholder  = 'Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+      if (status && status.textContent === '✅ LINE通知 有効') status.textContent = '';
+    }
+  }
+
   function bindEvents() {
     // タブ
     document.querySelectorAll('.tab-btn').forEach(btn =>
@@ -1435,13 +1453,12 @@ const UI = (() => {
     });
 
     // ─── LINE通知設定 ────────────────────────────────────────────────────────
+    // LINE通知トグル — 開くたびに設定状態を反映
     $('cs-line-toggle')?.addEventListener('click', () => {
       const form = $('cs-line-form');
       form?.classList.toggle('hidden');
-      // 既存のUser IDがあれば入力欄に表示
-      if (!form?.classList.contains('hidden') && _lineUserId) {
-        const input = $('cs-line-userid');
-        if (input) input.value = _lineUserId;
+      if (!form?.classList.contains('hidden')) {
+        _refreshLineNotifyUI();
       }
     });
     $('cs-line-save-btn')?.addEventListener('click', async () => {
@@ -1769,6 +1786,16 @@ const UI = (() => {
 
   function start() {
     const idleEarned = Game.init(Storage.load());
+
+    // 日課リセット通知（今日初回起動のみ）
+    (() => {
+      const today = new Date().toISOString().slice(0, 10);
+      if (sessionStorage.getItem('daily_notified') !== today) {
+        sessionStorage.setItem('daily_notified', today);
+        _sendLineNotify('daily_reset'); // LINE未設定なら内部でスキップ
+      }
+    })();
+
     bindEvents();
 
     runLoadingAnimation(() => {
