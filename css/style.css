@@ -786,6 +786,11 @@ body {
 
 /* ─── 日課タスク 報酬受取ボタン ─────────────────────────────────────────── */
 
+/* 週間ミッション */
+.weekly-task { border-color: rgba(139,92,246,.2) !important; }
+.weekly-bar  { background: linear-gradient(90deg, var(--primary), #a78bfa) !important; }
+.weekly-reset-label { font-size: 11px; color: var(--text-dim); font-weight: normal; margin-left: 6px; }
+
 .btn-claim {
   background: linear-gradient(135deg, #10b981, #059669); color: #fff;
   border: none; border-radius: 6px; padding: 5px 9px;

@@ -48,7 +48,16 @@ const Game = (() => {
       enhanced: false,
       claimed: {}
     },
-    shop: { items: [], refreshedAt: null }
+    shop: { items: [], refreshedAt: null },
+    weekly: {
+      date:     null,   // 'YYYY-WW' 形式（年+週番号）
+      battles:  0,
+      draws:    0,
+      enhanced: 0,
+      bossWins: 0,
+      dailyCompleted: 0,
+      claimed:  {}
+    }
   };
 
   function _newGeneral(id) {
@@ -220,6 +229,59 @@ const Game = (() => {
     }
   }
 
+  // ─── 週番号ヘルパー ──────────────────────────────────────────────────────
+  function _weekStr() {
+    const d = new Date();
+    const jan1 = new Date(d.getFullYear(), 0, 1);
+    const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+    return `${d.getFullYear()}-W${String(week).padStart(2,'0')}`;
+  }
+
+  function checkAndResetWeekly() {
+    if (!state.weekly) {
+      state.weekly = JSON.parse(JSON.stringify(DEFAULT_STATE.weekly));
+    }
+    const thisWeek = _weekStr();
+    if (state.weekly.date === thisWeek) return;
+    // 週が変わった → リセット
+    state.weekly = {
+      date: thisWeek, battles: 0, draws: 0, enhanced: 0,
+      bossWins: 0, dailyCompleted: 0, claimed: {}
+    };
+  }
+
+  const WEEKLY_DEFS = [
+    { id: 'w_battle',   label: 'バトル 20回',           icon: '⚔️', target: 20, reward: { crystals: 100 }, done: s => s.battles  >= 20, prog: s => Math.min(s.battles,  20) },
+    { id: 'w_draw',     label: 'ガチャを10回引く',       icon: '🎲', target: 10, reward: { crystals:  50 }, done: s => s.draws    >= 10, prog: s => Math.min(s.draws,    10) },
+    { id: 'w_enhance',  label: '装備を10回強化',         icon: '🔨', target: 10, reward: { coins:   5000 }, done: s => s.enhanced >= 10, prog: s => Math.min(s.enhanced, 10) },
+    { id: 'w_boss',     label: 'ボスに5回勝利',          icon: '👹', target:  5, reward: { coins:   3000 }, done: s => s.bossWins >= 5,  prog: s => Math.min(s.bossWins,  5) },
+    { id: 'w_daily',    label: '日課を5日分完了',        icon: '📋', target:  5, reward: { crystals:  30 }, done: s => s.dailyCompleted >= 5, prog: s => Math.min(s.dailyCompleted, 5) },
+  ];
+
+  function getWeeklyTasks() {
+    if (!state.weekly) checkAndResetWeekly();
+    const w = state.weekly;
+    return WEEKLY_DEFS.map(d => {
+      const isDone    = d.done(w);
+      const isClaimed = !!(w.claimed[d.id]);
+      const progress  = d.prog(w);
+      return { ...d, isDone, isClaimed, progress };
+    });
+  }
+
+  function claimWeeklyTask(taskId) {
+    if (!state.weekly) checkAndResetWeekly();
+    const task = WEEKLY_DEFS.find(d => d.id === taskId);
+    if (!task) return { success: false, reason: 'not_found' };
+    if (!task.done(state.weekly)) return { success: false, reason: 'not_done' };
+    if (state.weekly.claimed[taskId]) return { success: false, reason: 'already_claimed' };
+    state.weekly.claimed[taskId] = true;
+    if (task.reward.coins)    state.resources.coins    += task.reward.coins;
+    if (task.reward.crystals) state.resources.crystals += task.reward.crystals;
+    save();
+    return { success: true, reward: task.reward };
+  }
+
   const DAILY_DEFS = [
     { id: 'login',    label: 'ログインボーナス',       icon: '🌅', target: 1, reward: { coins: 100 },    done: s => s.login },
     { id: 'battle',   label: 'バトル 3回',              icon: '⚔️', target: 3, reward: { coins: 200 },    done: s => s.battles >= 3 },
@@ -250,6 +312,12 @@ const Game = (() => {
     state.daily.claimed[taskId] = true;
     if (task.reward.coins)    state.resources.coins    += task.reward.coins;
     if (task.reward.crystals) state.resources.crystals += task.reward.crystals;
+
+    // 全日課クリア判定 → 週課カウンタ更新
+    const allDone = DAILY_DEFS.every(d => d.done(state.daily) || !!(state.daily.claimed[d.id]));
+    if (allDone && state.weekly) {
+      state.weekly.dailyCompleted = (state.weekly.dailyCompleted || 0) + 1;
+    }
     return { success: true, reward: task.reward };
   }
 
@@ -270,6 +338,7 @@ const Game = (() => {
     while (state.formation.length < 3) state.formation.push(null);
 
     checkAndResetDaily();
+    checkAndResetWeekly();
 
     return Idle.calculate(state.resources.lastIdleTime, getIdleRate());
   }
@@ -314,9 +383,10 @@ const Game = (() => {
 
     const result = BattleEngine.simulate(team, enemies);
 
-    // 日課・カウント更新
+    // 日課・週課・カウント更新
     state.daily.battles = Math.min((state.daily.battles || 0) + 1, 99);
     state.progress.battleCount++;
+    if (state.weekly) state.weekly.battles = (state.weekly.battles || 0) + 1;
 
     const loot = { coins: 0, exp: 0, items: [], material: null, firstClear: null, levelUps: [] };
 
@@ -425,6 +495,7 @@ const Game = (() => {
 
     state.resources.crystals -= cost;
     state.daily.drew = true;
+    if (state.weekly) state.weekly.draws = (state.weekly.draws || 0) + count;
 
     const results = [];
     for (let i = 0; i < count; i++) {
@@ -500,6 +571,7 @@ const Game = (() => {
     state.resources.coins -= cost;
     inst.enhanceLevel++;
     state.daily.enhanced = true;
+    if (state.weekly) state.weekly.enhanced = (state.weekly.enhanced || 0) + 1;
     return { success: true, newLevel: inst.enhanceLevel, cost };
   }
 
@@ -558,6 +630,7 @@ const Game = (() => {
       state.inventory.materials[loot.material] =
         (state.inventory.materials[loot.material] || 0) + loot.materialCount;
       state.daily.bossWins = (state.daily.bossWins || 0) + 1;
+      if (state.weekly) state.weekly.bossWins = (state.weekly.bossWins || 0) + 1;
 
       // EXP配布
       const share = Math.floor(500 / teamIds.length);
@@ -764,6 +837,7 @@ const Game = (() => {
     draw,
     save,
     checkAndResetDaily, getDailyTasks, claimDailyTask,
+    checkAndResetWeekly, getWeeklyTasks, claimWeeklyTask,
     getStamina, consumeStamina,
     sellEquip, synthesize, getSynthRecipes,
     getShop, buyShopItem,

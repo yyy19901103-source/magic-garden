@@ -64,8 +64,9 @@ const UI = (() => {
   const HomeTab = {
     update() {
       this.renderFormation();
-      this.renderDailyTasks();
       this.renderDashboard();
+      this.renderDailyTasks();
+      this.renderWeeklyTasks();
     },
 
     renderDashboard() {
@@ -178,7 +179,58 @@ const UI = (() => {
       el.querySelectorAll('.btn-claim[data-task]').forEach(btn => {
         btn.addEventListener('click', () => {
           const r = Game.claimDailyTask(btn.dataset.task);
-          if (r.success) { updateResourceBar(); this.renderDailyTasks(); }
+          if (r.success) { updateResourceBar(); this.renderDailyTasks(); this.renderWeeklyTasks(); }
+        });
+      });
+    },
+
+    renderWeeklyTasks() {
+      const el = $('weekly-tasks');
+      if (!el) return;
+      el.innerHTML = '';
+
+      // リセット日（次の月曜）を表示
+      const label = $('weekly-reset-label');
+      if (label) {
+        const now   = new Date();
+        const daysToMon = (8 - now.getDay()) % 7 || 7;
+        const reset = new Date(now);
+        reset.setDate(now.getDate() + daysToMon);
+        label.textContent = `リセット: ${reset.getMonth()+1}/${reset.getDate()}`;
+      }
+
+      Game.getWeeklyTasks().forEach(task => {
+        const div = document.createElement('div');
+        div.className = `daily-task weekly-task ${task.isClaimed ? 'done' : ''}`;
+        const pct      = Math.round(task.progress / task.target * 100);
+        const progressBar = `<div class="task-progress-wrap"><div class="task-progress-bar weekly-bar" style="width:${pct}%"></div></div>`;
+        const rewardText  = task.reward.crystals
+          ? `+${task.reward.crystals}💎` : `+${task.reward.coins.toLocaleString()}🪙`;
+
+        let rightHtml;
+        if (task.isClaimed) {
+          rightHtml = `<span class="task-reward done">✓</span>`;
+        } else if (task.isDone) {
+          rightHtml = `<button class="btn-claim weekly-claim" data-task="${task.id}">${rewardText} 受取</button>`;
+        } else {
+          rightHtml = `<span class="task-reward">${rewardText}</span>`;
+        }
+
+        div.innerHTML = `
+          <span class="task-icon">${task.icon}</span>
+          <div class="task-info">
+            <span class="task-label">${task.label}</span>
+            <span class="task-count">${task.progress}/${task.target}</span>
+            ${progressBar}
+          </div>
+          ${rightHtml}`;
+        el.appendChild(div);
+      });
+
+      el.querySelectorAll('.weekly-claim').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const r = Game.claimWeeklyTask(btn.dataset.task);
+          if (r.success) { updateResourceBar(); this.renderWeeklyTasks(); }
         });
       });
     }
