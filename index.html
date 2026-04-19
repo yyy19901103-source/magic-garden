@@ -266,92 +266,69 @@
   </main>
 </div><!-- /screen-game -->
 
-<!-- ═══ クラウド設定モーダル ═══ -->
+<!-- ═══ クラウドセーブモーダル ═══ -->
 <div id="cloud-modal" class="overlay hidden">
   <div class="popup-card cloud-modal-card">
-    <h3 class="popup-title">☁️ クラウド設定</h3>
 
-    <!-- バックエンド選択タブ -->
-    <div class="cloud-backend-tabs">
-      <button class="cloud-tab-btn active" data-backend="firebase">🔥 Firebase Auth（推奨）</button>
-      <button class="cloud-tab-btn" data-backend="gas">⚙️ GAS</button>
-    </div>
-
-    <!-- ════ Firebase Auth タブ ════ -->
-    <div id="cloud-panel-firebase">
-
-      <!-- ログイン状態 -->
-      <div id="auth-status-row" class="auth-status-row">
-        <span id="auth-status-icon" class="auth-status-icon">⚪</span>
-        <span id="auth-status-text" class="auth-status-text">未設定</span>
-        <button id="auth-signout-btn" class="btn-text-link hidden">ログアウト</button>
+    <!-- ════ 状態A: 未接続（初回） ════ -->
+    <div id="cs-setup" class="cs-panel">
+      <div class="cs-hero">
+        <div class="cs-hero-icon">☁️</div>
+        <div class="cs-hero-title">クラウドセーブ</div>
+        <div class="cs-hero-sub">データを自動保存してスマホを変えても安心！</div>
       </div>
-
-      <!-- 匿名ユーザー向け: メール/PW昇格 OR 新規ログイン -->
-      <div id="auth-email-section" class="auth-email-section">
-        <button id="auth-email-toggle" class="auth-toggle-btn">
-          📧 メール+パスワードでログイン / 登録 ▼
-        </button>
-        <div id="auth-email-form" class="auth-email-form hidden">
-          <input id="auth-email"    class="cloud-input" type="email"    placeholder="メールアドレス">
-          <input id="auth-password" class="cloud-input" type="password" placeholder="パスワード（6文字以上）" style="margin-top:6px">
-          <div class="cloud-btns" style="margin-top:8px">
-            <button id="auth-login-btn"    class="btn btn-outline">ログイン</button>
-            <button id="auth-register-btn" class="btn btn-outline">新規登録</button>
-          </div>
-          <p class="auth-note">※ 匿名で始めたデータはそのまま引き継がれます</p>
-        </div>
-      </div>
-
-      <!-- Firebase設定（折りたたみ） -->
-      <div class="auth-section-sep"></div>
-      <button id="firebase-config-toggle" class="auth-toggle-btn">
-        ⚙️ Firebase設定（初回のみ） ▼
+      <button id="cs-autostart-btn" class="btn btn-primary cs-big-btn">
+        ✨ ワンタップで自動セーブを始める
       </button>
-      <div id="firebase-config-form" class="auth-email-form hidden">
-        <p class="auth-note">Firebase Console → プロジェクト設定 → マイアプリ → 設定オブジェクトをコピー</p>
-        <textarea id="firebase-config-json" class="cloud-input cloud-textarea"
-                  placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"...","projectId":"..."}'
-                  rows="4"></textarea>
-        <div class="cloud-setup-steps" style="margin:8px 0">
-          <ol class="cloud-steps-list">
-            <li><a href="https://console.firebase.google.com" target="_blank">Firebase Console</a> → プロジェクト作成</li>
-            <li>Authentication → ログイン方法 → <b>メール/パスワード</b> と <b>匿名</b> を有効化</li>
-            <li>Realtime Database → データベースを作成 → テストモード</li>
-            <li>プロジェクト設定 → マイアプリ → <b>SDK設定と構成</b> → 構成をコピー</li>
-            <li>上のテキストエリアに貼り付け → 「設定を適用」</li>
-          </ol>
+      <p class="cs-note">※ 設定不要。ボタン1つで完了します。</p>
+
+      <!-- 上級者向け（折りたたみ） -->
+      <div class="cs-advanced-wrap">
+        <button id="cs-advanced-toggle" class="cs-alt-link">▸ 自分のFirebase/GASを使う（上級者向け）</button>
+        <div id="cs-advanced-form" class="hidden" style="margin-top:10px">
+          <p class="cs-adv-note">Firebase設定コード（JSON）を貼り付け</p>
+          <textarea id="firebase-config-json" class="cloud-input cloud-textarea"
+                    placeholder='{"apiKey":"AIza...","databaseURL":"https://xxx.firebaseio.com","projectId":"xxx"}'
+                    rows="3"></textarea>
+          <button id="firebase-config-apply" class="btn btn-outline" style="margin-top:8px;width:100%">🔥 Firebase で接続</button>
+          <div style="margin-top:10px">
+            <label class="cloud-label">または GAS エンドポイント URL</label>
+            <input id="cloud-endpoint" class="cloud-input" type="url"
+                   placeholder="https://script.google.com/macros/s/.../exec">
+            <label class="cloud-label" style="margin-top:6px">プレイヤーID</label>
+            <input id="cloud-playerid" class="cloud-input" type="text" placeholder="player1" maxlength="32">
+            <button id="cloud-save-btn" class="btn btn-outline" style="margin-top:8px;width:100%">⚙️ GAS設定を保存</button>
+          </div>
         </div>
-        <button id="firebase-config-apply" class="btn btn-primary" style="width:100%">設定を適用してログイン</button>
+      </div>
+    </div>
+
+    <!-- ════ 状態B: 自動セーブ接続済み ════ -->
+    <div id="cs-connected" class="cs-panel hidden">
+      <div class="cs-status-badge cs-status-ok">✅ 自動セーブ有効</div>
+
+      <div class="cs-code-box">
+        <div class="cs-code-label">📋 引き継ぎコード（メモしておくと別端末でも復元できます）</div>
+        <div class="cs-code-display" id="cs-player-code">----</div>
+        <button id="cs-copy-code" class="btn-copy-code">コピー 📋</button>
       </div>
 
-    </div><!-- /cloud-panel-firebase -->
-
-    <!-- ════ GAS タブ ════ -->
-    <div id="cloud-panel-gas" class="hidden">
-      <p class="cloud-modal-desc">
-        <b>Google Apps Script</b> を使います（既存設定向け）。<br>
-        スプレッドシート不要・PropertiesService で保存。
-      </p>
-      <label class="cloud-label">GAS エンドポイント URL</label>
-      <input id="cloud-endpoint" class="cloud-input" type="url"
-             placeholder="https://script.google.com/macros/s/.../exec">
-      <label class="cloud-label">プレイヤーID <small>（例: player1）</small></label>
-      <input id="cloud-playerid" class="cloud-input" type="text"
-             placeholder="player1" maxlength="32">
+      <div class="cs-restore-wrap">
+        <button id="cs-restore-toggle" class="cs-alt-link">▸ 別の端末のデータを読み込む</button>
+        <div id="cs-restore-form" class="hidden" style="margin-top:8px">
+          <input id="cs-restore-input" class="cloud-input" type="text"
+                 placeholder="引き継ぎコードを入力（例: abc123de）" maxlength="48">
+          <button id="cs-restore-btn" class="btn btn-outline" style="margin-top:8px;width:100%">
+            📥 このコードで読み込む
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- 共通ボタン -->
-    <div class="cloud-btns" style="margin-top:12px">
-      <button id="cloud-test-btn"  class="btn btn-outline">🔌 接続テスト</button>
-      <button id="cloud-pull-btn"  class="btn btn-outline">📥 読込</button>
-    </div>
+    <!-- 共通ステータス -->
     <div id="cloud-status" class="cloud-status"></div>
 
-    <div class="cloud-btns" style="margin-top:8px">
-      <button id="cloud-save-btn"  class="btn btn-primary">💾 保存</button>
-      <button id="cloud-close-btn" class="btn btn-secondary">閉じる</button>
-    </div>
+    <button id="cloud-close-btn" class="btn btn-secondary cs-close-btn">閉じる</button>
   </div>
 </div>
 
@@ -365,15 +342,15 @@
 </div>
 
 <!-- JS 読み込み順序は依存関係を考慮 -->
-<script src="js/generals_data.js?v=9"></script>
-<script src="js/stages_data.js?v=9"></script>
-<script src="js/battle_engine.js?v=9"></script>
-<script src="js/bgm.js?v=9"></script>
-<script src="js/firebase_auth.js?v=9"></script>
-<script src="js/storage.js?v=9"></script>
-<script src="js/idle.js?v=9"></script>
-<script src="js/game.js?v=9"></script>
-<script src="js/main.js?v=9"></script>
+<script src="js/generals_data.js?v=10"></script>
+<script src="js/stages_data.js?v=10"></script>
+<script src="js/battle_engine.js?v=10"></script>
+<script src="js/bgm.js?v=10"></script>
+<script src="js/firebase_auth.js?v=10"></script>
+<script src="js/storage.js?v=10"></script>
+<script src="js/idle.js?v=10"></script>
+<script src="js/game.js?v=10"></script>
+<script src="js/main.js?v=10"></script>
 
 </body>
 </html>

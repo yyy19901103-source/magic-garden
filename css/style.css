@@ -1092,6 +1092,64 @@ body {
   100% { box-shadow: 0 0 12px rgba(255,215,0,.4); }
 }
 
+/* ─── クラウドセーブ モーダル（新デザイン） ────────────────────────────── */
+
+.cs-panel { }
+.cs-hero { text-align: center; padding: 10px 0 16px; }
+.cs-hero-icon  { font-size: 44px; margin-bottom: 6px; }
+.cs-hero-title { font-size: 20px; font-weight: bold; color: var(--text); margin-bottom: 4px; }
+.cs-hero-sub   { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
+
+.cs-big-btn {
+  width: 100%; padding: 14px; font-size: 16px; font-weight: bold;
+  border-radius: var(--radius-sm); margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  box-shadow: 0 4px 16px rgba(139,92,246,.4);
+}
+.cs-note { font-size: 11px; color: var(--text-dim); text-align: center; margin-bottom: 12px; }
+
+.cs-advanced-wrap { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.cs-alt-link {
+  background: none; border: none; color: var(--text-dim);
+  font-size: 11px; font-family: inherit; cursor: pointer;
+  padding: 4px 0; transition: color .15s;
+}
+.cs-alt-link:hover { color: var(--primary); }
+.cs-adv-note { font-size: 11px; color: var(--text-mid); margin-bottom: 6px; }
+
+.cs-status-badge {
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  font-size: 14px; font-weight: bold; text-align: center;
+  margin-bottom: 14px;
+}
+.cs-status-ok   { background: rgba(52,211,153,.15); border: 1px solid rgba(52,211,153,.4); color: var(--green); }
+.cs-status-anon { background: rgba(96,165,250,.12); border: 1px solid rgba(96,165,250,.3); color: var(--blue); }
+
+.cs-code-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;
+}
+.cs-code-label   { font-size: 11px; color: var(--text-mid); margin-bottom: 8px; line-height: 1.4; }
+.cs-code-display {
+  font-size: 18px; font-weight: bold; color: var(--gold);
+  letter-spacing: .12em; text-align: center;
+  padding: 8px; background: rgba(255,215,0,.06);
+  border-radius: 6px; margin-bottom: 8px;
+  font-family: 'Courier New', monospace;
+  user-select: all; word-break: break-all;
+}
+.btn-copy-code {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  color: var(--text-mid); border-radius: 6px; padding: 6px;
+  font-size: 12px; font-family: inherit; cursor: pointer; transition: all .15s;
+}
+.btn-copy-code:hover { border-color: var(--primary); color: var(--primary); }
+
+.cs-restore-wrap { border-top: 1px solid var(--border); padding-top: 8px; }
+.cs-close-btn    { width: 100%; margin-top: 12px; }
+.cs-footer-btns  { display: flex; gap: 8px; margin-top: 12px; }
+.cs-footer-btns .btn { flex: 1; }
+
 /* ─── スタミナ回復タイマー ──────────────────────────────────────────────── */
 
 .stamina-timer {
