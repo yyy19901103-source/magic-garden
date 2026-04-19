@@ -1079,6 +1079,13 @@ const UI = (() => {
     $('cloud-save-btn')?.addEventListener('click',  () => CloudModal.saveConfig());
     $('cloud-test-btn')?.addEventListener('click',  () => CloudModal.testConnection());
     $('cloud-pull-btn')?.addEventListener('click',  () => CloudModal.pullData());
+
+    // バックエンドタブ切替
+    document.querySelectorAll('.cloud-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => CloudModal._setBackend(btn.dataset.backend));
+    });
+    // Firebase設定手順トグル
+    $('cloud-firebase-guide')?.addEventListener('click', () => CloudModal.toggleFirebaseGuide());
   }
 
   // ─── ローディング ────────────────────────────────────────────────────────
@@ -1103,13 +1110,36 @@ const UI = (() => {
   // ═══════════════════════════════════════════════════════════════════════════
 
   const CloudModal = {
+    _backend: 'firebase',
+
     open() {
       const cfg = Storage.getConfig();
-      $('cloud-endpoint').value  = cfg.endpoint  || '';
-      $('cloud-playerid').value  = cfg.playerId  || '';
+      // バックエンド種別をUIに反映
+      this._backend = cfg.type || 'firebase';
+      this._setBackend(this._backend);
+      $('cloud-endpoint').value     = cfg.endpoint || '';
+      $('cloud-playerid').value     = cfg.playerId || '';
       $('cloud-status').textContent = '';
       $('cloud-status').className   = 'cloud-status';
       show('cloud-modal');
+    },
+
+    _setBackend(type) {
+      this._backend = type;
+      document.querySelectorAll('.cloud-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.backend === type);
+      });
+      const isFirebase = type === 'firebase';
+      $('cloud-desc-firebase') && ($('cloud-desc-firebase').classList.toggle('hidden', !isFirebase));
+      $('cloud-desc-gas')      && ($('cloud-desc-gas').classList.toggle('hidden', isFirebase));
+      if ($('cloud-endpoint-label'))
+        $('cloud-endpoint-label').textContent = isFirebase
+          ? 'Firebase データベース URL'
+          : 'GAS エンドポイント URL';
+      if ($('cloud-endpoint'))
+        $('cloud-endpoint').placeholder = isFirebase
+          ? 'https://your-project-default-rtdb.firebaseio.com'
+          : 'https://script.google.com/macros/s/.../exec';
     },
 
     saveConfig() {
@@ -1118,9 +1148,9 @@ const UI = (() => {
       if (!endpoint || !playerId) {
         this.setStatus('URLとプレイヤーIDを入力してください', 'err'); return;
       }
-      Storage.setConfig(endpoint, playerId);
+      Storage.setConfig(endpoint, playerId, this._backend);
       $('btn-cloud-settings').classList.add('connected');
-      this.setStatus('✓ 設定を保存しました', 'ok');
+      this.setStatus('✓ 設定を保存しました。クラウドに保存中…', 'ok');
       // 現在のセーブをクラウドに即バックアップ
       Storage.save(Game.getState());
     },
@@ -1129,8 +1159,11 @@ const UI = (() => {
       const endpoint = $('cloud-endpoint').value.trim();
       if (!endpoint) { this.setStatus('URLを入力してください', 'err'); return; }
       this.setStatus('🔌 接続確認中…', 'info');
-      const ok = await Storage.ping(endpoint);
-      this.setStatus(ok ? '✓ 接続成功！' : '✗ 接続失敗（URLを確認してください）', ok ? 'ok' : 'err');
+      const ok = await Storage.ping(endpoint, this._backend);
+      this.setStatus(
+        ok ? '✓ 接続成功！' : '✗ 接続失敗（URLを確認してください）',
+        ok ? 'ok' : 'err'
+      );
     },
 
     async pullData() {
@@ -1139,7 +1172,7 @@ const UI = (() => {
       if (!endpoint || !playerId) {
         this.setStatus('URLとプレイヤーIDを入力してください', 'err'); return;
       }
-      Storage.setConfig(endpoint, playerId);
+      Storage.setConfig(endpoint, playerId, this._backend);
       this.setStatus('📥 クラウドから読み込み中…', 'info');
       const data = await Storage.pullFromCloud();
       if (data) {
@@ -1148,10 +1181,14 @@ const UI = (() => {
         HomeTab.update();
         hide('cloud-modal');
         switchTab('home');
-        this.setStatus('✓ クラウドデータを反映しました', 'ok');
       } else {
         this.setStatus('クラウドにデータが見つかりませんでした', 'err');
       }
+    },
+
+    toggleFirebaseGuide() {
+      const el = $('cloud-firebase-steps');
+      if (el) el.classList.toggle('hidden');
     },
 
     setStatus(msg, type = '') {
@@ -1160,6 +1197,60 @@ const UI = (() => {
       el.className = `cloud-status ${type}`;
     }
   };
+
+  // ─── クラウド同期ステータスインジケーター ─────────────────────────────────
+
+  function initSyncIndicator() {
+    const btn = $('btn-cloud-settings');
+    if (!btn) return;
+
+    // ステータスドットを挿入
+    const dot = document.createElement('span');
+    dot.id = 'cloud-sync-dot';
+    dot.className = 'cloud-sync-dot';
+    btn.appendChild(dot);
+
+    Storage.onSyncStatusChange(status => {
+      dot.className = `cloud-sync-dot dot-${status}`;
+      switch (status) {
+        case 'syncing': dot.title = '同期中…'; break;
+        case 'ok':      dot.title = '同期完了 ✓'; break;
+        case 'retry':   dot.title = 'リトライ中…'; break;
+        case 'error':   dot.title = '同期失敗 ⚠'; break;
+        default:        dot.title = ''; break;
+      }
+    });
+  }
+
+  // ─── 自動保存設定 ────────────────────────────────────────────────────────
+
+  function setupAutoSave() {
+    // 30秒ごとに定期保存
+    setInterval(() => {
+      if (Game.getState()) Game.save();
+    }, 30000);
+
+    // タブが隠れた / フォーカス外れたら即保存
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && Game.getState()) {
+        Game.save();
+      }
+    });
+
+    // ページを閉じる直前に同期保存
+    window.addEventListener('beforeunload', () => {
+      if (Game.getState()) {
+        // ローカル保存のみ（クラウドは非同期なので間に合わない可能性あり）
+        const state = Game.getState();
+        try { localStorage.setItem('magic_garden_v2', JSON.stringify(state)); } catch(_) {}
+      }
+    });
+
+    // スマホでのバックグラウンド移行（pagehide）
+    window.addEventListener('pagehide', () => {
+      if (Game.getState()) Game.save();
+    });
+  }
 
   // ─── 起動 ────────────────────────────────────────────────────────────────
 
@@ -1179,6 +1270,10 @@ const UI = (() => {
       }
 
       BGM.init();  // 最初のクリックで自動起動
+
+      // 同期インジケーター & 自動保存
+      initSyncIndicator();
+      setupAutoSave();
 
       if (idleEarned > 0) {
         $('idle-reward-text').textContent = `🪙 ${idleEarned.toLocaleString()} コインを集めておいたよ！`;

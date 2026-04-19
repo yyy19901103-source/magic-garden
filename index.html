@@ -227,15 +227,45 @@
 <div id="cloud-modal" class="overlay hidden">
   <div class="popup-card cloud-modal-card">
     <h3 class="popup-title">☁️ クラウド設定</h3>
-    <p class="cloud-modal-desc">Google Sheets でセーブを共有します。<br>2人で同じシートに繋いでね！</p>
 
-    <label class="cloud-label">GAS エンドポイント URL</label>
+    <!-- バックエンド選択 -->
+    <div class="cloud-backend-tabs">
+      <button class="cloud-tab-btn active" data-backend="firebase">🔥 Firebase（推奨）</button>
+      <button class="cloud-tab-btn" data-backend="gas">⚙️ GAS</button>
+    </div>
+
+    <!-- Firebase 説明 -->
+    <div id="cloud-desc-firebase" class="cloud-modal-desc">
+      <b>Firebase Realtime Database</b> を使います。<br>
+      無料・PCなし・スマホのみで設定可能・高速です。<br>
+      <a id="cloud-firebase-guide" class="cloud-link" href="#" onclick="return false;">
+        📖 Firebase 設定手順を見る
+      </a>
+    </div>
+    <!-- GAS 説明 -->
+    <div id="cloud-desc-gas" class="cloud-modal-desc hidden">
+      <b>Google Apps Script</b> を使います（既存設定向け）。<br>
+      スプレッドシート不要・PropertiesService で保存。
+    </div>
+
+    <label class="cloud-label" id="cloud-endpoint-label">Firebase データベース URL</label>
     <input id="cloud-endpoint" class="cloud-input" type="url"
-           placeholder="https://script.google.com/macros/s/.../exec">
+           placeholder="https://your-project-default-rtdb.firebaseio.com">
 
-    <label class="cloud-label">プレイヤーID <small>（例: player1 / player2）</small></label>
+    <label class="cloud-label">プレイヤーID <small>（例: player1）</small></label>
     <input id="cloud-playerid" class="cloud-input" type="text"
            placeholder="player1" maxlength="32">
+
+    <!-- Firebase設定手順（折りたたみ） -->
+    <div id="cloud-firebase-steps" class="cloud-setup-steps hidden">
+      <ol class="cloud-steps-list">
+        <li><a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → プロジェクト作成</li>
+        <li>「リアルタイムデータベース」→「データベースを作成」</li>
+        <li>ロケーション: asia-southeast1（シンガポール推奨）</li>
+        <li>セキュリティルール → <b>テストモードで開始</b></li>
+        <li>データベースURL（<code>https://…firebaseio.com</code>）をコピーして上に貼り付け</li>
+      </ol>
+    </div>
 
     <div class="cloud-btns">
       <button id="cloud-test-btn"  class="btn btn-outline">🔌 接続テスト</button>
@@ -244,7 +274,7 @@
     <div id="cloud-status" class="cloud-status"></div>
 
     <div class="cloud-btns" style="margin-top:8px">
-      <button id="cloud-save-btn"  class="btn btn-primary">保存</button>
+      <button id="cloud-save-btn"  class="btn btn-primary">💾 保存</button>
       <button id="cloud-close-btn" class="btn btn-secondary">閉じる</button>
     </div>
   </div>
@@ -261,13 +291,13 @@
 
 <!-- JS 読み込み順序は依存関係を考慮 -->
 <script src="js/generals_data.js"></script>
-<script src="js/stages_data.js"></script>
-<script src="js/battle_engine.js"></script>
-<script src="js/bgm.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/idle.js"></script>
-<script src="js/game.js"></script>
-<script src="js/main.js"></script>
+<script src="js/stages_data.js?v=3"></script>
+<script src="js/battle_engine.js?v=3"></script>
+<script src="js/bgm.js?v=3"></script>
+<script src="js/storage.js?v=3"></script>
+<script src="js/idle.js?v=3"></script>
+<script src="js/game.js?v=3"></script>
+<script src="js/main.js?v=3"></script>
 
 </body>
 </html>
