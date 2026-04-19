@@ -1308,24 +1308,6 @@ const UI = (() => {
 
   // ─── イベントバインド ────────────────────────────────────────────────────
 
-  // LINE通知UIを設定状態に合わせて更新
-  function _refreshLineNotifyUI() {
-    const toggle = $('cs-line-toggle');
-    const input  = $('cs-line-userid');
-    const status = $('cs-line-status');
-    if (_lineUserId) {
-      // マスキング表示: 先頭4文字 + ... + 末尾3文字
-      const masked = _lineUserId.slice(0, 4) + '...' + _lineUserId.slice(-3);
-      if (toggle) toggle.textContent = `▾ LINE通知 ✅ ${masked}`;
-      if (input)  input.placeholder  = _lineUserId; // 既存IDをプレースホルダーに
-      if (status) { status.textContent = '✅ LINE通知 有効'; status.className = 'cs-line-status ok'; }
-    } else {
-      if (toggle) toggle.textContent = '▸ LINE通知を設定する（スタミナ・日課リセット）';
-      if (input)  input.placeholder  = 'Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
-      if (status && status.textContent === '✅ LINE通知 有効') status.textContent = '';
-    }
-  }
-
   function bindEvents() {
     // タブ
     document.querySelectorAll('.tab-btn').forEach(btn =>
@@ -1367,11 +1349,6 @@ const UI = (() => {
       hide('idle-reward');
       updateResourceBar();
       HomeTab.update();
-    });
-
-    // 保存
-    $('save-btn')?.addEventListener('click', () => {
-      if (Game.save()) showTemp('save-confirm', 2000);
     });
 
     // バトル結果閉じる
@@ -1449,43 +1426,6 @@ const UI = (() => {
       if (code && code !== '----') {
         navigator.clipboard?.writeText(code).catch(() => {});
         CloudModal.setStatus('コードをコピーしました ✓', 'ok');
-      }
-    });
-
-    // ─── LINE通知設定 ────────────────────────────────────────────────────────
-    // LINE通知トグル — 開くたびに設定状態を反映
-    $('cs-line-toggle')?.addEventListener('click', () => {
-      const form = $('cs-line-form');
-      form?.classList.toggle('hidden');
-      if (!form?.classList.contains('hidden')) {
-        _refreshLineNotifyUI();
-      }
-    });
-    $('cs-line-save-btn')?.addEventListener('click', async () => {
-      const input  = $('cs-line-userid');
-      const status = $('cs-line-status');
-      const uid = (input?.value || '').trim();
-      if (!uid.startsWith('U') || uid.length < 20) {
-        if (status) { status.textContent = '⚠️ 正しいUser IDを入力してください（Uから始まる文字列）'; status.className = 'cs-line-status error'; }
-        return;
-      }
-      _lineUserId = uid;
-      localStorage.setItem(LINE_UID_KEY, uid);
-      if (status) { status.textContent = '⏳ テスト通知を送信中...'; status.className = 'cs-line-status'; }
-      // テスト通知を送って確認
-      try {
-        const r = await fetch(LINE_NOTIFY_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: uid, event: 'custom', message: '✅ まほうの庭のLINE通知を設定しました！スタミナ満タン・日課リセット時にお知らせします🌸' }),
-        });
-        if (r.ok) {
-          if (status) { status.textContent = '✅ 連携完了！LINEにテスト通知を送りました'; status.className = 'cs-line-status ok'; }
-        } else {
-          if (status) { status.textContent = '⚠️ 設定は保存しましたが通知送信に失敗しました'; status.className = 'cs-line-status error'; }
-        }
-      } catch(_) {
-        if (status) { status.textContent = '✅ 設定を保存しました（オフライン）'; status.className = 'cs-line-status ok'; }
       }
     });
 
