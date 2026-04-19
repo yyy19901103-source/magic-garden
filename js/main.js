@@ -114,6 +114,14 @@ const UI = (() => {
     renderDashboard() {
       const el = $('home-dashboard');
       if (!el) return;
+
+      // クラウドセーブ未設定バナー
+      const banner = $('cloud-save-banner');
+      if (banner) {
+        const dismissed = sessionStorage.getItem('cloud_banner_dismissed') === '1';
+        banner.classList.toggle('hidden', Storage.isConfigured() || dismissed);
+      }
+
       const state   = Game.getState();
       const cleared = state.progress.clearedStages.length;
       const total   = getAllStageIds().length;
@@ -188,7 +196,17 @@ const UI = (() => {
       const el = $('daily-tasks');
       if (!el) return;
       el.innerHTML = '';
-      Game.getDailyTasks().forEach(task => {
+      const tasks = Game.getDailyTasks();
+
+      // 達成率バッジ更新
+      const badge = $('daily-badge');
+      if (badge) {
+        const claimed = tasks.filter(t => t.isClaimed).length;
+        badge.textContent = `${claimed}/${tasks.length}`;
+        badge.classList.toggle('badge-complete', claimed === tasks.length);
+      }
+
+      tasks.forEach(task => {
         const div = document.createElement('div');
         div.className = `daily-task ${task.isClaimed ? 'done' : ''}`;
         const hasProgress = task.id === 'battle' || task.id === 'boss';
@@ -1390,6 +1408,13 @@ const UI = (() => {
         navigator.clipboard?.writeText(code).catch(() => {});
         CloudModal.setStatus('コードをコピーしました ✓', 'ok');
       }
+    });
+
+    // クラウドセーブバナー
+    $('cloud-banner-setup')?.addEventListener('click', () => CloudModal.open());
+    $('cloud-banner-dismiss')?.addEventListener('click', () => {
+      $('cloud-save-banner')?.classList.add('hidden');
+      sessionStorage.setItem('cloud_banner_dismissed', '1');
     });
 
     // 副将フィルターバー
