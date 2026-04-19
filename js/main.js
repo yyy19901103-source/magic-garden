@@ -498,7 +498,8 @@ const UI = (() => {
 
       const logEl = $('result-log');
       logEl.innerHTML = '';
-      BattleEngine.extractHighlights(result.log, 7).forEach((entry, i) => {
+      const highlights = BattleEngine.extractHighlights(result.log, 7);
+      highlights.forEach((entry, i) => {
         setTimeout(() => {
           const div = document.createElement('div');
           div.className = `log-entry anim-fadein ${entry.isSkill?'log-skill':''} ${entry.type==='result'?'log-result':''}`;
@@ -507,6 +508,50 @@ const UI = (() => {
           logEl.scrollTop = logEl.scrollHeight;
         }, i * 130);
       });
+
+      // 全ログトグル（ハイライト以外のエントリがある場合のみ表示）
+      const toggleBtn = $('result-log-toggle');
+      if (toggleBtn) {
+        const hasMore = result.log.length > highlights.length;
+        if (hasMore) {
+          toggleBtn.classList.remove('hidden');
+          toggleBtn.classList.remove('open');
+          toggleBtn.textContent = `📜 全ログを見る（${result.log.length}行） ▼`;
+          // 重複バインド防止のためクローン置換
+          const fresh = toggleBtn.cloneNode(true);
+          toggleBtn.replaceWith(fresh);
+          let expanded = false;
+          fresh.addEventListener('click', () => {
+            expanded = !expanded;
+            fresh.classList.toggle('open', expanded);
+            fresh.textContent = expanded
+              ? '📜 折りたたむ ▲'
+              : `📜 全ログを見る（${result.log.length}行） ▼`;
+            if (expanded) {
+              // 全エントリを追記
+              logEl.innerHTML = '';
+              result.log.forEach(entry => {
+                const div = document.createElement('div');
+                div.className = `log-entry ${entry.isSkill?'log-skill':''} ${entry.type==='result'?'log-result':''}`;
+                div.textContent = entry.text;
+                logEl.appendChild(div);
+              });
+              logEl.scrollTop = logEl.scrollHeight;
+            } else {
+              // ハイライトに戻す
+              logEl.innerHTML = '';
+              highlights.forEach(entry => {
+                const div = document.createElement('div');
+                div.className = `log-entry ${entry.isSkill?'log-skill':''} ${entry.type==='result'?'log-result':''}`;
+                div.textContent = entry.text;
+                logEl.appendChild(div);
+              });
+            }
+          });
+        } else {
+          toggleBtn.classList.add('hidden');
+        }
+      }
 
       // 再挑戦ボタン（通常ステージの勝利時のみ）
       const retryBtn = $('result-retry');
@@ -796,7 +841,23 @@ const UI = (() => {
 
     update() {
       const pity = Game.getState().progress.gachaPity;
-      $('pity-count') && ($('pity-count').textContent = `天井まで: ${90 - pity}回`);
+      const CEIL = 90;
+      const pct  = Math.round(pity / CEIL * 100);
+      // 天井ゲージ更新
+      const cntEl = $('pity-count');
+      if (cntEl) cntEl.textContent = `残り${CEIL - pity}回`;
+      const drawnEl = $('pity-drawn');
+      if (drawnEl) drawnEl.textContent = `${pity}回消化`;
+      const barEl = $('pity-bar');
+      if (barEl) {
+        barEl.style.width = pct + '%';
+        // 残り少なくなるほど赤みが増すグラデーション
+        barEl.style.background = pct >= 80
+          ? 'linear-gradient(90deg,#f59e0b,#ef4444)'
+          : pct >= 50
+            ? 'linear-gradient(90deg,var(--primary),#f59e0b)'
+            : 'linear-gradient(90deg,var(--primary),#ec4899)';
+      }
       this.renderShop();
       this.renderEquipInventory();
       this.renderMaterials();
@@ -1254,7 +1315,12 @@ const UI = (() => {
     });
 
     // バトル結果閉じる
-    $('result-close')?.addEventListener('click', () => hide('battle-result'));
+    $('result-close')?.addEventListener('click', () => {
+      hide('battle-result');
+      // ログトグルをリセット
+      const tog = $('result-log-toggle');
+      if (tog) { tog.classList.add('hidden'); tog.classList.remove('open'); }
+    });
 
     // 章タブ（data-chapter / data-boss で判定）
     document.querySelectorAll('.chapter-tab').forEach(btn => {
