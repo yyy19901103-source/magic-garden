@@ -737,6 +737,9 @@ const UI = (() => {
   // ═══════════════════════════════════════════════════════════════════════════
 
   const GachaTab = {
+    _equipFilter: 'all',
+    _equipSort:   'rarity',
+
     update() {
       const pity = Game.getState().progress.gachaPity;
       $('pity-count') && ($('pity-count').textContent = `天井まで: ${90 - pity}回`);
@@ -744,6 +747,11 @@ const UI = (() => {
       this.renderEquipInventory();
       this.renderMaterials();
       this.updateButtons();
+      // フィルターボタンの状態を同期
+      document.querySelectorAll('.equip-filter-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.type === this._equipFilter));
+      const sel = $('equip-sort-sel');
+      if (sel) sel.value = this._equipSort;
     },
 
     updateButtons() {
@@ -870,11 +878,39 @@ const UI = (() => {
     renderEquipInventory() {
       const el = $('equip-inventory');
       if (!el) return;
-      const equips = Game.getState().inventory.equipment;
+      let equips = Game.getState().inventory.equipment;
       if (equips.length === 0) {
         el.innerHTML = '<p class="empty-msg">装備がありません。バトルで入手しよう！</p>';
         return;
       }
+
+      // フィルター
+      const filterType = this._equipFilter;
+      if (filterType !== 'all') {
+        equips = equips.filter(inst => {
+          const ed = EQUIPMENT_DATA[inst.defId];
+          return ed && ed.type === filterType;
+        });
+      }
+
+      // ソート
+      const rarityOrder = { SSR: 0, SR: 1, R: 2 };
+      if (this._equipSort === 'rarity') {
+        equips = equips.slice().sort((a, b) => {
+          const ra = rarityOrder[EQUIPMENT_DATA[a.defId]?.rarity] ?? 9;
+          const rb = rarityOrder[EQUIPMENT_DATA[b.defId]?.rarity] ?? 9;
+          return ra - rb || b.enhanceLevel - a.enhanceLevel;
+        });
+      } else if (this._equipSort === 'enhance') {
+        equips = equips.slice().sort((a, b) => b.enhanceLevel - a.enhanceLevel);
+      }
+      // 'new'はデフォルト順（追加順）
+
+      if (equips.length === 0) {
+        el.innerHTML = '<p class="empty-msg">この種類の装備はありません</p>';
+        return;
+      }
+
       el.innerHTML = '';
       equips.forEach(inst => {
         const ed = EQUIPMENT_DATA[inst.defId];
@@ -1230,6 +1266,20 @@ const UI = (() => {
       btn.addEventListener('click', () => CloudModal._setBackend(btn.dataset.backend));
     });
 
+    // 装備フィルターバー
+    document.querySelectorAll('.equip-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        GachaTab._equipFilter = btn.dataset.type;
+        document.querySelectorAll('.equip-filter-btn').forEach(b =>
+          b.classList.toggle('active', b === btn));
+        GachaTab.renderEquipInventory();
+      });
+    });
+    $('equip-sort-sel')?.addEventListener('change', e => {
+      GachaTab._equipSort = e.target.value;
+      GachaTab.renderEquipInventory();
+    });
+
     // Firebase Auth ボタン群
     $('firebase-config-apply')?.addEventListener('click', () => CloudModal.applyFirebaseConfig());
     $('auth-login-btn')?.addEventListener('click',    () => CloudModal.loginWithEmail());
@@ -1494,6 +1544,57 @@ const UI = (() => {
     });
   }
 
+  // ─── スワイプタブ切替 ─────────────────────────────────────────────────────
+
+  function setupSwipeTabs() {
+    const content = document.querySelector('.tab-content');
+    if (!content || !('ontouchstart' in window)) return;
+
+    const TABS = ['home', 'adventure', 'generals', 'gacha', 'zukan'];
+    let startX = 0, startY = 0;
+
+    // ヒント表示用（1回だけ）
+    let hintShown = false;
+    function showSwipeHint(label) {
+      if (hintShown) return;
+      hintShown = true;
+      let hint = document.getElementById('swipe-hint');
+      if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'swipe-hint';
+        hint.className = 'swipe-hint';
+        document.body.appendChild(hint);
+      }
+      hint.textContent = label;
+      hint.classList.add('show');
+      setTimeout(() => hint.classList.remove('show'), 900);
+    }
+
+    content.addEventListener('touchstart', e => {
+      startX = e.changedTouches[0].clientX;
+      startY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    content.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      // 縦スクロールが横より大きければ無視
+      if (Math.abs(dy) > Math.abs(dx) * 0.8) return;
+      if (Math.abs(dx) < 55) return;
+
+      const curBtn = document.querySelector('.tab-btn.active');
+      const curTab = curBtn?.dataset.tab;
+      const idx    = TABS.indexOf(curTab);
+      if (dx < 0 && idx < TABS.length - 1) {
+        switchTab(TABS[idx + 1]);
+        showSwipeHint('→ ' + TABS[idx + 1]);
+      } else if (dx > 0 && idx > 0) {
+        switchTab(TABS[idx - 1]);
+        showSwipeHint('← ' + TABS[idx - 1]);
+      }
+    }, { passive: true });
+  }
+
   // ─── 自動保存設定 ────────────────────────────────────────────────────────
 
   function setupAutoSave() {
@@ -1544,9 +1645,10 @@ const UI = (() => {
 
       BGM.init();  // 最初のクリックで自動起動
 
-      // 同期インジケーター & 自動保存
+      // 同期インジケーター & 自動保存 & スワイプタブ
       initSyncIndicator();
       setupAutoSave();
+      setupSwipeTabs();
 
       // Firebase Auto-Init（設定済みの場合）
       FirebaseAuth.autoInit().then(ok => {

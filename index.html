@@ -190,6 +190,17 @@
       <!-- 装備倉庫 -->
       <section class="home-section">
         <h3 class="section-label">🎒 装備倉庫</h3>
+        <div class="equip-filter-bar" id="equip-filter-bar">
+          <button class="equip-filter-btn active" data-type="all">全部</button>
+          <button class="equip-filter-btn" data-type="weapon">⚔️武器</button>
+          <button class="equip-filter-btn" data-type="armor">🛡️防具</button>
+          <button class="equip-filter-btn" data-type="accessory">💍装飾</button>
+          <select id="equip-sort-sel" class="equip-sort-sel">
+            <option value="rarity">レア度順</option>
+            <option value="enhance">強化順</option>
+            <option value="new">新着順</option>
+          </select>
+        </div>
         <div id="equip-inventory" class="equip-list"></div>
       </section>
 
@@ -332,15 +343,15 @@
 </div>
 
 <!-- JS 読み込み順序は依存関係を考慮 -->
-<script src="js/generals_data.js?v=6"></script>
-<script src="js/stages_data.js?v=6"></script>
-<script src="js/battle_engine.js?v=6"></script>
-<script src="js/bgm.js?v=6"></script>
-<script src="js/firebase_auth.js?v=6"></script>
-<script src="js/storage.js?v=6"></script>
-<script src="js/idle.js?v=6"></script>
-<script src="js/game.js?v=6"></script>
-<script src="js/main.js?v=6"></script>
+<script src="js/generals_data.js?v=7"></script>
+<script src="js/stages_data.js?v=7"></script>
+<script src="js/battle_engine.js?v=7"></script>
+<script src="js/bgm.js?v=7"></script>
+<script src="js/firebase_auth.js?v=7"></script>
+<script src="js/storage.js?v=7"></script>
+<script src="js/idle.js?v=7"></script>
+<script src="js/game.js?v=7"></script>
+<script src="js/main.js?v=7"></script>
 
 </body>
 </html>
