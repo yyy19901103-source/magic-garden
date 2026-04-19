@@ -822,6 +822,16 @@ const Game = (() => {
     });
   }
 
+  // ─── プレイヤー名 ────────────────────────────────────────────────────────
+
+  function setPlayerName(name) {
+    name = (name || '').trim().slice(0, 12);
+    if (!name) return { success: false, reason: 'empty' };
+    state.player.name = name;
+    save();
+    return { success: true, name };
+  }
+
   // ─── ユーティリティ ──────────────────────────────────────────────────────
 
   function _randInt(min, max) { return Math.floor(min + Math.random() * (max - min + 1)); }
@@ -846,6 +856,7 @@ const Game = (() => {
     getState, getGeneralDef, getAllGeneralDefs,
     getCharStats, getFormationTeam,
     getIdleRate, calcTeamPower,
-    expToNext, levelUpCost
+    expToNext, levelUpCost,
+    setPlayerName
   };
 })();

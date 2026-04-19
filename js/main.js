@@ -22,6 +22,13 @@ const UI = (() => {
       </div>`;
   }
 
+  // ─── プレイヤー名表示 ────────────────────────────────────────────────────
+
+  function updatePlayerName() {
+    const el = $('player-name');
+    if (el) el.textContent = Game.getState().player.name || 'まほうつかい';
+  }
+
   // ─── リソースバー更新（全タブ共通） ────────────────────────────────────
 
   function updateResourceBar() {
@@ -763,14 +770,19 @@ const UI = (() => {
     showGachaResult(results) {
       const el = $('gacha-result-cards');
       el.innerHTML = '';
-      results.forEach(({ def, isNew }) => {
+      results.forEach(({ def, isNew }, i) => {
         const card = document.createElement('div');
-        card.className = `gacha-card rarity-${def.rarity}`;
+        card.className = `gacha-card rarity-${def.rarity} card-reveal-hidden`;
         card.innerHTML = `
           ${makePortrait(def,'md')}
           <div class="gacha-card-name">${def.name}</div>
           <div class="gacha-card-sub">${isNew ? '🆕 NEW！' : `✨ 欠片 +5`}</div>`;
         el.appendChild(card);
+        // 1枚ずつずらして回転リビール
+        setTimeout(() => {
+          card.classList.remove('card-reveal-hidden');
+          if (def.rarity === 'SSR') card.classList.add('card-revealed');
+        }, 60 + i * 110);
       });
       show('gacha-result');
     },
@@ -1107,6 +1119,36 @@ const UI = (() => {
     // タブ
     document.querySelectorAll('.tab-btn').forEach(btn =>
       btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+    // プレイヤー名編集
+    $('btn-edit-name')?.addEventListener('click', () => {
+      const nameEl = $('player-name');
+      if (!nameEl || nameEl.tagName === 'INPUT') return;  // 二重クリック防止
+      const current = nameEl.textContent;
+      const input = document.createElement('input');
+      input.className = 'player-name-input';
+      input.value     = current;
+      input.maxLength = 12;
+      nameEl.replaceWith(input);
+      input.focus();
+      input.select();
+      let saved = false;
+      const commit = () => {
+        if (saved) return;
+        saved = true;
+        const newName = input.value.trim() || current;
+        Game.setPlayerName(newName);
+        const span = document.createElement('span');
+        span.id = 'player-name';
+        span.textContent = newName;
+        input.replaceWith(span);
+      };
+      input.addEventListener('blur', commit, { once: true });
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter')  { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') { input.value = current; input.blur(); }
+      });
+    });
 
     // 放置報酬受取
     $('collect-btn')?.addEventListener('click', () => {
@@ -1493,6 +1535,7 @@ const UI = (() => {
       $('screen-game')?.classList.add('active');
 
       updateResourceBar();
+      updatePlayerName();
       HomeTab.update();
 
       if (Storage.isConfigured()) {

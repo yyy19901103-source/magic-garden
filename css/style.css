@@ -1053,3 +1053,41 @@ body {
 .rarity-SR.zukan-equip  { border-left: 3px solid var(--sr); }
 .rarity-SSR.zukan-equip { border-left: 3px solid var(--ssr); }
 .zukan-unknown.zukan-equip { opacity: .45; }
+
+/* ─── プレイヤー名編集 ──────────────────────────────────────────────────────── */
+
+.hd-player { display: flex; align-items: center; gap: 4px; }
+.btn-edit-name {
+  background: none; border: none; cursor: pointer;
+  font-size: 11px; line-height: 1; padding: 2px;
+  opacity: 0; transition: opacity .2s;
+  color: inherit;
+}
+.hd-player:hover .btn-edit-name { opacity: .55; }
+.btn-edit-name:hover { opacity: 1 !important; }
+.player-name-input {
+  background: transparent; border: none;
+  border-bottom: 1.5px solid var(--primary);
+  color: var(--text); font-size: 12px; font-family: inherit; font-weight: bold;
+  outline: none; text-align: center; width: 100px; padding: 2px 0;
+}
+
+/* ─── ガチャカードフリップ ────────────────────────────────────────────────── */
+
+.gacha-result-grid { perspective: 600px; }
+.gacha-card {
+  transform-origin: center;
+  transition: transform .45s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+}
+.gacha-card.card-reveal-hidden {
+  transform: rotateY(90deg) scale(.7);
+  opacity: 0;
+}
+.gacha-card.rarity-SSR.card-revealed {
+  animation: ssrGlow .6s ease .1s both;
+}
+@keyframes ssrGlow {
+  0%   { box-shadow: 0 0 0 rgba(255,215,0,0); }
+  50%  { box-shadow: 0 0 22px rgba(255,215,0,.8); }
+  100% { box-shadow: 0 0 12px rgba(255,215,0,.4); }
+}
