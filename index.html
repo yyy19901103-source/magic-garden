@@ -28,6 +28,7 @@
       <span class="res-coins">🪙 <span id="coins">0</span></span>
       <span class="res-crystals">💎 <span id="crystals">0</span></span>
       <span class="res-stamina" id="stamina-display">⚡ 30/30</span>
+      <span id="stamina-timer" class="stamina-timer hidden"></span>
     </div>
     <div class="hd-player">
       <span id="player-name">まほうつかい</span>
@@ -151,6 +152,13 @@
       <!-- 所持副将 -->
       <section class="home-section">
         <h3 class="section-label">👥 所持副将 <span id="generals-count"></span></h3>
+        <div class="generals-filter-bar" id="generals-filter-bar">
+          <input id="generals-search" class="generals-search" type="search" placeholder="🔍 名前で検索">
+          <button class="rarity-filter-btn active" data-rarity="all">全部</button>
+          <button class="rarity-filter-btn" data-rarity="SSR" style="color:var(--ssr)">SSR</button>
+          <button class="rarity-filter-btn" data-rarity="SR"  style="color:var(--sr)">SR</button>
+          <button class="rarity-filter-btn" data-rarity="R">R</button>
+        </div>
         <div id="generals-grid" class="generals-grid"></div>
       </section>
 
@@ -343,15 +351,15 @@
 </div>
 
 <!-- JS 読み込み順序は依存関係を考慮 -->
-<script src="js/generals_data.js?v=7"></script>
-<script src="js/stages_data.js?v=7"></script>
-<script src="js/battle_engine.js?v=7"></script>
-<script src="js/bgm.js?v=7"></script>
-<script src="js/firebase_auth.js?v=7"></script>
-<script src="js/storage.js?v=7"></script>
-<script src="js/idle.js?v=7"></script>
-<script src="js/game.js?v=7"></script>
-<script src="js/main.js?v=7"></script>
+<script src="js/generals_data.js?v=8"></script>
+<script src="js/stages_data.js?v=8"></script>
+<script src="js/battle_engine.js?v=8"></script>
+<script src="js/bgm.js?v=8"></script>
+<script src="js/firebase_auth.js?v=8"></script>
+<script src="js/storage.js?v=8"></script>
+<script src="js/idle.js?v=8"></script>
+<script src="js/game.js?v=8"></script>
+<script src="js/main.js?v=8"></script>
 
 </body>
 </html>

@@ -1092,6 +1092,41 @@ body {
   100% { box-shadow: 0 0 12px rgba(255,215,0,.4); }
 }
 
+/* ─── スタミナ回復タイマー ──────────────────────────────────────────────── */
+
+.stamina-timer {
+  font-size: 10px; color: var(--text-dim);
+  background: rgba(255,255,255,.06);
+  border-radius: 99px; padding: 1px 7px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+/* ─── 副将フィルターバー ─────────────────────────────────────────────────── */
+
+.generals-filter-bar {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.generals-search {
+  flex: 1; min-width: 0; max-width: 160px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); border-radius: 99px; padding: 5px 12px;
+  font-size: 12px; font-family: inherit; outline: none;
+}
+.generals-search:focus { border-color: var(--primary); }
+.rarity-filter-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-mid); border-radius: 99px; padding: 4px 10px;
+  font-size: 11px; font-weight: bold; font-family: inherit; cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.rarity-filter-btn:hover { border-color: var(--primary); }
+.rarity-filter-btn.active {
+  background: var(--primary-lt); border-color: var(--primary);
+  color: var(--primary);
+}
+
 /* ─── 装備フィルターバー ────────────────────────────────────────────────── */
 
 .equip-filter-bar {

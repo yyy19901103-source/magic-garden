@@ -31,6 +31,36 @@ const UI = (() => {
 
   // ─── リソースバー更新（全タブ共通） ────────────────────────────────────
 
+  // スタミナ秒単位タイマー用
+  let _staminaTimerIv = null;
+
+  function _fmtSec(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${String(sec).padStart(2,'0')}`;
+  }
+
+  function _updateStaminaTimer() {
+    const timerEl = $('stamina-timer');
+    if (!timerEl) return;
+    const st = Game.getStamina();
+    if (st.current >= st.max) {
+      timerEl.classList.add('hidden');
+      timerEl.textContent = '';
+      if (_staminaTimerIv) { clearInterval(_staminaTimerIv); _staminaTimerIv = null; }
+      return;
+    }
+    timerEl.classList.remove('hidden');
+    const toFull = st.secsToFull;
+    if (toFull > 0) {
+      const h = Math.floor(toFull / 3600);
+      const remain = toFull % 3600;
+      timerEl.textContent = h > 0
+        ? `満タン ${h}h${_fmtSec(remain)}`
+        : `満タン ${_fmtSec(remain)}`;
+    }
+  }
+
   function updateResourceBar() {
     const r = Game.getState().resources;
     $('coins').textContent    = Math.floor(r.coins).toLocaleString();
@@ -43,9 +73,14 @@ const UI = (() => {
         <span class="st-label">⚡ ${st.current}/${st.max}</span>
         <span class="st-bar-wrap"><span class="st-bar-fill" style="width:${pct}%"></span></span>`;
       stEl.title = st.current < st.max
-        ? `${st.nextRegenMin}分後に+1回復`
+        ? `次回+1まで${st.nextRegenMin}分`
         : '満タン！';
       stEl.classList.toggle('stamina-low', st.current <= 5);
+    }
+    // タイマー即時更新 & 定期更新セットアップ
+    _updateStaminaTimer();
+    if (st.current < st.max && !_staminaTimerIv) {
+      _staminaTimerIv = setInterval(_updateStaminaTimer, 1000);
     }
   }
 
@@ -499,9 +534,17 @@ const UI = (() => {
   // ═══════════════════════════════════════════════════════════════════════════
 
   const GeneralsTab = {
+    _nameFilter:   '',
+    _rarityFilter: 'all',
+
     update() {
       this.renderFormationEditor();
       this.renderGrid();
+      // フィルター状態の同期
+      const searchEl = $('generals-search');
+      if (searchEl) searchEl.value = this._nameFilter;
+      document.querySelectorAll('.rarity-filter-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.rarity === this._rarityFilter));
     },
 
     renderFormationEditor() {
@@ -532,16 +575,27 @@ const UI = (() => {
       if (!el) return;
       const state = Game.getState();
       const inFormation = state.formation;
-      el.innerHTML = '';
       const total = Object.keys(state.generals).length;
       $('generals-count') && ($('generals-count').textContent = `(${total}体)`);
 
       // SSR→SR→R 順にソート
       const order = { SSR: 0, SR: 1, R: 2 };
-      const sorted = Object.keys(state.generals).sort((a, b) => {
+      let sorted = Object.keys(state.generals).sort((a, b) => {
         const da = GENERALS_DATA[a], db = GENERALS_DATA[b];
         return (order[da.rarity] - order[db.rarity]) || (state.generals[b].level - state.generals[a].level);
       });
+
+      // フィルター適用
+      const nameQ  = (this._nameFilter || '').trim().toLowerCase();
+      const rarQ   = this._rarityFilter;
+      if (nameQ) {
+        sorted = sorted.filter(gid => GENERALS_DATA[gid]?.name.toLowerCase().includes(nameQ));
+      }
+      if (rarQ && rarQ !== 'all') {
+        sorted = sorted.filter(gid => GENERALS_DATA[gid]?.rarity === rarQ);
+      }
+
+      el.innerHTML = '';
 
       sorted.forEach(gid => {
         const def   = GENERALS_DATA[gid];
@@ -1264,6 +1318,20 @@ const UI = (() => {
     // バックエンドタブ切替
     document.querySelectorAll('.cloud-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => CloudModal._setBackend(btn.dataset.backend));
+    });
+
+    // 副将フィルターバー
+    $('generals-search')?.addEventListener('input', e => {
+      GeneralsTab._nameFilter = e.target.value;
+      GeneralsTab.renderGrid();
+    });
+    document.querySelectorAll('.rarity-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        GeneralsTab._rarityFilter = btn.dataset.rarity;
+        document.querySelectorAll('.rarity-filter-btn').forEach(b =>
+          b.classList.toggle('active', b === btn));
+        GeneralsTab.renderGrid();
+      });
     });
 
     // 装備フィルターバー

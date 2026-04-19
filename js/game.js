@@ -190,13 +190,19 @@ const Game = (() => {
   function getStamina() {
     const current = _calcStamina();
     let nextRegenMin = 0;
+    let nextRegenSec = 0;
+    let secsToFull   = 0;
     if (current < STAMINA_MAX) {
       const at = state.resources.staminaAt || new Date().toISOString();
-      const elapsedMin = (Date.now() - new Date(at).getTime()) / 60000;
-      const done = Math.floor(elapsedMin / STAMINA_REGEN);
-      nextRegenMin = Math.max(1, Math.ceil((done + 1) * STAMINA_REGEN - elapsedMin));
+      const elapsedMs  = Date.now() - new Date(at).getTime();
+      const regenMs    = STAMINA_REGEN * 60 * 1000;
+      const done       = Math.floor(elapsedMs / regenMs);
+      const nextMs     = (done + 1) * regenMs - elapsedMs;
+      nextRegenSec = Math.max(1, Math.ceil(nextMs / 1000));
+      nextRegenMin = Math.ceil(nextRegenSec / 60);
+      secsToFull   = nextRegenSec + (STAMINA_MAX - current - 1) * STAMINA_REGEN * 60;
     }
-    return { current, max: STAMINA_MAX, nextRegenMin };
+    return { current, max: STAMINA_MAX, nextRegenMin, nextRegenSec, secsToFull };
   }
 
   function consumeStamina(amount) {
