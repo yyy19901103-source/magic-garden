@@ -1175,16 +1175,33 @@ const UI = (() => {
     $('cloud-modal')?.addEventListener('click', e => {
       if (e.target === $('cloud-modal')) hide('cloud-modal');
     });
-    $('cloud-save-btn')?.addEventListener('click',  () => CloudModal.saveConfig());
-    $('cloud-test-btn')?.addEventListener('click',  () => CloudModal.testConnection());
-    $('cloud-pull-btn')?.addEventListener('click',  () => CloudModal.pullData());
+    // 保存ボタン: バックエンド別に処理
+    $('cloud-save-btn')?.addEventListener('click', () => {
+      if (CloudModal._backend === 'gas') CloudModal.saveGasConfig();
+      else CloudModal.setStatus('Firebase は自動保存されます ✓', 'ok');
+    });
+    $('cloud-test-btn')?.addEventListener('click', () => CloudModal.testConnection());
+    $('cloud-pull-btn')?.addEventListener('click', () => CloudModal.pullData());
 
     // バックエンドタブ切替
     document.querySelectorAll('.cloud-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => CloudModal._setBackend(btn.dataset.backend));
     });
-    // Firebase設定手順トグル
-    $('cloud-firebase-guide')?.addEventListener('click', () => CloudModal.toggleFirebaseGuide());
+
+    // Firebase Auth ボタン群
+    $('firebase-config-apply')?.addEventListener('click', () => CloudModal.applyFirebaseConfig());
+    $('auth-login-btn')?.addEventListener('click',    () => CloudModal.loginWithEmail());
+    $('auth-register-btn')?.addEventListener('click', () => CloudModal.registerWithEmail());
+    $('auth-signout-btn')?.addEventListener('click',  () => CloudModal.signOut());
+
+    // Firebase設定フォーム トグル
+    $('firebase-config-toggle')?.addEventListener('click', () => {
+      $('firebase-config-form')?.classList.toggle('hidden');
+    });
+    // メール/PWフォーム トグル
+    $('auth-email-toggle')?.addEventListener('click', () => {
+      $('auth-email-form')?.classList.toggle('hidden');
+    });
   }
 
   // ─── ローディング ────────────────────────────────────────────────────────
@@ -1205,7 +1222,7 @@ const UI = (() => {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // クラウド設定モーダル
+  // クラウド設定モーダル（Firebase Auth + GAS 対応）
   // ═══════════════════════════════════════════════════════════════════════════
 
   const CloudModal = {
@@ -1213,13 +1230,21 @@ const UI = (() => {
 
     open() {
       const cfg = Storage.getConfig();
-      // バックエンド種別をUIに反映
-      this._backend = cfg.type || 'firebase';
+      this._backend = FirebaseAuth.hasConfig() ? 'firebase' : (cfg.type || 'firebase');
       this._setBackend(this._backend);
-      $('cloud-endpoint').value     = cfg.endpoint || '';
-      $('cloud-playerid').value     = cfg.playerId || '';
+      // GAS 既存設定を反映
+      $('cloud-endpoint') && ($('cloud-endpoint').value = cfg.endpoint || '');
+      $('cloud-playerid') && ($('cloud-playerid').value = cfg.playerId || '');
       $('cloud-status').textContent = '';
       $('cloud-status').className   = 'cloud-status';
+      // Firebase 設定済みならconfig表示
+      if (FirebaseAuth.hasConfig()) {
+        const saved = FirebaseAuth.getConfig();
+        if ($('firebase-config-json')) {
+          $('firebase-config-json').value = JSON.stringify(saved, null, 2);
+        }
+      }
+      this._updateAuthStatus();
       show('cloud-modal');
     },
 
@@ -1229,49 +1254,159 @@ const UI = (() => {
         b.classList.toggle('active', b.dataset.backend === type);
       });
       const isFirebase = type === 'firebase';
-      $('cloud-desc-firebase') && ($('cloud-desc-firebase').classList.toggle('hidden', !isFirebase));
-      $('cloud-desc-gas')      && ($('cloud-desc-gas').classList.toggle('hidden', isFirebase));
-      if ($('cloud-endpoint-label'))
-        $('cloud-endpoint-label').textContent = isFirebase
-          ? 'Firebase データベース URL'
-          : 'GAS エンドポイント URL';
-      if ($('cloud-endpoint'))
-        $('cloud-endpoint').placeholder = isFirebase
-          ? 'https://your-project-default-rtdb.firebaseio.com'
-          : 'https://script.google.com/macros/s/.../exec';
+      $('cloud-panel-firebase')?.classList.toggle('hidden', !isFirebase);
+      $('cloud-panel-gas')?.classList.toggle('hidden', isFirebase);
     },
 
-    saveConfig() {
-      const endpoint = $('cloud-endpoint').value.trim();
-      const playerId = $('cloud-playerid').value.trim();
+    _updateAuthStatus() {
+      const icon = $('auth-status-icon');
+      const text = $('auth-status-text');
+      const signOutBtn = $('auth-signout-btn');
+      const emailSection = $('auth-email-section');
+      if (!icon || !text) return;
+
+      if (!FirebaseAuth.hasConfig()) {
+        icon.textContent = '⚪';
+        text.textContent = '未設定 — 下の「Firebase設定」を開いてください';
+        signOutBtn?.classList.add('hidden');
+        emailSection?.classList.add('hidden');
+        return;
+      }
+      if (!FirebaseAuth.isSignedIn()) {
+        icon.textContent = '🟡';
+        text.textContent = '接続中…';
+        return;
+      }
+      if (FirebaseAuth.isAnonymous()) {
+        icon.textContent = '🟢';
+        text.textContent = `匿名ユーザー — ${FirebaseAuth.getUID()?.slice(0,12)}...`;
+        signOutBtn?.classList.remove('hidden');
+        emailSection?.classList.remove('hidden');
+      } else {
+        icon.textContent = '🟢';
+        text.textContent = `✉️ ${FirebaseAuth.getEmail()}`;
+        signOutBtn?.classList.remove('hidden');
+        emailSection?.classList.add('hidden');  // 既にメールログイン済み
+      }
+      $('btn-cloud-settings')?.classList.add('connected');
+    },
+
+    async applyFirebaseConfig() {
+      const jsonStr = $('firebase-config-json')?.value.trim();
+      if (!jsonStr) { this.setStatus('設定JSONを入力してください', 'err'); return; }
+      let cfg;
+      try {
+        cfg = JSON.parse(jsonStr);
+      } catch(_) {
+        this.setStatus('JSONの形式が正しくありません', 'err'); return;
+      }
+      if (!cfg.apiKey || !cfg.databaseURL) {
+        this.setStatus('apiKey と databaseURL が必要です', 'err'); return;
+      }
+      this.setStatus('🔌 Firebase に接続中…', 'info');
+      try {
+        FirebaseAuth.saveConfig(cfg);
+        const ok = await FirebaseAuth.init(cfg);
+        if (!ok) { this.setStatus('Firebase の初期化に失敗しました', 'err'); return; }
+        // 匿名サインイン
+        await FirebaseAuth.signInAnonymously();
+        this.setStatus('✓ 匿名ログイン成功！データは自動保存されます', 'ok');
+        this._updateAuthStatus();
+        // 即バックアップ
+        setTimeout(() => Storage.save(Game.getState()), 500);
+        // フォームを閉じる
+        $('firebase-config-form')?.classList.add('hidden');
+      } catch(e) {
+        this.setStatus(`エラー: ${e.message}`, 'err');
+      }
+    },
+
+    async loginWithEmail() {
+      const email    = $('auth-email')?.value.trim();
+      const password = $('auth-password')?.value;
+      if (!email || !password) { this.setStatus('メールとパスワードを入力してください', 'err'); return; }
+      this.setStatus('🔑 ログイン中…', 'info');
+      try {
+        if (FirebaseAuth.isAnonymous()) {
+          // 匿名 → メール昇格（データ引き継ぎ）
+          await FirebaseAuth.linkToEmail(email, password);
+          this.setStatus('✓ アカウントを紐付けました！データが引き継がれました', 'ok');
+        } else {
+          await FirebaseAuth.signInWithEmail(email, password);
+          this.setStatus('✓ ログインしました', 'ok');
+          // クラウドからデータ読込
+          const data = await Storage.pullFromCloud();
+          if (data) { Game.init(data); updateResourceBar(); HomeTab.update(); }
+        }
+        this._updateAuthStatus();
+        $('auth-email-form')?.classList.add('hidden');
+      } catch(e) {
+        // パスワード誤りなど
+        const msg = e.code === 'auth/wrong-password'    ? 'パスワードが違います'
+                  : e.code === 'auth/user-not-found'    ? 'ユーザーが見つかりません'
+                  : e.code === 'auth/email-already-in-use' ? 'このメールは登録済みです'
+                  : e.message;
+        this.setStatus(`✗ ${msg}`, 'err');
+      }
+    },
+
+    async registerWithEmail() {
+      const email    = $('auth-email')?.value.trim();
+      const password = $('auth-password')?.value;
+      if (!email || !password) { this.setStatus('メールとパスワードを入力してください', 'err'); return; }
+      if (password.length < 6) { this.setStatus('パスワードは6文字以上にしてください', 'err'); return; }
+      this.setStatus('📝 アカウント作成中…', 'info');
+      try {
+        if (FirebaseAuth.isAnonymous()) {
+          await FirebaseAuth.linkToEmail(email, password);
+          this.setStatus('✓ アカウント作成 & データ引き継ぎ完了！', 'ok');
+        } else {
+          await FirebaseAuth.createAccount(email, password);
+          this.setStatus('✓ アカウントを作成しました', 'ok');
+        }
+        this._updateAuthStatus();
+        Storage.save(Game.getState());
+        $('auth-email-form')?.classList.add('hidden');
+      } catch(e) {
+        const msg = e.code === 'auth/email-already-in-use' ? 'このメールはすでに登録されています'
+                  : e.code === 'auth/weak-password' ? 'パスワードが弱すぎます'
+                  : e.message;
+        this.setStatus(`✗ ${msg}`, 'err');
+      }
+    },
+
+    async signOut() {
+      await FirebaseAuth.signOut();
+      this._updateAuthStatus();
+      this.setStatus('ログアウトしました', 'info');
+    },
+
+    // GAS用
+    saveGasConfig() {
+      const endpoint = $('cloud-endpoint')?.value.trim();
+      const playerId = $('cloud-playerid')?.value.trim();
       if (!endpoint || !playerId) {
         this.setStatus('URLとプレイヤーIDを入力してください', 'err'); return;
       }
-      Storage.setConfig(endpoint, playerId, this._backend);
-      $('btn-cloud-settings').classList.add('connected');
-      this.setStatus('✓ 設定を保存しました。クラウドに保存中…', 'ok');
-      // 現在のセーブをクラウドに即バックアップ
+      Storage.setConfig(endpoint, playerId, 'gas');
+      $('btn-cloud-settings')?.classList.add('connected');
+      this.setStatus('✓ GAS設定を保存しました', 'ok');
       Storage.save(Game.getState());
     },
 
     async testConnection() {
-      const endpoint = $('cloud-endpoint').value.trim();
-      if (!endpoint) { this.setStatus('URLを入力してください', 'err'); return; }
       this.setStatus('🔌 接続確認中…', 'info');
-      const ok = await Storage.ping(endpoint, this._backend);
-      this.setStatus(
-        ok ? '✓ 接続成功！' : '✗ 接続失敗（URLを確認してください）',
-        ok ? 'ok' : 'err'
-      );
+      let ok;
+      if (this._backend === 'firebase' && FirebaseAuth.isReady()) {
+        ok = await FirebaseAuth.ping();
+      } else {
+        const endpoint = $('cloud-endpoint')?.value.trim() || Storage.getConfig().endpoint;
+        ok = await Storage.ping(endpoint, this._backend);
+      }
+      this.setStatus(ok ? '✓ 接続成功！' : '✗ 接続失敗（設定を確認してください）', ok ? 'ok' : 'err');
     },
 
     async pullData() {
-      const endpoint = $('cloud-endpoint').value.trim();
-      const playerId = $('cloud-playerid').value.trim();
-      if (!endpoint || !playerId) {
-        this.setStatus('URLとプレイヤーIDを入力してください', 'err'); return;
-      }
-      Storage.setConfig(endpoint, playerId, this._backend);
       this.setStatus('📥 クラウドから読み込み中…', 'info');
       const data = await Storage.pullFromCloud();
       if (data) {
@@ -1285,13 +1420,9 @@ const UI = (() => {
       }
     },
 
-    toggleFirebaseGuide() {
-      const el = $('cloud-firebase-steps');
-      if (el) el.classList.toggle('hidden');
-    },
-
     setStatus(msg, type = '') {
       const el = $('cloud-status');
+      if (!el) return;
       el.textContent = msg;
       el.className = `cloud-status ${type}`;
     }
@@ -1373,6 +1504,20 @@ const UI = (() => {
       // 同期インジケーター & 自動保存
       initSyncIndicator();
       setupAutoSave();
+
+      // Firebase Auto-Init（設定済みの場合）
+      FirebaseAuth.autoInit().then(ok => {
+        if (ok) {
+          // 匿名サインインされていなければ自動サインイン
+          FirebaseAuth.onAuthChange(async user => {
+            if (ok && !user) {
+              try { await FirebaseAuth.signInAnonymously(); } catch(_) {}
+            }
+            // Auth状態変化 → sync indicator 更新
+            if (user) $('btn-cloud-settings')?.classList.add('connected');
+          });
+        }
+      });
 
       if (idleEarned > 0) {
         $('idle-reward-text').textContent = `🪙 ${idleEarned.toLocaleString()} コインを集めておいたよ！`;

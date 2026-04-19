@@ -235,48 +235,80 @@
   <div class="popup-card cloud-modal-card">
     <h3 class="popup-title">☁️ クラウド設定</h3>
 
-    <!-- バックエンド選択 -->
+    <!-- バックエンド選択タブ -->
     <div class="cloud-backend-tabs">
-      <button class="cloud-tab-btn active" data-backend="firebase">🔥 Firebase（推奨）</button>
+      <button class="cloud-tab-btn active" data-backend="firebase">🔥 Firebase Auth（推奨）</button>
       <button class="cloud-tab-btn" data-backend="gas">⚙️ GAS</button>
     </div>
 
-    <!-- Firebase 説明 -->
-    <div id="cloud-desc-firebase" class="cloud-modal-desc">
-      <b>Firebase Realtime Database</b> を使います。<br>
-      無料・PCなし・スマホのみで設定可能・高速です。<br>
-      <a id="cloud-firebase-guide" class="cloud-link" href="#" onclick="return false;">
-        📖 Firebase 設定手順を見る
-      </a>
+    <!-- ════ Firebase Auth タブ ════ -->
+    <div id="cloud-panel-firebase">
+
+      <!-- ログイン状態 -->
+      <div id="auth-status-row" class="auth-status-row">
+        <span id="auth-status-icon" class="auth-status-icon">⚪</span>
+        <span id="auth-status-text" class="auth-status-text">未設定</span>
+        <button id="auth-signout-btn" class="btn-text-link hidden">ログアウト</button>
+      </div>
+
+      <!-- 匿名ユーザー向け: メール/PW昇格 OR 新規ログイン -->
+      <div id="auth-email-section" class="auth-email-section">
+        <button id="auth-email-toggle" class="auth-toggle-btn">
+          📧 メール+パスワードでログイン / 登録 ▼
+        </button>
+        <div id="auth-email-form" class="auth-email-form hidden">
+          <input id="auth-email"    class="cloud-input" type="email"    placeholder="メールアドレス">
+          <input id="auth-password" class="cloud-input" type="password" placeholder="パスワード（6文字以上）" style="margin-top:6px">
+          <div class="cloud-btns" style="margin-top:8px">
+            <button id="auth-login-btn"    class="btn btn-outline">ログイン</button>
+            <button id="auth-register-btn" class="btn btn-outline">新規登録</button>
+          </div>
+          <p class="auth-note">※ 匿名で始めたデータはそのまま引き継がれます</p>
+        </div>
+      </div>
+
+      <!-- Firebase設定（折りたたみ） -->
+      <div class="auth-section-sep"></div>
+      <button id="firebase-config-toggle" class="auth-toggle-btn">
+        ⚙️ Firebase設定（初回のみ） ▼
+      </button>
+      <div id="firebase-config-form" class="auth-email-form hidden">
+        <p class="auth-note">Firebase Console → プロジェクト設定 → マイアプリ → 設定オブジェクトをコピー</p>
+        <textarea id="firebase-config-json" class="cloud-input cloud-textarea"
+                  placeholder='{"apiKey":"...","authDomain":"...","databaseURL":"...","projectId":"..."}'
+                  rows="4"></textarea>
+        <div class="cloud-setup-steps" style="margin:8px 0">
+          <ol class="cloud-steps-list">
+            <li><a href="https://console.firebase.google.com" target="_blank">Firebase Console</a> → プロジェクト作成</li>
+            <li>Authentication → ログイン方法 → <b>メール/パスワード</b> と <b>匿名</b> を有効化</li>
+            <li>Realtime Database → データベースを作成 → テストモード</li>
+            <li>プロジェクト設定 → マイアプリ → <b>SDK設定と構成</b> → 構成をコピー</li>
+            <li>上のテキストエリアに貼り付け → 「設定を適用」</li>
+          </ol>
+        </div>
+        <button id="firebase-config-apply" class="btn btn-primary" style="width:100%">設定を適用してログイン</button>
+      </div>
+
+    </div><!-- /cloud-panel-firebase -->
+
+    <!-- ════ GAS タブ ════ -->
+    <div id="cloud-panel-gas" class="hidden">
+      <p class="cloud-modal-desc">
+        <b>Google Apps Script</b> を使います（既存設定向け）。<br>
+        スプレッドシート不要・PropertiesService で保存。
+      </p>
+      <label class="cloud-label">GAS エンドポイント URL</label>
+      <input id="cloud-endpoint" class="cloud-input" type="url"
+             placeholder="https://script.google.com/macros/s/.../exec">
+      <label class="cloud-label">プレイヤーID <small>（例: player1）</small></label>
+      <input id="cloud-playerid" class="cloud-input" type="text"
+             placeholder="player1" maxlength="32">
     </div>
-    <!-- GAS 説明 -->
-    <div id="cloud-desc-gas" class="cloud-modal-desc hidden">
-      <b>Google Apps Script</b> を使います（既存設定向け）。<br>
-      スプレッドシート不要・PropertiesService で保存。
-    </div>
 
-    <label class="cloud-label" id="cloud-endpoint-label">Firebase データベース URL</label>
-    <input id="cloud-endpoint" class="cloud-input" type="url"
-           placeholder="https://your-project-default-rtdb.firebaseio.com">
-
-    <label class="cloud-label">プレイヤーID <small>（例: player1）</small></label>
-    <input id="cloud-playerid" class="cloud-input" type="text"
-           placeholder="player1" maxlength="32">
-
-    <!-- Firebase設定手順（折りたたみ） -->
-    <div id="cloud-firebase-steps" class="cloud-setup-steps hidden">
-      <ol class="cloud-steps-list">
-        <li><a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → プロジェクト作成</li>
-        <li>「リアルタイムデータベース」→「データベースを作成」</li>
-        <li>ロケーション: asia-southeast1（シンガポール推奨）</li>
-        <li>セキュリティルール → <b>テストモードで開始</b></li>
-        <li>データベースURL（<code>https://…firebaseio.com</code>）をコピーして上に貼り付け</li>
-      </ol>
-    </div>
-
-    <div class="cloud-btns">
+    <!-- 共通ボタン -->
+    <div class="cloud-btns" style="margin-top:12px">
       <button id="cloud-test-btn"  class="btn btn-outline">🔌 接続テスト</button>
-      <button id="cloud-pull-btn"  class="btn btn-outline">📥 クラウドから読込</button>
+      <button id="cloud-pull-btn"  class="btn btn-outline">📥 読込</button>
     </div>
     <div id="cloud-status" class="cloud-status"></div>
 
@@ -297,14 +329,15 @@
 </div>
 
 <!-- JS 読み込み順序は依存関係を考慮 -->
-<script src="js/generals_data.js"></script>
-<script src="js/stages_data.js?v=4"></script>
-<script src="js/battle_engine.js?v=4"></script>
-<script src="js/bgm.js?v=4"></script>
-<script src="js/storage.js?v=4"></script>
-<script src="js/idle.js?v=4"></script>
-<script src="js/game.js?v=4"></script>
-<script src="js/main.js?v=4"></script>
+<script src="js/generals_data.js?v=5"></script>
+<script src="js/stages_data.js?v=5"></script>
+<script src="js/battle_engine.js?v=5"></script>
+<script src="js/bgm.js?v=5"></script>
+<script src="js/firebase_auth.js?v=5"></script>
+<script src="js/storage.js?v=5"></script>
+<script src="js/idle.js?v=5"></script>
+<script src="js/game.js?v=5"></script>
+<script src="js/main.js?v=5"></script>
 
 </body>
 </html>

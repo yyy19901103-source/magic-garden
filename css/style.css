@@ -786,6 +786,44 @@ body {
 
 /* ─── 日課タスク 報酬受取ボタン ─────────────────────────────────────────── */
 
+/* ─── Firebase Auth UI ───────────────────────────────────────────────────── */
+
+.auth-status-row {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px;
+}
+.auth-status-icon { font-size: 14px; flex-shrink: 0; }
+.auth-status-text { font-size: 12px; color: var(--text-mid); flex: 1; }
+.btn-text-link {
+  background: none; border: none; color: var(--primary);
+  font-size: 11px; cursor: pointer; padding: 2px 4px;
+  text-decoration: underline; flex-shrink: 0;
+}
+
+.auth-toggle-btn {
+  width: 100%; background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 12px;
+  color: var(--text-mid); font-size: 12px; font-family: inherit;
+  text-align: left; cursor: pointer; margin-bottom: 4px;
+  transition: background .15s;
+}
+.auth-toggle-btn:hover { background: rgba(255,255,255,.08); }
+
+.auth-email-form {
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.auth-note {
+  font-size: 10px; color: var(--text-dim); margin: 6px 0 2px; line-height: 1.4;
+}
+.auth-section-sep { height: 8px; }
+
+.cloud-textarea {
+  height: auto; resize: vertical;
+  font-family: monospace; font-size: 11px; line-height: 1.4;
+}
+
 /* 週間ミッション */
 .weekly-task { border-color: rgba(139,92,246,.2) !important; }
 .weekly-bar  { background: linear-gradient(90deg, var(--primary), #a78bfa) !important; }
