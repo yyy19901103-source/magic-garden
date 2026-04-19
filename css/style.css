@@ -1337,3 +1337,114 @@ body {
 }
 .cs-line-status.ok    { color: #22c55e; }
 .cs-line-status.error { color: #f87171; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   スマホ最適化 — Safe Area / 小画面 / タップターゲット
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Safe Area（iPhone ノッチ・Dynamic Island・ホームバー） ─────────────── */
+
+:root {
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left,   0px);
+  --sar: env(safe-area-inset-right,  0px);
+}
+
+.game-header {
+  padding-top:  max(10px, calc(var(--sat) + 6px));
+  padding-left: max(14px, calc(var(--sal) + 14px));
+  padding-right:max(14px, calc(var(--sar) + 14px));
+}
+
+.tab-content {
+  /* ホームバーぶん余白を確保 */
+  padding-bottom: var(--sab);
+}
+
+/* タブナビも safe-area 対応 */
+.tab-nav {
+  padding-left:  max(8px, calc(var(--sal) + 8px));
+  padding-right: max(8px, calc(var(--sar) + 8px));
+}
+
+/* ─── タップターゲット強化（最低44px） ──────────────────────────────────── */
+
+.tab-btn    { min-height: 44px; padding-top: 8px; padding-bottom: 8px; }
+.btn-battle { min-height: 40px; }
+.btn        { min-height: 44px; }
+.btn-claim,
+.btn-log-toggle { min-height: 36px; }
+
+/* ボス選択カードもタップしやすく */
+.boss-card  { padding: 14px 10px; }
+
+/* ─── ヘッダー：小画面でコンパクトに ────────────────────────────────────── */
+
+@media (max-width: 374px) {
+  .res-coins    { font-size: 13px; }
+  .res-crystals { font-size: 13px; }
+  .hd-resources { gap: 7px; }
+  .st-bar-wrap  { width: 40px; }
+  .st-label     { font-size: 11px; }
+
+  /* タブラベルを絵文字のみにして省スペース */
+  .tab-btn { font-size: 10px; padding: 5px 2px; }
+
+  /* ダッシュボードチップを2列に */
+  .home-dashboard { grid-template-columns: 1fr 1fr; }
+}
+
+/* ─── 全スマホ共通：スクロール慣性・選択禁止 ────────────────────────────── */
+
+.tab-content  { -webkit-overflow-scrolling: touch; }
+.game-header,
+.tab-nav      { user-select: none; -webkit-user-select: none; }
+
+/* ─── ダッシュボード：横並びが崩れない最小幅 ────────────────────────────── */
+
+.home-dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.dash-chip { min-width: 0; }
+
+@media (max-width: 340px) {
+  .home-dashboard { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─── オーバーレイ（詳細画面）がはみ出さないよう ────────────────────────── */
+
+.detail-panel,
+.result-panel,
+.popup-card,
+.cloud-modal-card {
+  max-height: calc(100dvh - var(--sat) - var(--sab) - 24px);
+  overflow-y: auto;
+}
+
+/* ─── ガチャ結果カード：スマホで2列固定 ─────────────────────────────────── */
+
+@media (max-width: 400px) {
+  .gacha-result-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+}
+
+/* ─── 副将グリッド：最小カード幅 ────────────────────────────────────────── */
+
+.generals-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+
+@media (max-width: 360px) {
+  .generals-grid { grid-template-columns: repeat(3, 1fr); }
+  .general-card  { padding: 8px 4px; }
+}
+
+/* ─── フォーム入力（クラウドモーダル等）のズーム防止 ────────────────────── */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+textarea {
+  font-size: max(16px, 1em); /* iOS: 16px未満でズームが発生するのを防ぐ */
+}
