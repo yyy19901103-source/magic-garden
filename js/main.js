@@ -31,7 +31,25 @@ const UI = (() => {
 
   // ─── リソースバー更新（全タブ共通） ────────────────────────────────────
 
-  // スタミナ秒単位タイマー用
+  // ─── LINE通知 ──────────────────────────────────────────────────────────────
+
+  const LINE_NOTIFY_URL = 'https://line-claude-bot-ymn6.onrender.com/line-notify';
+  const LINE_UID_KEY    = 'magic_garden_line_uid';
+  let _lineUserId         = localStorage.getItem(LINE_UID_KEY) || '';
+  let _staminaNotifyArmed = false; // スタミナ<maxだった → 満タン到達で通知
+
+  async function _sendLineNotify(event, message) {
+    if (!_lineUserId) return;
+    try {
+      await fetch(LINE_NOTIFY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: _lineUserId, event, message }),
+      });
+    } catch(_) { /* ネットワーク失敗は無視 */ }
+  }
+
+  // ─── スタミナ秒単位タイマー用 ────────────────────────────────────────────
   let _staminaTimerIv = null;
 
   function _fmtSec(s) {
@@ -45,11 +63,17 @@ const UI = (() => {
     if (!timerEl) return;
     const st = Game.getStamina();
     if (st.current >= st.max) {
+      // スタミナ満タン到達 → LINE通知（アームされていた場合のみ）
+      if (_staminaNotifyArmed) {
+        _staminaNotifyArmed = false;
+        _sendLineNotify('stamina_full');
+      }
       timerEl.classList.add('hidden');
       timerEl.textContent = '';
       if (_staminaTimerIv) { clearInterval(_staminaTimerIv); _staminaTimerIv = null; }
       return;
     }
+    _staminaNotifyArmed = true; // 満タンでない → 次に満タンになったら通知
     timerEl.classList.remove('hidden');
     const toFull = st.secsToFull;
     if (toFull > 0) {
@@ -1407,6 +1431,44 @@ const UI = (() => {
       if (code && code !== '----') {
         navigator.clipboard?.writeText(code).catch(() => {});
         CloudModal.setStatus('コードをコピーしました ✓', 'ok');
+      }
+    });
+
+    // ─── LINE通知設定 ────────────────────────────────────────────────────────
+    $('cs-line-toggle')?.addEventListener('click', () => {
+      const form = $('cs-line-form');
+      form?.classList.toggle('hidden');
+      // 既存のUser IDがあれば入力欄に表示
+      if (!form?.classList.contains('hidden') && _lineUserId) {
+        const input = $('cs-line-userid');
+        if (input) input.value = _lineUserId;
+      }
+    });
+    $('cs-line-save-btn')?.addEventListener('click', async () => {
+      const input  = $('cs-line-userid');
+      const status = $('cs-line-status');
+      const uid = (input?.value || '').trim();
+      if (!uid.startsWith('U') || uid.length < 20) {
+        if (status) { status.textContent = '⚠️ 正しいUser IDを入力してください（Uから始まる文字列）'; status.className = 'cs-line-status error'; }
+        return;
+      }
+      _lineUserId = uid;
+      localStorage.setItem(LINE_UID_KEY, uid);
+      if (status) { status.textContent = '⏳ テスト通知を送信中...'; status.className = 'cs-line-status'; }
+      // テスト通知を送って確認
+      try {
+        const r = await fetch(LINE_NOTIFY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: uid, event: 'custom', message: '✅ まほうの庭のLINE通知を設定しました！スタミナ満タン・日課リセット時にお知らせします🌸' }),
+        });
+        if (r.ok) {
+          if (status) { status.textContent = '✅ 連携完了！LINEにテスト通知を送りました'; status.className = 'cs-line-status ok'; }
+        } else {
+          if (status) { status.textContent = '⚠️ 設定は保存しましたが通知送信に失敗しました'; status.className = 'cs-line-status error'; }
+        }
+      } catch(_) {
+        if (status) { status.textContent = '✅ 設定を保存しました（オフライン）'; status.className = 'cs-line-status ok'; }
       }
     });
 

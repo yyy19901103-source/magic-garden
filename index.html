@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>まほうの庭 ✿ Magic Garden</title>
-  <link rel="stylesheet" href="css/style.css?v=11">
+  <link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
 
@@ -333,6 +333,18 @@
       </div>
     </div>
 
+    <!-- ════ LINE通知設定（共通） ════ -->
+    <div class="cs-line-section">
+      <button id="cs-line-toggle" class="cs-alt-link">▸ LINE通知を設定する（スタミナ・日課リセット）</button>
+      <div id="cs-line-form" class="hidden cs-line-form">
+        <p class="cs-adv-note">LINE User IDを入力すると、スタミナ満タン・日課リセット時に通知が届きます</p>
+        <input id="cs-line-userid" class="cloud-input" type="text"
+               placeholder="Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" maxlength="36">
+        <div id="cs-line-status" class="cs-line-status"></div>
+        <button id="cs-line-save-btn" class="btn btn-outline cs-line-btn">💚 LINE通知を有効にする</button>
+      </div>
+    </div>
+
     <!-- 共通ステータス -->
     <div id="cloud-status" class="cloud-status"></div>
 
@@ -350,15 +362,15 @@
 </div>
 
 <!-- JS 読み込み順序は依存関係を考慮 -->
-<script src="js/generals_data.js?v=11"></script>
-<script src="js/stages_data.js?v=11"></script>
-<script src="js/battle_engine.js?v=11"></script>
-<script src="js/bgm.js?v=11"></script>
-<script src="js/firebase_auth.js?v=11"></script>
-<script src="js/storage.js?v=11"></script>
-<script src="js/idle.js?v=11"></script>
-<script src="js/game.js?v=11"></script>
-<script src="js/main.js?v=11"></script>
+<script src="js/generals_data.js?v=12"></script>
+<script src="js/stages_data.js?v=12"></script>
+<script src="js/battle_engine.js?v=12"></script>
+<script src="js/bgm.js?v=12"></script>
+<script src="js/firebase_auth.js?v=12"></script>
+<script src="js/storage.js?v=12"></script>
+<script src="js/idle.js?v=12"></script>
+<script src="js/game.js?v=12"></script>
+<script src="js/main.js?v=12"></script>
 
 </body>
 </html>

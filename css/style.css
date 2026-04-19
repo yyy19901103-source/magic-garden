@@ -1309,3 +1309,31 @@ body {
 }
 .btn-banner-close:hover { color: var(--text1, #eee); }
 .swipe-hint.show { opacity: 1; }
+
+/* ─── LINE通知設定セクション ──────────────────────────────────────────────── */
+
+.cs-line-section {
+  border-top: 1px solid var(--border, rgba(255,255,255,.1));
+  margin-top: 12px;
+  padding-top: 10px;
+}
+.cs-line-form {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cs-line-btn {
+  width: 100%;
+  background: #06c755 !important;
+  color: #fff !important;
+  border-color: #06c755 !important;
+}
+.cs-line-btn:hover { opacity: .88; }
+.cs-line-status {
+  font-size: 12px;
+  min-height: 16px;
+  color: var(--text2, #aaa);
+}
+.cs-line-status.ok    { color: #22c55e; }
+.cs-line-status.error { color: #f87171; }
