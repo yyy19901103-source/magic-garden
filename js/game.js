@@ -35,7 +35,9 @@ const Game = (() => {
     progress: {
       clearedStages: [],
       battleCount: 0,
-      gachaPity: 0
+      gachaPity: 0,
+      winStreak: 0,    // 現在の連勝数
+      maxWinStreak: 0  // 最大連勝記録
     },
     daily: {
       date: null,
@@ -400,17 +402,36 @@ const Game = (() => {
     state.progress.battleCount++;
     if (state.weekly) state.weekly.battles = (state.weekly.battles || 0) + 1;
 
-    const loot = { coins: 0, exp: 0, items: [], material: null, firstClear: null, levelUps: [] };
+    // ─── 連勝ストリーク更新 ────────────────────────────────────────────────
+    if (result.win) {
+      state.progress.winStreak = (state.progress.winStreak || 0) + 1;
+      if (state.progress.winStreak > (state.progress.maxWinStreak || 0)) {
+        state.progress.maxWinStreak = state.progress.winStreak;
+      }
+    } else {
+      state.progress.winStreak = 0;
+    }
+
+    // 連勝ボーナス倍率（連勝数に応じて報酬増加）
+    const streak = state.progress.winStreak;
+    const streakMult = streak >= 20 ? 1.5
+                     : streak >= 10 ? 1.3
+                     : streak >= 5  ? 1.2
+                     : streak >= 3  ? 1.1
+                     : 1.0;
+
+    const loot = { coins: 0, exp: 0, items: [], material: null, firstClear: null, levelUps: [],
+                   streak, streakMult: streakMult > 1 ? streakMult : null };
 
     if (result.win) {
-      // コイン
+      // コイン（ストリークボーナス適用）
       const [cMin, cMax] = stage.rewards.coins;
-      loot.coins = _randInt(cMin, cMax);
+      loot.coins = Math.floor(_randInt(cMin, cMax) * streakMult);
       state.resources.coins += loot.coins;
 
-      // 経験値（編成キャラに均等配布）
+      // 経験値（ストリークボーナス適用、編成キャラに均等配布）
       const [eMin, eMax] = stage.rewards.exp;
-      loot.exp = _randInt(eMin, eMax);
+      loot.exp = Math.floor(_randInt(eMin, eMax) * streakMult);
       const share = Math.floor(loot.exp / teamIds.length);
       teamIds.forEach(id => {
         const before = state.generals[id].level;
@@ -419,10 +440,11 @@ const Game = (() => {
         if (after > before) loot.levelUps.push({ id, name: GENERALS_DATA[id].name, newLevel: after });
       });
 
-      // 装備ドロップ
+      // 装備ドロップ（ストリーク5以上で+10% ドロップ率）
       if (stage.rewards.equipIds) {
+        const dropBoost = streak >= 5 ? 1.1 : 1.0;
         stage.rewards.equipIds.forEach(({ id, chance }) => {
-          if (Math.random() < chance) {
+          if (Math.random() < chance * dropBoost) {
             const inst = { instanceId: `eq_${Date.now()}_${Math.random().toString(36).slice(2,7)}`, defId: id, enhanceLevel: 0 };
             state.inventory.equipment.push(inst);
             loot.items.push(inst);
@@ -430,10 +452,11 @@ const Game = (() => {
         });
       }
 
-      // 素材ドロップ
+      // 素材ドロップ（ストリーク10以上で+20% ドロップ率）
       if (stage.rewards.material) {
         const { id, chance } = stage.rewards.material;
-        if (Math.random() < chance) {
+        const matBoost = streak >= 10 ? 1.2 : 1.0;
+        if (Math.random() < chance * matBoost) {
           state.inventory.materials[id] = (state.inventory.materials[id] || 0) + 1;
           loot.material = id;
         }
@@ -449,7 +472,7 @@ const Game = (() => {
       }
     }
 
-    return { win: result.win, log: result.log, loot };
+    return { win: result.win, log: result.log, loot, turns: result.turns, stats: result.stats };
   }
 
   // ─── 育成 ────────────────────────────────────────────────────────────────

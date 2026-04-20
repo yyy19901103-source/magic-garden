@@ -727,6 +727,13 @@ body {
   border-radius: 4px; padding: 1px 5px;
 }
 .enhance-max { font-size: 11px; font-weight: bold; color: var(--green); }
+
+/* 装備グロウ: 強化レベルに応じた輝き */
+.equip-item[data-enh="5"]  .equip-emoji { filter: drop-shadow(0 0 4px #ffd700); }
+.equip-item[data-enh="8"]  .equip-emoji { filter: drop-shadow(0 0 7px #ff8c00); animation: equipGlow8 2s ease-in-out infinite; }
+.equip-item[data-enh="10"] .equip-emoji { filter: drop-shadow(0 0 10px #ff4500); animation: equipGlowMax 1.5s ease-in-out infinite; }
+@keyframes equipGlow8  { 0%,100% { filter: drop-shadow(0 0 5px #ff8c00); } 50% { filter: drop-shadow(0 0 12px #ffd700); } }
+@keyframes equipGlowMax { 0%,100% { filter: drop-shadow(0 0 8px #ff0080); } 33% { filter: drop-shadow(0 0 14px #ff4500); } 66% { filter: drop-shadow(0 0 14px #ffd700); } }
 .btn-enhance {
   background: linear-gradient(135deg,#f59e0b,#d97706); color: #1a0a00;
   border: none; border-radius: 6px; padding: 5px 8px;
@@ -814,6 +821,12 @@ body {
 .dash-chip--power   { border-color: rgba(239,68,68,.25);  background: linear-gradient(160deg, rgba(239,68,68,.08),  var(--card)); }
 .dash-chip--idle    { border-color: rgba(52,211,153,.25); background: linear-gradient(160deg, rgba(52,211,153,.08), var(--card)); }
 .dash-chip--generals{ border-color: rgba(139,92,246,.25); background: linear-gradient(160deg, rgba(139,92,246,.08), var(--card)); }
+.dash-chip--streak  { border-color: rgba(249,115,22,.35); background: linear-gradient(160deg, rgba(249,115,22,.12), var(--card));
+                      animation: streakPulse 2s ease-in-out infinite; }
+@keyframes streakPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,.0); }
+  50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
+}
 
 .dash-icon  { font-size: 16px; line-height: 1; }
 .dash-val   { font-size: 13px; font-weight: bold; color: var(--text); line-height: 1.2; }
@@ -836,6 +849,11 @@ body {
 .level-up-chip {
   border-color: var(--green) !important; color: var(--green) !important;
   font-weight: bold; animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+.streak-chip {
+  border-color: #f97316 !important; color: #fb923c !important;
+  font-weight: bold; animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+  background: rgba(249,115,22,.12) !important;
 }
 
 /* ─── 日課タスク 報酬受取ボタン ─────────────────────────────────────────── */

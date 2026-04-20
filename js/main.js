@@ -167,11 +167,27 @@ const UI = (() => {
       const power   = Math.floor(Game.calcTeamPower());
       const rate    = Math.floor(Game.getIdleRate());
       const genCnt  = Object.keys(state.generals).length;
+      const streak  = state.progress.winStreak || 0;
+      const maxStreak = state.progress.maxWinStreak || 0;
 
       // ステージクリア進捗バー付きチップ
       const clearBar = `<div class="dash-progress-wrap">
         <div class="dash-progress-bar" style="width:${pct}%"></div>
       </div><span class="dash-pct">${pct}%</span>`;
+
+      // 連勝ストリーク表示（3以上のみ）
+      const streakEmoji = streak >= 20 ? '🌈' : streak >= 10 ? '🔥' : streak >= 5 ? '⚡' : '🎯';
+      const streakChip = streak >= 3 ? `
+        <div class="dash-chip dash-chip--streak">
+          <span class="dash-icon">${streakEmoji}</span>
+          <span class="dash-val">${streak}</span>
+          <span class="dash-lbl">連勝中！</span>
+        </div>` : `
+        <div class="dash-chip dash-chip--streak">
+          <span class="dash-icon">🎯</span>
+          <span class="dash-val">${maxStreak || '-'}</span>
+          <span class="dash-lbl">最大連勝</span>
+        </div>`;
 
       el.innerHTML = `
         <div class="dash-chip dash-chip--clear">
@@ -185,6 +201,7 @@ const UI = (() => {
           <span class="dash-val">${power >= 10000 ? (power/1000).toFixed(1)+'K' : power.toLocaleString()}</span>
           <span class="dash-lbl">戦力</span>
         </div>
+        ${streakChip}
         <div class="dash-chip dash-chip--idle">
           <span class="dash-icon">🪙</span>
           <span class="dash-val">${rate}</span>
@@ -605,6 +622,12 @@ const UI = (() => {
           loot.levelUps.forEach(lu => {
             lootEl.innerHTML += `<span class="loot-chip level-up-chip">⬆️ ${lu.name} Lv.${lu.newLevel}!</span>`;
           });
+        }
+        // 連勝ストリーク表示
+        if (loot.streak >= 3) {
+          const streakEmoji = loot.streak >= 20 ? '🌈' : loot.streak >= 10 ? '🔥' : loot.streak >= 5 ? '⚡' : '🎯';
+          const multStr = loot.streakMult ? ` (報酬×${loot.streakMult.toFixed(1)})` : '';
+          lootEl.innerHTML += `<span class="loot-chip streak-chip">${streakEmoji} ${loot.streak}連勝！${multStr}</span>`;
         }
       }
 
@@ -1183,6 +1206,7 @@ const UI = (() => {
         if (!ed) return;
         const div = document.createElement('div');
         div.className = `equip-item rarity-${ed.rarity}`;
+        div.dataset.enh = String(Math.min(10, inst.enhanceLevel));
         const bonus = 1 + inst.enhanceLevel * 0.1;
         const statsText = Object.entries(ed.stats)
           .map(([k,v]) => `${k.toUpperCase()}+${Math.floor(v * bonus)}`)
