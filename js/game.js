@@ -375,13 +375,16 @@ const Game = (() => {
     if (teamIds.length === 0) return { success: false, reason: 'no_team' };
 
     // ファイター構築（チーム）
+    const TYPE_CRIT = { assassin: 0.18, attacker: 0.12, mage: 0.10, tank: 0.04, healer: 0.05, support: 0.06 };
+    const RARITY_CRIT = { SSR: 0.04, SR: 0.02, R: 0 };
     const teamRaw = teamIds.map(id => {
       const gs  = state.generals[id];
       const def = GENERALS_DATA[id];
+      const critRate = (TYPE_CRIT[def.type] || 0.07) + (RARITY_CRIT[def.rarity] || 0);
       return {
         id, name: def.name, emoji: def.emoji,
         stats: calcCharStats(gs, def), isEnemy: false,
-        element: def.element, type: def.type   // 属性・役割を渡す
+        element: def.element, type: def.type, critRate
       };
     });
     const team = _applySkillLevelsToTeam(teamRaw);
@@ -634,13 +637,16 @@ const Game = (() => {
     const teamIds = state.formation.filter(id => id && state.generals[id]);
     if (teamIds.length === 0) return { success: false, reason: 'no_team' };
 
+    const TYPE_CRIT2 = { assassin: 0.18, attacker: 0.12, mage: 0.10, tank: 0.04, healer: 0.05, support: 0.06 };
+    const RARITY_CRIT2 = { SSR: 0.04, SR: 0.02, R: 0 };
     const teamRaw = teamIds.map(id => {
       const gs  = state.generals[id];
       const def = GENERALS_DATA[id];
+      const critRate = (TYPE_CRIT2[def.type] || 0.07) + (RARITY_CRIT2[def.rarity] || 0);
       return {
         id, name: def.name, emoji: def.emoji,
         stats: calcCharStats(gs, def), isEnemy: false,
-        element: def.element, type: def.type
+        element: def.element, type: def.type, critRate
       };
     });
     const team = _applySkillLevelsToTeam(teamRaw);

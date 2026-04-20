@@ -51,6 +51,13 @@ const BattleEngine = (() => {
     return Math.max(1, Math.floor(base * variance));
   }
 
+  /** クリティカル込みダメージ計算。{ dmg, isCrit } を返す */
+  function calcDmgCrit(atk, def, power, atkElem, defElem, critRate) {
+    const isCrit = Math.random() < (critRate || 0.05);
+    const dmg = calcDamage(atk, def, power * (isCrit ? 1.75 : 1.0), atkElem, defElem);
+    return { dmg, isCrit };
+  }
+
   function isWeakness(atkElem, defElem) {
     if (!atkElem || !defElem) return false;
     return (ELEMENT_WEAKNESS[atkElem] || []).includes(defElem);
@@ -78,21 +85,25 @@ const BattleEngine = (() => {
 
       case 'damage_single': {
         const target = enemies[Math.floor(Math.random() * enemies.length)];
-        const dmg = calcDamage(actor.stats.atk, target.stats.def, skill.power, actor.element, target.element);
+        const cr = actor.critRate || 0.05;
+        const { dmg, isCrit } = calcDmgCrit(actor.stats.atk, target.stats.def, skill.power, actor.element, target.element, cr);
         target.currentHp -= dmg;
         const weakTag = isWeakness(actor.element, target.element) ? ' 🔥弱点！' : '';
-        log.push({ type: 'skill', text: `✨ ${aName}の【${skill.name}】！ ${target.name}に ${fmtN(dmg)} の大ダメージ！${weakTag}`, dmg, isSkill: true });
+        const critTag = isCrit ? ' ✨暴撃！' : '';
+        log.push({ type: 'skill', text: `✨ ${aName}の【${skill.name}】！ ${target.name}に ${fmtN(dmg)} の大ダメージ！${weakTag}${critTag}`, dmg, isSkill: true });
         if (target.currentHp <= 0) log.push({ type: 'defeat', text: `💀 ${target.name}が倒れた！`, isEnemy: target.isEnemy });
         break;
       }
 
       case 'damage_all': {
+        const cr = actor.critRate || 0.05;
         log.push({ type: 'skill', text: `💥 ${aName}の【${skill.name}】！ 全体攻撃！`, isSkill: true });
         enemies.forEach(t => {
-          const dmg = calcDamage(actor.stats.atk, t.stats.def, skill.power, actor.element, t.element);
+          const { dmg, isCrit } = calcDmgCrit(actor.stats.atk, t.stats.def, skill.power, actor.element, t.element, cr);
           t.currentHp -= dmg;
           const wt = isWeakness(actor.element, t.element) ? ' 🔥弱点！' : '';
-          log.push({ type: 'aoe', text: `  → ${t.name}に ${fmtN(dmg)} ダメージ！${wt}`, dmg });
+          const ct = isCrit ? ' ✨暴撃！' : '';
+          log.push({ type: 'aoe', text: `  → ${t.name}に ${fmtN(dmg)} ダメージ！${wt}${ct}`, dmg });
           if (t.currentHp <= 0) log.push({ type: 'defeat', text: `💀 ${t.name}が倒れた！`, isEnemy: t.isEnemy });
         });
         break;
@@ -100,15 +111,18 @@ const BattleEngine = (() => {
 
       case 'damage_multi': {
         const target = enemies[Math.floor(Math.random() * enemies.length)];
-        let total = 0;
+        const cr = actor.critRate || 0.05;
+        let total = 0; let critHits = 0;
         const hits = skill.hits || 3;
         for (let i = 0; i < hits; i++) {
-          const dmg = calcDamage(actor.stats.atk, target.stats.def, skill.power, actor.element, target.element);
+          const { dmg, isCrit } = calcDmgCrit(actor.stats.atk, target.stats.def, skill.power, actor.element, target.element, cr);
           target.currentHp -= dmg;
           total += dmg;
+          if (isCrit) critHits++;
         }
         const wt = isWeakness(actor.element, target.element) ? ' 🔥弱点！' : '';
-        log.push({ type: 'skill', text: `⚡ ${aName}の【${skill.name}】！ ${hits}連撃で計 ${fmtN(total)} ダメージ！${wt}`, dmg: total, isSkill: true });
+        const ct = critHits > 0 ? ` ✨暴撃${critHits}回！` : '';
+        log.push({ type: 'skill', text: `⚡ ${aName}の【${skill.name}】！ ${hits}連撃で計 ${fmtN(total)} ダメージ！${wt}${ct}`, dmg: total, isSkill: true });
         if (target.currentHp <= 0) log.push({ type: 'defeat', text: `💀 ${target.name}が倒れた！`, isEnemy: target.isEnemy });
         break;
       }
@@ -278,12 +292,14 @@ const BattleEngine = (() => {
         }
 
         if (!acted) {
-          // 通常攻撃（属性相性を考慮）
+          // 通常攻撃（属性相性＋クリティカル考慮）
           const target = enemies[Math.floor(Math.random() * enemies.length)];
-          const dmg = calcDamage(actor.stats.atk, target.stats.def, 1.0, actor.element, target.element);
+          const cr = actor.critRate || (actor.isEnemy ? 0.04 : 0.07);
+          const { dmg, isCrit } = calcDmgCrit(actor.stats.atk, target.stats.def, 1.0, actor.element, target.element, cr);
           target.currentHp -= dmg;
           const wt = isWeakness(actor.element, target.element) ? ' 🔥弱点！' : '';
-          log.push({ type: 'attack', text: `⚔️ ${actor.name}の攻撃！ ${target.name}に ${fmtN(dmg)} ダメージ！${wt}`, dmg, isEnemyAttacker: actor.isEnemy });
+          const ct = isCrit ? ' ✨暴撃！' : '';
+          log.push({ type: 'attack', text: `⚔️ ${actor.name}の攻撃！ ${target.name}に ${fmtN(dmg)} ダメージ！${wt}${ct}`, dmg, isEnemyAttacker: actor.isEnemy });
           if (target.currentHp <= 0) {
             log.push({ type: 'defeat', text: `💀 ${target.name}が倒れた！`, isEnemy: target.isEnemy });
           }
