@@ -511,6 +511,28 @@ const UI = (() => {
       void banner.offsetWidth;                    // reflow で animation をリセット
       banner.classList.add(win ? 'win' : 'lose');
 
+      // 勝利時の紙吹雪アニメーション
+      const confettiEl = $('confetti-container');
+      confettiEl.innerHTML = '';
+      if (win) {
+        const colors = ['#ffd700','#ff6b6b','#4ecdc4','#a8e6cf','#ff8b94','#c3b1e1','#fddb92','#d4fc79'];
+        for (let i = 0; i < 45; i++) {
+          const piece = document.createElement('div');
+          piece.className = 'confetti-piece';
+          const size = 6 + Math.random() * 8;
+          const left = Math.random() * 100;
+          const delay = Math.random() * 1.2;
+          const dur   = 2.2 + Math.random() * 1.8;
+          piece.style.cssText = `
+            left:${left}%; width:${size}px; height:${size * (0.4 + Math.random())}px;
+            background:${colors[Math.floor(Math.random()*colors.length)]};
+            animation-duration:${dur}s; animation-delay:${delay}s;
+          `;
+          confettiEl.appendChild(piece);
+        }
+        setTimeout(() => { confettiEl.innerHTML = ''; }, 5000);
+      }
+
       const lootEl = $('result-loot');
       lootEl.innerHTML = '';
       if (win) {
