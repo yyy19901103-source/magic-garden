@@ -379,6 +379,98 @@ const STAGES_DATA = [
         firstClear: { crystals: 200 }
       }
     ]
+  },
+
+  // ─── 第六章 ─────────────────────────────────────────────────────────────
+  {
+    chapter: 6,
+    name: '第六章: 幻夢の回廊',
+    stages: [
+      {
+        id: '6-1', name: '夢の入口', isBoss: false,
+        enemies: [
+          { name: 'ゆめスライム', emoji: '🌈', hp: 35000, atk: 1200, def: 900,  spd: 140 },
+          { name: 'ゆめスライム', emoji: '🌈', hp: 35000, atk: 1200, def: 900,  spd: 140 },
+          { name: 'ほしくまさん', emoji: '🐻', hp: 28000, atk: 1100, def: 800,  spd: 100 }
+        ],
+        rewards: { coins: [3000, 4500], exp: [1200, 1800],
+          material: { id: 'dreamdust', chance: 0.5 },
+          equipIds: [{ id: 'sword_ssr', chance: 0.22 }, { id: 'armor_ssr', chance: 0.22 }]
+        },
+        firstClear: { crystals: 40 }
+      },
+      {
+        id: '6-2', name: '菓子の迷宮', isBoss: false,
+        enemies: [
+          { name: 'キャンディゴースト', emoji: '👻', hp: 40000, atk: 1300, def: 950, spd: 160 },
+          { name: 'キャンディゴースト', emoji: '👻', hp: 40000, atk: 1300, def: 950, spd: 160 },
+          { name: 'ふわっち',           emoji: '☁️', hp: 50000, atk: 1000, def: 1100, spd: 80 }
+        ],
+        rewards: { coins: [3600, 5400], exp: [1440, 2160],
+          material: { id: 'dreamdust', chance: 0.55 },
+          equipIds: [{ id: 'ring_ssr', chance: 0.22 }, { id: 'sword_ssr', chance: 0.25 }]
+        },
+        firstClear: { crystals: 40 }
+      },
+      {
+        id: '6-3', name: '影の戦場', isBoss: false,
+        enemies: [
+          { name: 'デスナイト',   emoji: '☠️', hp: 60000, atk: 1600, def: 1100, spd: 120 },
+          { name: 'デスナイト',   emoji: '☠️', hp: 60000, atk: 1600, def: 1100, spd: 120 },
+          { name: '影狼王',       emoji: '🐺', hp: 55000, atk: 1800, def: 800,  spd: 200 }
+        ],
+        rewards: { coins: [4200, 6300], exp: [1680, 2520],
+          material: { id: 'dreamdust', chance: 0.6 },
+          equipIds: [{ id: 'armor_ssr', chance: 0.28 }, { id: 'ring_ssr', chance: 0.25 }]
+        },
+        firstClear: { crystals: 45 }
+      },
+      {
+        id: '6-4', name: '幻の庭園', isBoss: false,
+        enemies: [
+          { name: 'のろわれた人形', emoji: '🪆', hp: 45000, atk: 1700, def: 1000, spd: 150 },
+          { name: 'のろわれた人形', emoji: '🪆', hp: 45000, atk: 1700, def: 1000, spd: 150 },
+          { name: '幻影の剣士',     emoji: '⚔️', hp: 80000, atk: 1900, def: 1200, spd: 170 }
+        ],
+        rewards: { coins: [4800, 7200], exp: [1920, 2880],
+          material: { id: 'dreamdust', chance: 0.65 },
+          equipIds: [{ id: 'sword_ssr', chance: 0.30 }, { id: 'armor_ssr', chance: 0.30 }]
+        },
+        firstClear: { crystals: 50 }
+      },
+      {
+        id: '6-5', name: '深淵の霧', isBoss: false,
+        enemies: [
+          { name: '夢喰い',       emoji: '👁️', hp: 90000, atk: 2000, def: 1300, spd: 160 },
+          { name: '深淵の守護者', emoji: '🌑', hp: 100000, atk: 1800, def: 1500, spd: 90 },
+          { name: 'デスナイト',   emoji: '☠️', hp: 60000,  atk: 1600, def: 1100, spd: 120 }
+        ],
+        rewards: { coins: [5500, 8200], exp: [2200, 3300],
+          material: { id: 'dreamdust', chance: 0.7 },
+          equipIds: [{ id: 'ring_ssr', chance: 0.32 }, { id: 'sword_ssr', chance: 0.32 }]
+        },
+        firstClear: { crystals: 55 }
+      },
+      {
+        id: '6-6', name: '【最終BOSS】夢魔女王リリス', isBoss: true,
+        enemies: [
+          { name: '夢魔女王リリス', emoji: '🦋', hp: 800000, atk: 2200, def: 1600, spd: 180,
+            skills: [
+              { name: '夢の誘惑',     sp: 2, type: 'debuff_atk',  power: 0.35, description: '甘い夢で全体の攻撃力を下げる' },
+              { name: '蝶の乱舞',     sp: 4, type: 'damage_all',  power: 1.4,  description: '無数の蝶が全体を切り裂く' },
+              { name: '幻夢回復',     sp: 6, type: 'heal_single', power: 3.5,  description: '夢の力で大回復' },
+              { name: '深淵の叫び',   sp: 7, type: 'damage_single', power: 4.5, description: '選ばれし者に全力の一撃' },
+              { name: '夢世界の崩壊', sp: 10, type: 'damage_all', power: 2.8,  description: '夢ごと全てを消し去る究極技' }
+            ]
+          }
+        ],
+        rewards: { coins: [9000, 13000], exp: [3600, 5400],
+          material: { id: 'dreamdust', chance: 1.0 },
+          equipIds: [{ id: 'sword_ssr', chance: 0.50 }, { id: 'armor_ssr', chance: 0.50 }, { id: 'ring_ssr', chance: 0.45 }]
+        },
+        firstClear: { crystals: 300 }
+      }
+    ]
   }
 ];
 
@@ -436,6 +528,7 @@ const MATERIALS_DATA = {
   goddessfeather: { id: 'goddessfeather', name: '女神の羽',         emoji: '🪶', desc: '古の女神が残した羽根' },
   dragonscale:    { id: 'dragonscale',    name: '竜鱗',             emoji: '🐲', desc: '竜王の強靭な鱗' },
   holywater:      { id: 'holywater',      name: '聖水',             emoji: '💧', desc: '天空の聖域に湧く聖水' },
+  dreamdust:      { id: 'dreamdust',      name: '夢の塵',           emoji: '🌟', desc: '幻夢の回廊に漂う神秘の輝き' },
   shard_s:        { id: 'shard_s',        name: '試練の欠片',       emoji: '🔷', desc: '日課ボスから得られる欠片' }
 };
 

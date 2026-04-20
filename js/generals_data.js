@@ -255,6 +255,172 @@ const GENERALS_DATA = {
       { name: '氷盾',   sp: 3, type: 'shield_all',    power: 0.45, description: '全体に氷のシールドを付与' },
       { name: '吹雪',   sp: 6, type: 'damage_all',    power: 0.75, description: '凍てつく吹雪で全体攻撃' }
     ]
+  },
+
+  // ─── NEW SSR ──────────────────────────────────────────────────────────────
+
+  luna: {
+    id: 'luna',
+    name: 'ルナ',
+    title: '月夜の魔女',
+    rarity: 'SSR',
+    type: 'mage',
+    typeName: '魔法',
+    element: '月',
+    emoji: '🌙',
+    gradient: 'linear-gradient(160deg, #e8eaf6 0%, #b39ddb 60%, #4527a0 100%)',
+    borderColor: '#7c4dff',
+    description: '月の加護を受けた銀髪の魔女。うさぎ耳のアクセサリーが愛らしいが、その魔力は計り知れない。',
+    baseStats: { hp: 7200, atk: 920, def: 280, spd: 115 },
+    statGrowth: { hp: 185, atk: 29, def: 8, spd: 0.45 },
+    skills: [
+      { name: '月光魔弾',   sp: 3, type: 'damage_single', power: 2.7, description: '月光の魔力を込めた圧倒的な一撃' },
+      { name: '星の海',     sp: 8, type: 'damage_all',    power: 1.3, description: '無数の星光が敵全体を包み込む' }
+    ]
+  },
+
+  volkhan: {
+    id: 'volkhan',
+    name: 'ヴォルカン',
+    title: '炎神の化身',
+    rarity: 'SSR',
+    type: 'attacker',
+    typeName: '攻撃',
+    element: '火',
+    emoji: '🔱',
+    gradient: 'linear-gradient(160deg, #1a0000 0%, #b71c1c 55%, #ff6d00 100%)',
+    borderColor: '#ff3d00',
+    description: '炎の神が人に降臨した姿。逆立つ銀髪に炎が宿り、圧倒的な威圧感を放つ最強の戦士。',
+    baseStats: { hp: 6800, atk: 1050, def: 240, spd: 130 },
+    statGrowth: { hp: 170, atk: 34, def: 6, spd: 0.6 },
+    skills: [
+      { name: '神炎の刃',   sp: 3, type: 'damage_single', power: 3.0, description: '炎神の力を込めた絶対の一撃' },
+      { name: '炎神の怒り', sp: 9, type: 'damage_all',    power: 1.6, description: '全てを焼き尽くす神の炎' }
+    ]
+  },
+
+  // ─── NEW SR ───────────────────────────────────────────────────────────────
+
+  coral: {
+    id: 'coral',
+    name: 'コーラル',
+    title: '珊瑚の人魚姫',
+    rarity: 'SR',
+    type: 'healer',
+    typeName: '支援',
+    element: '水',
+    emoji: '🐚',
+    gradient: 'linear-gradient(160deg, #e0f7fa 0%, #f48fb1 50%, #26c6da 100%)',
+    borderColor: '#00acc1',
+    description: '珊瑚色の髪を持つ愛らしい人魚姫。笑顔で仲間を癒す天使のような存在。',
+    baseStats: { hp: 6500, atk: 480, def: 380, spd: 105 },
+    statGrowth: { hp: 170, atk: 14, def: 12, spd: 0.4 },
+    skills: [
+      { name: '珊瑚の癒し', sp: 3, type: 'heal_single', power: 2.0, description: 'HPが最も低い仲間をたっぷり回復' },
+      { name: '人魚の歌',   sp: 7, type: 'heal_all',    power: 1.0, description: '歌声で全体のHPをじんわり回復' }
+    ]
+  },
+
+  zephyr: {
+    id: 'zephyr',
+    name: 'ゼファー',
+    title: '嵐の剣豪',
+    rarity: 'SR',
+    type: 'assassin',
+    typeName: '刺客',
+    element: '風',
+    emoji: '⚡',
+    gradient: 'linear-gradient(160deg, #0d1117 0%, #1565c0 60%, #90a4ae 100%)',
+    borderColor: '#546e7a',
+    description: '嵐を纏う無口の剣豪。黒髪に青い眼帯、寡黙な実力者が持つオーラは他を圧倒する。',
+    baseStats: { hp: 5800, atk: 780, def: 220, spd: 170 },
+    statGrowth: { hp: 145, atk: 25, def: 6, spd: 1.3 },
+    skills: [
+      { name: '烈風刃',   sp: 2, type: 'damage_single', power: 2.8, description: '嵐の速度で繰り出す必殺の一刀' },
+      { name: '嵐の連撃', sp: 6, type: 'damage_multi',  power: 0.9, hits: 3, description: '嵐のごとく3連続斬り' }
+    ]
+  },
+
+  popo: {
+    id: 'popo',
+    name: 'ポポ',
+    title: 'もふもふ魔法使い',
+    rarity: 'SR',
+    type: 'support',
+    typeName: '支援',
+    element: '光',
+    emoji: '🧸',
+    gradient: 'linear-gradient(160deg, #fff9c4 0%, #ffccbc 60%, #f8bbd0 100%)',
+    borderColor: '#f06292',
+    description: '大きなもふもふ帽子をかぶったちびっ子魔法使い。全員を元気にする応援魔法が得意。',
+    baseStats: { hp: 5500, atk: 420, def: 350, spd: 120 },
+    statGrowth: { hp: 145, atk: 13, def: 11, spd: 0.5 },
+    skills: [
+      { name: 'もふもふパワー', sp: 3, type: 'buff_atk', power: 0.4, description: 'もふもふの魔力で仲間の攻撃を上げる' },
+      { name: 'みんなへのエール', sp: 6, type: 'heal_all', power: 0.85, description: '全員に元気をわけてあげる' }
+    ]
+  },
+
+  // ─── NEW R ────────────────────────────────────────────────────────────────
+
+  lily: {
+    id: 'lily',
+    name: 'リリィ',
+    title: '花園の妖精',
+    rarity: 'R',
+    type: 'healer',
+    typeName: '支援',
+    element: '光',
+    emoji: '🌸',
+    gradient: 'linear-gradient(160deg, #fce4ec 0%, #c8e6c9 60%, #f9fbe7 100%)',
+    borderColor: '#66bb6a',
+    description: '花の冠をつけた小さな妖精。小さな翼でひらひら飛びながら仲間を癒してくれる。',
+    baseStats: { hp: 4200, atk: 380, def: 220, spd: 150 },
+    statGrowth: { hp: 105, atk: 12, def: 6, spd: 0.8 },
+    skills: [
+      { name: '花びら癒し', sp: 2, type: 'heal_single', power: 1.5, description: '花びらで傷をふわっと癒す' },
+      { name: '花吹雪',     sp: 5, type: 'damage_all',  power: 0.65, description: '花びらの渦で全体攻撃' }
+    ]
+  },
+
+  choco: {
+    id: 'choco',
+    name: 'チョコ',
+    title: 'お菓子の魔法使い',
+    rarity: 'R',
+    type: 'mage',
+    typeName: '魔法',
+    element: '火',
+    emoji: '🍫',
+    gradient: 'linear-gradient(160deg, #4e342e 0%, #a1887f 60%, #f8bbd0 100%)',
+    borderColor: '#8d6e63',
+    description: 'キャンディの杖を持つ超キュートな魔法使い。お菓子に見せかけた爆発魔法が得意。',
+    baseStats: { hp: 3900, atk: 510, def: 160, spd: 115 },
+    statGrowth: { hp: 98, atk: 16, def: 5, spd: 0.4 },
+    skills: [
+      { name: 'チョコ魔法',   sp: 2, type: 'damage_single', power: 1.8, description: 'チョコレート色の魔弾で攻撃' },
+      { name: 'お菓子の爆弾', sp: 5, type: 'damage_all',    power: 0.7, description: 'ポップな爆弾で全体攻撃' }
+    ]
+  },
+
+  galdo: {
+    id: 'galdo',
+    name: 'ガルド',
+    title: '鋼鉄の騎士',
+    rarity: 'R',
+    type: 'tank',
+    typeName: '防御',
+    element: '土',
+    emoji: '⚙️',
+    gradient: 'linear-gradient(160deg, #263238 0%, #546e7a 60%, #b0bec5 100%)',
+    borderColor: '#455a64',
+    description: '全身を鋼鉄の鎧で覆った無敵の騎士。無口でクールな佇まいが仲間の信頼を集める。',
+    baseStats: { hp: 10500, atk: 360, def: 560, spd: 55 },
+    statGrowth: { hp: 295, atk: 11, def: 16, spd: 0.1 },
+    skills: [
+      { name: '鋼の意志', sp: 3, type: 'buff_def',      power: 0.4, description: '鋼鉄の鎧を展開し防御力を大幅強化' },
+      { name: '鉄槌',     sp: 6, type: 'damage_single', power: 2.0, description: '巨大な鉄の拳を叩き込む' }
+    ]
   }
 };
 
@@ -263,19 +429,27 @@ const GENERALS_DATA = {
  * weight が高いほど排出されやすい
  */
 const GACHA_POOL = [
-  // SSR (各4%, 合計16%)
+  // SSR (各3〜4, 合計~15%)
   { id: 'seraphina', weight: 4 },
   { id: 'shadow',    weight: 4 },
   { id: 'aquaria',   weight: 4 },
   { id: 'lucifer',   weight: 4 },
-  // SR (各10%, 合計30%)
+  { id: 'luna',      weight: 3 },
+  { id: 'volkhan',   weight: 3 },
+  // SR (各7〜10, 合計~45%)
   { id: 'flame',     weight: 10 },
   { id: 'terra',     weight: 10 },
   { id: 'windel',    weight: 10 },
   { id: 'aria',      weight: 10 },
-  // R (各10.5%, 合計42%)  ※端数調整で合計100%相当
+  { id: 'coral',     weight: 8 },
+  { id: 'zephyr',    weight: 8 },
+  { id: 'popo',      weight: 8 },
+  // R (各9〜11, 合計~40%)
   { id: 'arca',      weight: 11 },
   { id: 'rockus',    weight: 11 },
   { id: 'blaze',     weight: 10 },
-  { id: 'frost',     weight: 10 }
+  { id: 'frost',     weight: 10 },
+  { id: 'lily',      weight: 9 },
+  { id: 'choco',     weight: 9 },
+  { id: 'galdo',     weight: 9 }
 ];
