@@ -390,12 +390,28 @@ const UI = (() => {
           ? `<img src="assets/bosses/${bossKey}.png" class="stage-boss-img" alt="${stage.name}" onerror="this.style.display='none'">`
           : '';
 
+        // Reward preview
+        const r = stage.rewards;
+        const matInfo = r.material && MATERIALS_DATA[r.material.id];
+        const matHtml = matInfo
+          ? `<span class="reward-chip">${matInfo.emoji} ${matInfo.name} ${Math.round(r.material.chance*100)}%</span>`
+          : '';
+        const fcHtml = stage.firstClear
+          ? `<span class="reward-chip reward-chip-fc">💎 初回+${stage.firstClear.crystals}</span>`
+          : '';
+        const rewardBar = `<div class="stage-rewards-preview">
+          <span class="reward-chip">🪙 ${r.coins[0]}~${r.coins[1]}</span>
+          <span class="reward-chip">✨ ${r.exp[0]}~${r.exp[1]}</span>
+          ${matHtml}${fcHtml}
+        </div>`;
+
         div.innerHTML = `
           <span class="stage-status">${statusIcon}</span>
           ${bossImgHtml}
           <div class="stage-info">
             <div class="stage-name">${stage.isBoss?'👑 ':''}${stage.id} ${stage.name}</div>
             <div class="stage-enemies">${stage.enemies.map(e=>e.emoji).join(' ')}</div>
+            ${rewardBar}
           </div>
           ${btnHtml}`;
         el.appendChild(div);

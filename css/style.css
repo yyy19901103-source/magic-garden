@@ -495,6 +495,13 @@ body {
 .stage-info   { flex: 1; min-width: 0; }
 .stage-name   { font-size: 13px; font-weight: bold; line-height: 1.3; }
 .stage-enemies{ font-size: 16px; margin-top: 2px; }
+.stage-rewards-preview { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.reward-chip {
+  font-size: 10px; padding: 1px 6px; border-radius: 10px;
+  background: rgba(139,92,246,.12); color: var(--text-dim);
+  border: 1px solid rgba(139,92,246,.25); white-space: nowrap;
+}
+.reward-chip-fc { background: rgba(251,191,36,.15); color: var(--gold); border-color: rgba(251,191,36,.35); }
 
 /* ─── 副将タブ ──────────────────────────────────────────────────────────── */
 
