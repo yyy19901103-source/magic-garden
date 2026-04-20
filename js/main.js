@@ -817,12 +817,26 @@ const UI = (() => {
           <div class="exp-bar-wrap"><div class="exp-bar" style="width:${expPct}%"></div></div>
         </div>
 
-        <div class="detail-stats">
-          <div class="stat-box"><span>❤️ HP</span><strong>${stats.hp.toLocaleString()}</strong></div>
-          <div class="stat-box"><span>⚔️ 攻撃</span><strong>${stats.atk.toLocaleString()}</strong></div>
-          <div class="stat-box"><span>🛡️ 防御</span><strong>${stats.def.toLocaleString()}</strong></div>
-          <div class="stat-box"><span>💨 速度</span><strong>${stats.spd}</strong></div>
-        </div>
+        ${(() => {
+          const STAT_MAX = { hp: 30000, atk: 3500, def: 1500, spd: 200 };
+          const STAT_COLOR = { hp: '#ef4444', atk: '#f97316', def: '#3b82f6', spd: '#10b981' };
+          const rows = [
+            { key: 'hp',  icon: '❤️', label: 'HP',   val: stats.hp,  fmt: stats.hp.toLocaleString() },
+            { key: 'atk', icon: '⚔️', label: '攻撃', val: stats.atk, fmt: stats.atk.toLocaleString() },
+            { key: 'def', icon: '🛡️', label: '防御', val: stats.def, fmt: stats.def.toLocaleString() },
+            { key: 'spd', icon: '💨', label: '速度', val: stats.spd, fmt: String(stats.spd) },
+          ];
+          return `<div class="detail-stats-bars">${rows.map(r => {
+            const pct = Math.min(100, Math.round(r.val / STAT_MAX[r.key] * 100));
+            return `<div class="stat-bar-row">
+              <span class="stat-bar-label">${r.icon} ${r.label}</span>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill" style="width:${pct}%;background:${STAT_COLOR[r.key]}"></div>
+              </div>
+              <span class="stat-bar-val">${r.fmt}</span>
+            </div>`;
+          }).join('')}</div>`;
+        })()}
 
         <div class="detail-section">
           <h4 class="section-label">スキル</h4>

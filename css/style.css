@@ -576,6 +576,20 @@ body {
 .stat-box span   { font-size: 12px; color: var(--text-mid); }
 .stat-box strong { font-size: 16px; font-weight: bold; }
 
+/* ステータスバー（詳細画面） */
+.detail-stats-bars { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.stat-bar-row { display: flex; align-items: center; gap: 8px; }
+.stat-bar-label { font-size: 11px; color: var(--text-dim); width: 44px; flex-shrink: 0; }
+.stat-bar-track {
+  flex: 1; height: 10px; background: rgba(255,255,255,.06);
+  border-radius: 99px; overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%; border-radius: 99px;
+  transition: width .6s cubic-bezier(.34,1.56,.64,1);
+}
+.stat-bar-val { font-size: 11px; font-weight: bold; color: var(--text-mid); min-width: 42px; text-align: right; }
+
 .detail-section { margin-bottom: 14px; }
 .detail-section h4 { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; letter-spacing: .05em; }
 .skill-row {
