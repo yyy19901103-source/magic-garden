@@ -11,6 +11,20 @@ const UI = (() => {
   const hide = id => { const e=$(id); if(e) e.classList.add('hidden'); };
   const showTemp = (id, ms=2000) => { show(id); setTimeout(() => hide(id), ms); };
 
+  // 汎用トースト通知（alert()の代替）
+  function showToast(msg, type='info', ms=2800) {
+    let el = document.getElementById('game-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'game-toast';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.className = `game-toast toast-${type} toast-show`;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.classList.remove('toast-show'); }, ms);
+  }
+
   function makePortrait(def, size='md') {
     const sizeClass = size === 'lg' ? 'portrait-lg' : 'portrait-md';
     return `
@@ -178,7 +192,7 @@ const UI = (() => {
         </div>
         <div class="dash-chip dash-chip--generals">
           <span class="dash-icon">👥</span>
-          <span class="dash-val">${genCnt}<span class="dash-total">/12</span></span>
+          <span class="dash-val">${genCnt}<span class="dash-total">/${Object.keys(GENERALS_DATA).length}</span></span>
           <span class="dash-lbl">副将</span>
         </div>`;
     },
@@ -469,8 +483,8 @@ const UI = (() => {
     handleBattle(stageId) {
       const result = Game.battle(stageId);
       if (result.reason) {
-        if (result.reason === 'no_team')    { alert('編成に副将を入れてください！'); return; }
-        if (result.reason === 'no_stamina') { alert('スタミナが不足しています！　⚡ 5分ごとに1回復します。'); updateResourceBar(); return; }
+        if (result.reason === 'no_team')    { showToast('👥 編成に副将を入れてください！', 'warn'); return; }
+        if (result.reason === 'no_stamina') { showToast('⚡ スタミナ不足！ 5分ごとに1回復します', 'warn'); updateResourceBar(); return; }
         if (result.reason !== undefined && !result.win) { alert('エラー: ' + result.reason); return; }
       }
       this.lastStageId = stageId;
@@ -482,9 +496,9 @@ const UI = (() => {
 
     handleBossBattle(bossId) {
       const result = Game.battleBoss(bossId);
-      if (result.reason === 'no_attempts') { alert('本日の挑戦回数が尽きました。明日また挑戦してください！'); return; }
-      if (result.reason === 'no_team')     { alert('編成に副将を入れてください！'); return; }
-      if (result.reason === 'no_stamina')  { alert('スタミナが不足しています！　日課ボスは⚡3消費します。'); updateResourceBar(); return; }
+      if (result.reason === 'no_attempts') { showToast('🔒 本日の挑戦回数が尽きました', 'warn'); return; }
+      if (result.reason === 'no_team')     { showToast('👥 編成に副将を入れてください！', 'warn'); return; }
+      if (result.reason === 'no_stamina')  { showToast('⚡ スタミナ不足！ 日課ボスは3消費します', 'warn'); updateResourceBar(); return; }
       updateResourceBar();
       this.renderBossSection();
       HomeTab.renderDailyTasks();
@@ -923,14 +937,14 @@ const UI = (() => {
       $('dbl-btn')?.addEventListener('click', () => {
         const r = Game.breakLimit(gid);
         if (r.success) { this.showDetail(gid); this.renderGrid(); }
-        else if (r.reason === 'no_shards') alert(`欠片が不足しています。必要: ${r.needed}個`);
+        else if (r.reason === 'no_shards') showToast(`欠片不足！ 必要: ${r.needed}個`, 'warn');
       });
 
       $('detail-body').querySelectorAll('.btn-skill-up[data-idx]').forEach(btn => {
         btn.addEventListener('click', () => {
           const r = Game.upgradeSkill(btn.dataset.gid, Number(btn.dataset.idx));
           if (r.success) { this.showDetail(gid); GachaTab.renderMaterials(); }
-          else if (r.reason === 'no_materials') alert('素材が不足しています！');
+          else if (r.reason === 'no_materials') showToast('素材が不足しています！', 'warn');
         });
       });
     }
@@ -985,7 +999,7 @@ const UI = (() => {
     handleDraw(count) {
       const result = Game.draw(count);
       if (!result.success) {
-        alert(`クリスタルが不足しています。必要: ${result.needed}💎`);
+        showToast(`💎 クリスタル不足！ 必要: ${result.needed}`, 'warn');
         return;
       }
       updateResourceBar();
@@ -1090,7 +1104,7 @@ const UI = (() => {
         btn.addEventListener('click', () => {
           const r = Game.buyShopItem(Number(btn.dataset.idx));
           if (r.success) { updateResourceBar(); this.renderShop(); this.renderEquipInventory(); }
-          else if (r.reason === 'no_coins') alert(`コインが不足しています。必要: ${r.needed?.toLocaleString()}🪙`);
+          else if (r.reason === 'no_coins') showToast(`🪙 コイン不足！ 必要: ${r.needed?.toLocaleString()}`, 'warn');
         });
       });
     },
@@ -1175,7 +1189,7 @@ const UI = (() => {
         btn.addEventListener('click', () => {
           const r = Game.enhanceEquip(btn.dataset.iid);
           if (r.success) { updateResourceBar(); HomeTab.renderDailyTasks(); this.renderEquipInventory(); }
-          else if (r.reason === 'no_coins') alert(`コインが不足しています。必要: ${r.needed?.toLocaleString()}🪙`);
+          else if (r.reason === 'no_coins') showToast(`🪙 コイン不足！ 必要: ${r.needed?.toLocaleString()}`, 'warn');
         });
       });
 
@@ -1845,3 +1859,4 @@ const UI = (() => {
 })();
 
 document.addEventListener('DOMContentLoaded', UI.start);
+
