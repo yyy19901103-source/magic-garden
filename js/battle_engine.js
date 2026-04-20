@@ -8,14 +8,52 @@ const BattleEngine = (() => {
 
   const MAX_TURNS = 120;
 
+  // ─── 属性相性テーブル ────────────────────────────────────────────────────────
+  // キー: 攻撃側属性 → 配列: 弱点となる防御側属性
+  const ELEMENT_WEAKNESS = {
+    '炎': ['氷', '森', '甘'],
+    '氷': ['雷', '炎'],
+    '雷': ['水', '鉄'],
+    '水': ['炎', '土'],
+    '光': ['闇', '影'],
+    '闇': ['月', '光'],
+    '月': ['闇', '影'],
+    '風': ['土', '森'],
+    '土': ['雷', '風'],
+    '鉄': ['水', '炎'],
+    '森': ['炎', '氷'],
+    '影': ['光', '月'],
+    '夢': ['闇', '影'],
+    '甘': ['炎', '氷'],
+  };
+  const ELEM_BONUS   = 1.40;  // 弱点時ダメージ倍率
+  const ELEM_RESIST  = 0.72;  // 耐性時ダメージ倍率
+
+  /** 属性相性倍率を返す。弱点=1.4、耐性=0.72、それ以外=1.0 */
+  function getElemMult(atkElem, defElem) {
+    if (!atkElem || !defElem) return 1.0;
+    const weakTo = ELEMENT_WEAKNESS[atkElem] || [];
+    if (weakTo.includes(defElem)) return ELEM_BONUS;
+    // 逆方向（防御側が攻撃側の弱点）= 耐性
+    const defWeak = ELEMENT_WEAKNESS[defElem] || [];
+    if (defWeak.includes(atkElem)) return ELEM_RESIST;
+    return 1.0;
+  }
+
   // ─── ダメージ計算 ──────────────────────────────────────────────────────────
 
-  function calcDamage(atk, def, power = 1.0) {
+  function calcDamage(atk, def, power = 1.0, atkElem, defElem) {
     // 防御軽減: def / (def + 500) が軽減率（上限80%）
     const reduction = Math.min(0.8, def / (def + 500));
-    const base = atk * power * (1 - reduction);
+    const elemMult = getElemMult(atkElem, defElem);
+    const base = atk * power * (1 - reduction) * elemMult;
     const variance = 0.9 + Math.random() * 0.2; // ±10%
     return Math.max(1, Math.floor(base * variance));
+  }
+
+  function isWeakness(atkElem, defElem) {
+    if (!atkElem || !defElem) return false;
+    return (ELEMENT_WEAKNESS[atkElem] || []).includes(defElem);
   }
 
   function calcHeal(atk, power = 1.0) {
@@ -40,9 +78,10 @@ const BattleEngine = (() => {
 
       case 'damage_single': {
         const target = enemies[Math.floor(Math.random() * enemies.length)];
-        const dmg = calcDamage(actor.stats.atk, target.stats.def, skill.power);
+        const dmg = calcDamage(actor.stats.atk, target.stats.def, skill.power, actor.element, target.element);
         target.currentHp -= dmg;
-        log.push({ type: 'skill', text: `✨ ${aName}の【${skill.name}】！ ${target.name}に ${fmtN(dmg)} の大ダメージ！`, dmg, isSkill: true });
+        const weakTag = isWeakness(actor.element, target.element) ? ' 🔥弱点！' : '';
+        log.push({ type: 'skill', text: `✨ ${aName}の【${skill.name}】！ ${target.name}に ${fmtN(dmg)} の大ダメージ！${weakTag}`, dmg, isSkill: true });
         if (target.currentHp <= 0) log.push({ type: 'defeat', text: `💀 ${target.name}が倒れた！`, isEnemy: target.isEnemy });
         break;
       }
@@ -50,9 +89,10 @@ const BattleEngine = (() => {
       case 'damage_all': {
         log.push({ type: 'skill', text: `💥 ${aName}の【${skill.name}】！ 全体攻撃！`, isSkill: true });
         enemies.forEach(t => {
-          const dmg = calcDamage(actor.stats.atk, t.stats.def, skill.power);
+          const dmg = calcDamage(actor.stats.atk, t.stats.def, skill.power, actor.element, t.element);
           t.currentHp -= dmg;
-          log.push({ type: 'aoe', text: `  → ${t.name}に ${fmtN(dmg)} ダメージ！`, dmg });
+          const wt = isWeakness(actor.element, t.element) ? ' 🔥弱点！' : '';
+          log.push({ type: 'aoe', text: `  → ${t.name}に ${fmtN(dmg)} ダメージ！${wt}`, dmg });
           if (t.currentHp <= 0) log.push({ type: 'defeat', text: `💀 ${t.name}が倒れた！`, isEnemy: t.isEnemy });
         });
         break;
@@ -63,11 +103,12 @@ const BattleEngine = (() => {
         let total = 0;
         const hits = skill.hits || 3;
         for (let i = 0; i < hits; i++) {
-          const dmg = calcDamage(actor.stats.atk, target.stats.def, skill.power);
+          const dmg = calcDamage(actor.stats.atk, target.stats.def, skill.power, actor.element, target.element);
           target.currentHp -= dmg;
           total += dmg;
         }
-        log.push({ type: 'skill', text: `⚡ ${aName}の【${skill.name}】！ ${hits}連撃で計 ${fmtN(total)} ダメージ！`, dmg: total, isSkill: true });
+        const wt = isWeakness(actor.element, target.element) ? ' 🔥弱点！' : '';
+        log.push({ type: 'skill', text: `⚡ ${aName}の【${skill.name}】！ ${hits}連撃で計 ${fmtN(total)} ダメージ！${wt}`, dmg: total, isSkill: true });
         if (target.currentHp <= 0) log.push({ type: 'defeat', text: `💀 ${target.name}が倒れた！`, isEnemy: target.isEnemy });
         break;
       }
@@ -167,6 +208,32 @@ const BattleEngine = (() => {
       }))
     ];
 
+    // ─── 編成ボーナス解析 ─────────────────────────────────────────────────────
+    const teamFighters = fighters.filter(f => !f.isEnemy);
+    const teamRoles  = new Set(teamFighters.map(f => f.type || ''));
+    const teamElems  = teamFighters.map(f => f.element).filter(Boolean);
+    const allSameElem = teamElems.length > 1 && teamElems.every(e => e === teamElems[0]);
+    const hasTank    = teamRoles.has('tank');
+    const hasHealer  = teamRoles.has('healer');
+    const hasAttacker = teamRoles.has('attacker') || teamRoles.has('assassin') || teamRoles.has('mage');
+    const roleCoverage = (hasTank ? 1 : 0) + (hasHealer ? 1 : 0) + (hasAttacker ? 1 : 0);
+
+    // 同属性ボーナス: チーム全員のATK +20%
+    if (allSameElem) {
+      teamFighters.forEach(f => { f.stats.atk = Math.floor(f.stats.atk * 1.20); });
+      log.push({ type: 'skill', text: `✨ 全員が「${teamElems[0]}」属性！ 属性共鳴 ATK+20%！`, isSkill: true });
+    }
+    // 役割カバーボーナス (タンク+ヒーラー+アタッカー) → チームATK+10%
+    if (roleCoverage >= 3) {
+      teamFighters.forEach(f => { f.stats.atk = Math.floor(f.stats.atk * 1.10); });
+      log.push({ type: 'skill', text: `⚡ 編成ボーナス！ タンク+回復+攻撃の完璧な布陣 ATK+10%！`, isSkill: true });
+    }
+    // タンクボーナス: 敵全体のATK -15%（盾役が前衛に立つ）
+    if (hasTank) {
+      fighters.filter(f => f.isEnemy).forEach(e => { e.stats.atk = Math.floor(e.stats.atk * 0.85); });
+      log.push({ type: 'skill', text: `🛡️ タンクが前衛！ 敵の攻撃力が下がった！(-15%)`, isSkill: true });
+    }
+
     for (let turn = 0; turn < MAX_TURNS; turn++) {
 
       const alive = fighters.filter(f => f.currentHp > 0);
@@ -211,15 +278,25 @@ const BattleEngine = (() => {
         }
 
         if (!acted) {
-          // 通常攻撃
+          // 通常攻撃（属性相性を考慮）
           const target = enemies[Math.floor(Math.random() * enemies.length)];
-          const dmg = calcDamage(actor.stats.atk, target.stats.def);
+          const dmg = calcDamage(actor.stats.atk, target.stats.def, 1.0, actor.element, target.element);
           target.currentHp -= dmg;
-          log.push({ type: 'attack', text: `⚔️ ${actor.name}の攻撃！ ${target.name}に ${fmtN(dmg)} ダメージ！`, dmg, isEnemyAttacker: actor.isEnemy });
+          const wt = isWeakness(actor.element, target.element) ? ' 🔥弱点！' : '';
+          log.push({ type: 'attack', text: `⚔️ ${actor.name}の攻撃！ ${target.name}に ${fmtN(dmg)} ダメージ！${wt}`, dmg, isEnemyAttacker: actor.isEnemy });
           if (target.currentHp <= 0) {
             log.push({ type: 'defeat', text: `💀 ${target.name}が倒れた！`, isEnemy: target.isEnemy });
           }
         }
+      }
+
+      // ターン終了: ヒーラー役割ボーナス — 生存チーム全員を3%回復（3ターンごと）
+      if (hasHealer && turn % 3 === 0) {
+        const liveTeam = fighters.filter(f => !f.isEnemy && f.currentHp > 0);
+        liveTeam.forEach(f => {
+          const heal = Math.floor(f.stats.hp * 0.03);
+          f.currentHp = Math.min(f.stats.hp, f.currentHp + heal);
+        });
       }
     }
 

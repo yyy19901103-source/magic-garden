@@ -202,6 +202,11 @@ const UI = (() => {
       if (!el) return;
       const state = Game.getState();
       el.innerHTML = '';
+
+      const formDefs = state.formation
+        .filter(gid => gid && state.generals[gid])
+        .map(gid => GENERALS_DATA[gid]);
+
       state.formation.forEach((gid, i) => {
         const slot = document.createElement('div');
         slot.className = 'formation-slot';
@@ -228,6 +233,33 @@ const UI = (() => {
         }
         el.appendChild(slot);
       });
+
+      // 編成ボーナス表示
+      if (formDefs.length >= 2) {
+        const elems = formDefs.map(d => d.element).filter(Boolean);
+        const roles = formDefs.map(d => d.type).filter(Boolean);
+        const hasTank    = roles.includes('tank');
+        const hasHealer  = roles.includes('healer');
+        const hasAtk     = roles.some(r => ['attacker','assassin','mage'].includes(r));
+        const allSameElem = elems.length === formDefs.length && elems.every(e => e === elems[0]);
+
+        const bonuses = [];
+        if (allSameElem && elems.length > 1) bonuses.push(`✨ ${elems[0]}属性共鳴 ATK+20%`);
+        if (hasTank && hasHealer && hasAtk)   bonuses.push('⚡ 完璧布陣 ATK+10%');
+        if (hasTank)   bonuses.push('🛡️ タンク前衛 敵ATK-15%');
+        if (hasHealer) bonuses.push('💚 ヒーラー 毎3ターン全体回復');
+
+        if (bonuses.length > 0) {
+          const bonusDiv = document.createElement('div');
+          bonusDiv.className = 'formation-bonus-bar';
+          bonusDiv.innerHTML = bonuses.map(b => `<span class="fm-bonus">${b}</span>`).join('');
+          el.parentElement.insertBefore(bonusDiv, el.nextSibling);
+        } else {
+          // 既存ボーナスバーがあれば削除
+          const old = el.parentElement.querySelector('.formation-bonus-bar');
+          if (old) old.remove();
+        }
+      }
     },
 
     renderDailyTasks() {

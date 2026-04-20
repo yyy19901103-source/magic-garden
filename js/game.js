@@ -376,7 +376,11 @@ const Game = (() => {
     const teamRaw = teamIds.map(id => {
       const gs  = state.generals[id];
       const def = GENERALS_DATA[id];
-      return { id, name: def.name, emoji: def.emoji, stats: calcCharStats(gs, def), isEnemy: false };
+      return {
+        id, name: def.name, emoji: def.emoji,
+        stats: calcCharStats(gs, def), isEnemy: false,
+        element: def.element, type: def.type   // 属性・役割を渡す
+      };
     });
     const team = _applySkillLevelsToTeam(teamRaw);
 
@@ -384,7 +388,9 @@ const Game = (() => {
     const enemies = stage.enemies.map(e => ({
       name: e.name, emoji: e.emoji,
       stats: { hp: e.hp, atk: e.atk, def: e.def, spd: e.spd },
-      isEnemy: true
+      isEnemy: true,
+      element: e.element || null,  // 敵の属性（定義があれば）
+      skills: e.skills || []
     }));
 
     const result = BattleEngine.simulate(team, enemies);
@@ -608,13 +614,19 @@ const Game = (() => {
     const teamRaw = teamIds.map(id => {
       const gs  = state.generals[id];
       const def = GENERALS_DATA[id];
-      return { id, name: def.name, emoji: def.emoji, stats: calcCharStats(gs, def), isEnemy: false };
+      return {
+        id, name: def.name, emoji: def.emoji,
+        stats: calcCharStats(gs, def), isEnemy: false,
+        element: def.element, type: def.type
+      };
     });
     const team = _applySkillLevelsToTeam(teamRaw);
     const enemies = bossData.enemies.map(e => ({
       name: e.name, emoji: e.emoji,
       stats: { hp: e.hp, atk: e.atk, def: e.def, spd: e.spd },
-      isEnemy: true
+      isEnemy: true,
+      element: e.element || null,
+      skills: e.skills || []
     }));
 
     const result = BattleEngine.simulate(team, enemies);

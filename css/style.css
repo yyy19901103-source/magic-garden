@@ -288,6 +288,18 @@ body {
 .slot-lv     { font-size: 10px; color: var(--text-dim); }
 .slot-power  { font-size: 10px; color: var(--gold); font-weight: bold; }
 
+/* 編成ボーナスバー */
+.formation-bonus-bar {
+  display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;
+  padding: 6px 8px; background: rgba(139,92,246,.08);
+  border-radius: var(--radius-sm); border: 1px dashed rgba(139,92,246,.3);
+}
+.fm-bonus {
+  font-size: 10px; color: var(--primary); font-weight: 500;
+  background: rgba(139,92,246,.12); padding: 2px 8px;
+  border-radius: 10px; border: 1px solid rgba(139,92,246,.2);
+}
+
 /* 日課タスク */
 .daily-tasks-list { display: flex; flex-direction: column; gap: 6px; }
 .daily-task {

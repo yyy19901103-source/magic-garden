@@ -13,8 +13,8 @@ const STAGES_DATA = [
       {
         id: '1-1', name: '迷いの森', isBoss: false,
         enemies: [
-          { name: 'スライム', emoji: '🟢', hp: 600,  atk: 80,  def: 30,  spd: 50 },
-          { name: 'スライム', emoji: '🟢', hp: 600,  atk: 80,  def: 30,  spd: 50 }
+          { name: 'スライム', emoji: '🟢', hp: 600,  atk: 80,  def: 30,  spd: 50, element: '水' },
+          { name: 'スライム', emoji: '🟢', hp: 600,  atk: 80,  def: 30,  spd: 50, element: '水' }
         ],
         rewards: { coins: [80, 150], exp: [30, 60],
           material: { id: 'herb', chance: 0.5 },
@@ -37,9 +37,9 @@ const STAGES_DATA = [
       {
         id: '1-3', name: '森の奥地', isBoss: false,
         enemies: [
-          { name: 'ゴブリン', emoji: '👺', hp: 1200, atk: 130, def: 60,  spd: 75 },
-          { name: 'ゴブリン', emoji: '👺', hp: 1200, atk: 130, def: 60,  spd: 75 },
-          { name: 'ゴブリン', emoji: '👺', hp: 1200, atk: 130, def: 60,  spd: 75 }
+          { name: 'ゴブリン', emoji: '👺', hp: 1200, atk: 130, def: 60,  spd: 75, element: '土' },
+          { name: 'ゴブリン', emoji: '👺', hp: 1200, atk: 130, def: 60,  spd: 75, element: '土' },
+          { name: 'ゴブリン', emoji: '👺', hp: 1200, atk: 130, def: 60,  spd: 75, element: '土' }
         ],
         rewards: { coins: [160, 260], exp: [70, 110],
           material: { id: 'fang', chance: 0.55 },
@@ -50,9 +50,9 @@ const STAGES_DATA = [
       {
         id: '1-4', name: '狼の縄張り', isBoss: false,
         enemies: [
-          { name: 'オオカミ', emoji: '🐺', hp: 1800, atk: 200, def: 80,  spd: 130 },
-          { name: 'オオカミ', emoji: '🐺', hp: 1800, atk: 200, def: 80,  spd: 130 },
-          { name: 'オオカミ', emoji: '🐺', hp: 1800, atk: 200, def: 80,  spd: 130 }
+          { name: 'オオカミ', emoji: '🐺', hp: 1800, atk: 200, def: 80,  spd: 130, element: '風' },
+          { name: 'オオカミ', emoji: '🐺', hp: 1800, atk: 200, def: 80,  spd: 130, element: '風' },
+          { name: 'オオカミ', emoji: '🐺', hp: 1800, atk: 200, def: 80,  spd: 130, element: '風' }
         ],
         rewards: { coins: [200, 320], exp: [90, 140],
           material: { id: 'pelt', chance: 0.6 },
@@ -63,7 +63,7 @@ const STAGES_DATA = [
       {
         id: '1-5', name: '【BOSS】古樹の精', isBoss: true,
         enemies: [
-          { name: '古樹の精', emoji: '🌳', hp: 12000, atk: 320, def: 220, spd: 45,
+          { name: '古樹の精', emoji: '🌳', hp: 12000, atk: 320, def: 220, spd: 45, element: '森',
             skills: [
               { name: '根の縛り', sp: 4, type: 'atk_down',  power: 0.2, description: '蔓で縛り敵の攻撃を下げる' },
               { name: '古樹の怒り', sp: 7, type: 'damage_all', power: 0.9, description: '枝で全体を薙ぎ払う' }
@@ -110,7 +110,7 @@ const STAGES_DATA = [
       {
         id: '2-3', name: '【BOSS】魔王', isBoss: true,
         enemies: [
-          { name: '魔王', emoji: '👿', hp: 30000, atk: 550, def: 380, spd: 110,
+          { name: '魔王', emoji: '👿', hp: 30000, atk: 550, def: 380, spd: 110, element: '闇',
             skills: [
               { name: '魔王の威圧', sp: 3, type: 'atk_down',     power: 0.25, description: '全体の戦意を砕く' },
               { name: '闇の爆撃',   sp: 6, type: 'damage_all',   power: 1.1,  description: '闇の力で全体を爆撃' },
@@ -199,7 +199,7 @@ const STAGES_DATA = [
       {
         id: '3-6', name: '【BOSS】古の女神', isBoss: true,
         enemies: [
-          { name: '古の女神', emoji: '🌸', hp: 80000, atk: 780, def: 600, spd: 120,
+          { name: '古の女神', emoji: '🌸', hp: 80000, atk: 780, def: 600, spd: 120, element: '光',
             skills: [
               { name: '聖なる裁き', sp: 4, type: 'damage_all',   power: 1.2, description: '神の裁きが全体に降り注ぐ' },
               { name: '女神の癒し', sp: 6, type: 'heal_single',  power: 2.0, description: '自身のHPを大回復' },
@@ -225,8 +225,8 @@ const STAGES_DATA = [
       {
         id: '4-1', name: '溶岩の渓谷', isBoss: false,
         enemies: [
-          { name: 'ワイバーン', emoji: '🦎', hp: 15000, atk: 800, def: 550, spd: 110 },
-          { name: 'ワイバーン', emoji: '🦎', hp: 15000, atk: 800, def: 550, spd: 110 }
+          { name: 'ワイバーン', emoji: '🦎', hp: 15000, atk: 800, def: 550, spd: 110, element: '炎' },
+          { name: 'ワイバーン', emoji: '🦎', hp: 15000, atk: 800, def: 550, spd: 110, element: '炎' }
         ],
         rewards: { coins: [1000, 1500], exp: [400, 600],
           material: { id: 'dragonscale', chance: 0.5 },
@@ -249,8 +249,8 @@ const STAGES_DATA = [
       {
         id: '4-3', name: '竜の眠る丘', isBoss: false,
         enemies: [
-          { name: '古竜', emoji: '🐉', hp: 35000, atk: 950, def: 700, spd: 80 },
-          { name: 'ワイバーン', emoji: '🦎', hp: 15000, atk: 800, def: 550, spd: 110 }
+          { name: '古竜', emoji: '🐉', hp: 35000, atk: 950, def: 700, spd: 80, element: '炎' },
+          { name: 'ワイバーン', emoji: '🦎', hp: 15000, atk: 800, def: 550, spd: 110, element: '炎' }
         ],
         rewards: { coins: [1400, 2100], exp: [560, 840],
           material: { id: 'dragonscale', chance: 0.6 },
@@ -286,7 +286,7 @@ const STAGES_DATA = [
       {
         id: '4-6', name: '【BOSS】竜王ヴァルグ', isBoss: true,
         enemies: [
-          { name: '竜王ヴァルグ', emoji: '🐲', hp: 200000, atk: 1200, def: 900, spd: 100,
+          { name: '竜王ヴァルグ', emoji: '🐲', hp: 200000, atk: 1200, def: 900, spd: 100, element: '炎',
             skills: [
               { name: '竜の咆哮',   sp: 3, type: 'atk_down',    power: 0.3,  description: '雄叫びで全体の攻撃力を下げる' },
               { name: '業火の息',   sp: 5, type: 'damage_all',  power: 1.3,  description: '炎のブレスで全体を焼き尽くす' },
@@ -362,7 +362,7 @@ const STAGES_DATA = [
       {
         id: '5-5', name: '【最終BOSS】天空の守護神', isBoss: true,
         enemies: [
-          { name: '天空の守護神', emoji: '⚡', hp: 500000, atk: 1800, def: 1200, spd: 140,
+          { name: '天空の守護神', emoji: '⚡', hp: 500000, atk: 1800, def: 1200, spd: 140, element: '雷',
             skills: [
               { name: '天罰',       sp: 2, type: 'damage_single', power: 3.5,  description: '神の裁きを一点に集中させる' },
               { name: '神聖波動',   sp: 5, type: 'damage_all',    power: 1.5,  description: '聖なる衝撃波で全体を薙ぎ払う' },
@@ -454,7 +454,7 @@ const STAGES_DATA = [
       {
         id: '6-6', name: '【最終BOSS】夢魔女王リリス', isBoss: true,
         enemies: [
-          { name: '夢魔女王リリス', emoji: '🦋', hp: 800000, atk: 2200, def: 1600, spd: 180,
+          { name: '夢魔女王リリス', emoji: '🦋', hp: 800000, atk: 2200, def: 1600, spd: 180, element: '夢',
             skills: [
               { name: '夢の誘惑',     sp: 2, type: 'debuff_atk',  power: 0.35, description: '甘い夢で全体の攻撃力を下げる' },
               { name: '蝶の乱舞',     sp: 4, type: 'damage_all',  power: 1.4,  description: '無数の蝶が全体を切り裂く' },
@@ -578,3 +578,4 @@ const DAILY_BOSS_DATA = [
     rewards: { coins: [8000, 12000], crystals: 80, material: 'shard_s', materialCount: 10 }
   }
 ];
+
