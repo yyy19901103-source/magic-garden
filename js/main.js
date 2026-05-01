@@ -11,6 +11,115 @@ const UI = (() => {
   const hide = id => { const e=$(id); if(e) e.classList.add('hidden'); };
   const showTemp = (id, ms=2000) => { show(id); setTimeout(() => hide(id), ms); };
 
+  // 材料アイコンを統一ピクセル枠で囲む
+  // (12種の絵文字を全SVG化せず、ピクセル枠+背景色で「素材タイル」の見た目に統一)
+  const MAT_BG = {
+    herb:'#3a6b3a',  fang:'#d8d0b8',  pelt:'#7a4a30',  bark:'#5a3a20',
+    iron:'#666b78',  darkstone:'#2a1040',  crystaldust:'#4a8acc',
+    goddessfeather:'#d8c8e8',  dragonscale:'#8a2222',  holywater:'#4abae8',
+    dreamdust:'#a06bd8',  shard_s:'#3a8aaa'
+  };
+  function matIcon(matId) {
+    if (!matId) return '';
+    const md = (typeof MATERIALS_DATA !== 'undefined') ? MATERIALS_DATA[matId] : null;
+    if (!md) return '';
+    const bg = MAT_BG[matId] || '#555';
+    return `<span class="mat-icon" style="background:${bg}" title="${md.name}">${md.emoji}</span>`;
+  }
+
+  // HTML属性エスケープ（XSS防止）
+  function escapeAttr(v = '') {
+    return String(v)
+      .replaceAll('&', '&amp;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;');
+  }
+
+  // 既存ボタンのリスナーをクローン置換でリセットして新しい handler をバインド
+  // 同じ DOM 要素に複数回 listener が積み重なるのを防ぐ
+  function bindFresh(elemOrId, handler) {
+    const el = (typeof elemOrId === 'string') ? document.getElementById(elemOrId) : elemOrId;
+    if (!el) return null;
+    const fresh = el.cloneNode(true);
+    el.replaceWith(fresh);
+    fresh.addEventListener('click', handler);
+    return fresh;
+  }
+
+  // ログエントリ配列をDOMに描画 (animDelay指定でフェードイン演出)
+  function renderLogEntries(entries, container, animDelay = 0) {
+    container.innerHTML = '';
+    entries.forEach((entry, i) => {
+      const draw = () => {
+        const div = document.createElement('div');
+        div.className = classifyLogEntry(entry) + (animDelay ? ' anim-fadein' : '');
+        div.textContent = entry.text;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+      };
+      if (animDelay) setTimeout(draw, i * animDelay); else draw();
+    });
+  }
+
+  // 戦闘ログ entry の種別を判定して色クラス付与
+  function classifyLogEntry(entry) {
+    const t = entry.text || '';
+    const cls = ['log-entry'];
+    if (entry.isSkill)         cls.push('log-skill');
+    if (entry.type === 'result') cls.push('log-result');
+    // 重要イベント
+    if (t.includes('暴撃'))     cls.push('log-crit');
+    if (t.includes('弱点'))     cls.push('log-weakness');
+    if (t.includes('回復') || t.includes('癒'))     cls.push('log-heal');
+    if (t.includes('倒した') || t.includes('撃破')) cls.push('log-kill');
+    if (t.includes('被弾') || t.includes('ダメージ')) cls.push('log-dmg');
+    if (t.includes('バフ') || t.includes('強化'))   cls.push('log-buff');
+    if (t.includes('デバフ') || t.includes('弱体')) cls.push('log-debuff');
+    if (t.includes('外し') || t.includes('回避'))   cls.push('log-miss');
+    if (entry.type === 'turn')  cls.push('log-turn');
+    return cls.join(' ');
+  }
+
+  // 敵名 → ピクセルスプライトクラス フォールバックマップ
+  // (一次データは stages_data.js の enemy.spriteKey、ここは後方互換用)
+  const ENEMY_SPRITE = {
+    'スライム': 'slime',
+    'ゴブリン': 'goblin',
+    'オオカミ': 'wolf',
+    '古樹の精': 'treant',
+    '古竜': 'dragon',
+    '竜王ヴァルグ': 'king',
+    'ワイバーン': 'wyvern',
+    '魔王': 'demon',
+    '古の女神': 'goddess',
+    '試練の番人': 'guard',
+    '試練の番人・強': 'guard2',
+    '試練の番人・極': 'guard3',
+    '天空の守護神': 'titan',
+    '夢魔女王リリス': 'lilith',
+    '鎧ゴブリン': 'goblin_armor',
+    '闇の騎士': 'dark_knight',
+    '森の妖精': 'fairy',
+    '石像兵': 'golem',
+    '天空騎士': 'sky_knight',
+    'コウモリ': 'bat',
+    'スケルトン': 'skeleton',
+    'ゾンビ': 'zombie',
+    'ハーピー': 'harpy',
+    'ミノタウロス': 'minotaur',
+    'リッチ': 'lich'
+  };
+
+  // enemy: オブジェクト or 文字列。spriteKey を優先しフォールバック→monster
+  function enemySprite(enemy, size='') {
+    const obj = (typeof enemy === 'string') ? { name: enemy } : (enemy || {});
+    const key = obj.spriteKey || ENEMY_SPRITE[obj.name] || 'monster';
+    const sz = size === 'lg' ? ' esprite-lg' : size === 'xl' ? ' esprite-xl' : size === 'sm' ? ' esprite-sm' : '';
+    return `<span class="esprite esprite-${escapeAttr(key)}${sz}" title="${escapeAttr(obj.name || '')}"></span>`;
+  }
+
   // 汎用トースト通知（alert()の代替）
   function showToast(msg, type='info', ms=2800) {
     let el = document.getElementById('game-toast');
@@ -27,10 +136,12 @@ const UI = (() => {
 
   function makePortrait(def, size='md') {
     const sizeClass = size === 'lg' ? 'portrait-lg' : 'portrait-md';
+    // 一覧用 (md) は lazy + async decoding で副将タブの読み込み爆発を抑制
+    const lazyAttrs = size === 'lg' ? '' : 'loading="lazy" decoding="async"';
     return `
       <div class="portrait ${sizeClass} rarity-${def.rarity}" style="background:${def.gradient}">
         <span class="portrait-emoji">${def.emoji}</span>
-        <img src="assets/characters/${def.id}.png"
+        <img ${lazyAttrs} src="assets/characters/${def.id}.png"
              onload="this.classList.add('loaded')" onerror="this.remove()">
         <span class="rarity-badge badge-${def.rarity}">${def.rarity}</span>
       </div>`;
@@ -108,7 +219,7 @@ const UI = (() => {
     if (stEl) {
       const pct = Math.min(100, Math.round(st.current / st.max * 100));
       stEl.innerHTML = `
-        <span class="st-label">⚡ ${st.current}/${st.max}</span>
+        <span class="st-label"><span class="picon picon-stam"></span> ${st.current}/${st.max}</span>
         <span class="st-bar-wrap"><span class="st-bar-fill" style="width:${pct}%"></span></span>`;
       stEl.title = st.current < st.max
         ? `次回+1まで${st.nextRegenMin}分`
@@ -179,36 +290,36 @@ const UI = (() => {
       const streakEmoji = streak >= 20 ? '🌈' : streak >= 10 ? '🔥' : streak >= 5 ? '⚡' : '🎯';
       const streakChip = streak >= 3 ? `
         <div class="dash-chip dash-chip--streak">
-          <span class="dash-icon">${streakEmoji}</span>
+          <span class="dash-icon"><span class="picon picon-fire"></span></span>
           <span class="dash-val">${streak}</span>
           <span class="dash-lbl">連勝中！</span>
         </div>` : `
         <div class="dash-chip dash-chip--streak">
-          <span class="dash-icon">🎯</span>
+          <span class="dash-icon"><span class="picon picon-target"></span></span>
           <span class="dash-val">${maxStreak || '-'}</span>
           <span class="dash-lbl">最大連勝</span>
         </div>`;
 
       el.innerHTML = `
         <div class="dash-chip dash-chip--clear">
-          <span class="dash-icon">🏆</span>
+          <span class="dash-icon"><span class="picon picon-trophy"></span></span>
           <span class="dash-val">${cleared}<span class="dash-total">/${total}</span></span>
           <span class="dash-lbl">クリア</span>
           ${clearBar}
         </div>
         <div class="dash-chip dash-chip--power">
-          <span class="dash-icon">⚔️</span>
+          <span class="dash-icon"><span class="picon picon-sword"></span></span>
           <span class="dash-val">${power >= 10000 ? (power/1000).toFixed(1)+'K' : power.toLocaleString()}</span>
           <span class="dash-lbl">戦力</span>
         </div>
         ${streakChip}
         <div class="dash-chip dash-chip--idle">
-          <span class="dash-icon">🪙</span>
+          <span class="dash-icon"><span class="picon picon-coin"></span></span>
           <span class="dash-val">${rate}</span>
           <span class="dash-lbl">毎分収益</span>
         </div>
         <div class="dash-chip dash-chip--generals">
-          <span class="dash-icon">👥</span>
+          <span class="dash-icon"><span class="picon picon-people"></span></span>
           <span class="dash-val">${genCnt}<span class="dash-total">/${Object.keys(GENERALS_DATA).length}</span></span>
           <span class="dash-lbl">副将</span>
         </div>`;
@@ -443,10 +554,14 @@ const UI = (() => {
         const div = document.createElement('div');
         div.className = `stage-item ${isCleared?'cleared':''} ${isNext&&!isCleared?'available':''} ${isLocked?'locked':''} ${stage.isBoss?'boss':''}`;
 
-        const statusIcon = isCleared ? '⭐' : isNext ? '▶' : '🔒';
+        const statusIcon = isCleared
+          ? '<span class="picon picon-star"></span>'
+          : isNext
+            ? '<span class="picon picon-play"></span>'
+            : '<span class="picon picon-lock"></span>';
         const btnHtml = !isLocked
-          ? `<button class="btn-battle" data-stage="${stage.id}">⚔️ 戦闘</button>`
-          : `<button class="btn-battle" disabled>🔒</button>`;
+          ? `<button class="btn-battle" data-stage="${stage.id}"><span class="picon picon-sword"></span> 戦闘</button>`
+          : `<button class="btn-battle" disabled><span class="picon picon-lock"></span></button>`;
 
         const bossKey = stageBossImg[stage.id];
         const bossImgHtml = bossKey
@@ -457,14 +572,14 @@ const UI = (() => {
         const r = stage.rewards;
         const matInfo = r.material && MATERIALS_DATA[r.material.id];
         const matHtml = matInfo
-          ? `<span class="reward-chip">${matInfo.emoji} ${matInfo.name} ${Math.round(r.material.chance*100)}%</span>`
+          ? `<span class="reward-chip">${matIcon(r.material.id)} ${matInfo.name} ${Math.round(r.material.chance*100)}%</span>`
           : '';
         const fcHtml = stage.firstClear
-          ? `<span class="reward-chip reward-chip-fc">💎 初回+${stage.firstClear.crystals}</span>`
+          ? `<span class="reward-chip reward-chip-fc"><span class="picon picon-gem"></span> 初回+${stage.firstClear.crystals}</span>`
           : '';
         const rewardBar = `<div class="stage-rewards-preview">
-          <span class="reward-chip">🪙 ${r.coins[0]}~${r.coins[1]}</span>
-          <span class="reward-chip">✨ ${r.exp[0]}~${r.exp[1]}</span>
+          <span class="reward-chip"><span class="picon picon-coin"></span> ${r.coins[0]}~${r.coins[1]}</span>
+          <span class="reward-chip"><span class="picon picon-exp"></span> ${r.exp[0]}~${r.exp[1]}</span>
           ${matHtml}${fcHtml}
         </div>`;
 
@@ -473,7 +588,7 @@ const UI = (() => {
           ${bossImgHtml}
           <div class="stage-info">
             <div class="stage-name">${stage.isBoss?'👑 ':''}${stage.id} ${stage.name}</div>
-            <div class="stage-enemies">${stage.enemies.map(e=>e.emoji).join(' ')}</div>
+            <div class="stage-enemies">${stage.enemies.map(e=>enemySprite(e, 'sm')).join(' ')}</div>
             ${rewardBar}
           </div>
           ${btnHtml}`;
@@ -501,8 +616,8 @@ const UI = (() => {
         card.className = `boss-card boss-${boss.difficulty}`;
         const bossImg = dailyImgMap[boss.id] || '';
         const imgHtml = bossImg
-          ? `<img src="assets/bosses/${bossImg}.png" class="boss-card-img" alt="${boss.name}" onerror="this.outerHTML='<span class=\\'boss-emoji\\'>${boss.emoji}</span>'">`
-          : `<span class="boss-emoji">${boss.emoji}</span>`;
+          ? `<img src="assets/bosses/${bossImg}.png" class="boss-card-img" alt="${escapeAttr(boss.name)}" onerror="this.outerHTML='${enemySprite(boss, 'lg').replace(/'/g, '&#39;')}'">`
+          : enemySprite(boss, 'lg');
         card.innerHTML = `
           <div class="boss-card-header">
             ${imgHtml}
@@ -512,12 +627,12 @@ const UI = (() => {
             </div>
           </div>
           <div class="boss-rewards">
-            <span class="boss-reward-chip">🪙 ${boss.rewards.coins[0].toLocaleString()}〜</span>
-            <span class="boss-reward-chip">💎 +${boss.rewards.crystals}</span>
-            <span class="boss-reward-chip">${MATERIALS_DATA[boss.rewards.material]?.emoji} ×${boss.rewards.materialCount}</span>
+            <span class="boss-reward-chip"><span class="picon picon-coin"></span> ${boss.rewards.coins[0].toLocaleString()}〜</span>
+            <span class="boss-reward-chip"><span class="picon picon-gem"></span> +${boss.rewards.crystals}</span>
+            <span class="boss-reward-chip">${matIcon(boss.rewards.material)} ×${boss.rewards.materialCount}</span>
           </div>
           <button class="btn-boss-fight" data-boss="${boss.id}" ${disabled ? 'disabled' : ''}>
-            ${disabled ? '本日終了' : '⚔️ 挑戦する'}
+            ${disabled ? '本日終了' : '<span class="picon picon-sword"></span> 挑戦する'}
           </button>`;
         el.appendChild(card);
       });
@@ -530,28 +645,121 @@ const UI = (() => {
     lastStageId: null,
 
     handleBattle(stageId) {
-      const result = Game.battle(stageId);
-      if (result.reason) {
-        if (result.reason === 'no_team')    { showToast('👥 編成に副将を入れてください！', 'warn'); return; }
-        if (result.reason === 'no_stamina') { showToast('⚡ スタミナ不足！ 5分ごとに1回復します', 'warn'); updateResourceBar(); return; }
-        if (result.reason !== undefined && !result.win) { alert('エラー: ' + result.reason); return; }
+      const stage = (typeof findStageDef === 'function') ? findStageDef(stageId) : null;
+      const team = Game.getFormationTeam ? Game.getFormationTeam() : [];
+      // ── 演出前バリデーション (失敗時は演出をスキップ) ──
+      if (!team || team.filter(t => t).length === 0) {
+        showToast('👥 編成に副将を入れてください！', 'warn'); return;
       }
-      this.lastStageId = stageId;
-      updateResourceBar();
-      this.renderChapter();
-      HomeTab.renderDailyTasks();
-      this.showBattleResult(stageId, result, false);
+      const stCur = Game.getStamina ? (Game.getStamina().current ?? 0) : 999;
+      if (stCur < 1) {
+        showToast('⚡ スタミナ不足！ 5分ごとに1回復します', 'warn'); updateResourceBar(); return;
+      }
+      this.showBattleIntro({ team, enemies: stage ? stage.enemies : [], isBoss: stage && stage.isBoss, stageName: stage ? stage.name : '' }, () => {
+        const result = Game.battle(stageId);
+        if (result.reason) {
+          if (result.reason === 'no_team')    { showToast('👥 編成に副将を入れてください！', 'warn'); return; }
+          if (result.reason === 'no_stamina') { showToast('⚡ スタミナ不足！', 'warn'); updateResourceBar(); return; }
+          if (result.reason !== undefined && !result.win) { showToast('エラー: ' + result.reason, 'error'); return; }
+        }
+        this.lastStageId = stageId;
+        updateResourceBar();
+        this.renderChapter();
+        HomeTab.renderDailyTasks();
+        this.showBattleResult(stageId, result, false);
+      });
     },
 
     handleBossBattle(bossId) {
-      const result = Game.battleBoss(bossId);
-      if (result.reason === 'no_attempts') { showToast('🔒 本日の挑戦回数が尽きました', 'warn'); return; }
-      if (result.reason === 'no_team')     { showToast('👥 編成に副将を入れてください！', 'warn'); return; }
-      if (result.reason === 'no_stamina')  { showToast('⚡ スタミナ不足！ 日課ボスは3消費します', 'warn'); updateResourceBar(); return; }
-      updateResourceBar();
-      this.renderBossSection();
-      HomeTab.renderDailyTasks();
-      this.showBattleResult(bossId, result, true);
+      const team = Game.getFormationTeam ? Game.getFormationTeam() : [];
+      const boss = (typeof DAILY_BOSS_DATA !== 'undefined') ? DAILY_BOSS_DATA.find(b => b.id === bossId) : null;
+      // ── 演出前バリデーション ──
+      if (!team || team.filter(t => t).length === 0) {
+        showToast('👥 編成に副将を入れてください！', 'warn'); return;
+      }
+      const stateNow = Game.getState ? Game.getState() : {};
+      const dailyBoss = stateNow.dailyBoss || {};
+      const attemptsLeft = (dailyBoss.maxAttempts ?? 5) - (dailyBoss.bossAttempts ?? 0);
+      if (attemptsLeft <= 0) {
+        showToast('🔒 本日の挑戦回数が尽きました', 'warn'); return;
+      }
+      const stCur = Game.getStamina ? (Game.getStamina().current ?? 0) : 999;
+      if (stCur < 3) {
+        showToast('⚡ スタミナ不足！ 日課ボスは3消費します', 'warn'); updateResourceBar(); return;
+      }
+      this.showBattleIntro({ team, enemies: boss ? boss.enemies : [], isBoss: true, stageName: boss ? boss.name : '' }, () => {
+        const result = Game.battleBoss(bossId);
+        if (result.reason === 'no_attempts') { showToast('🔒 本日の挑戦回数が尽きました', 'warn'); return; }
+        if (result.reason === 'no_team')     { showToast('👥 編成に副将を入れてください！', 'warn'); return; }
+        if (result.reason === 'no_stamina')  { showToast('⚡ スタミナ不足！', 'warn'); updateResourceBar(); return; }
+        updateResourceBar();
+        this.renderBossSection();
+        HomeTab.renderDailyTasks();
+        this.showBattleResult(bossId, result, true);
+      });
+    },
+
+    showBattleIntro({ team, enemies, isBoss, stageName }, onDone) {
+      const intro = document.getElementById('battle-intro');
+      // 設定で OFF の場合は演出スキップ
+      if (!intro || (window.__gameSettings && !window.__gameSettings.vsIntro)) { onDone(); return; }
+      const left  = intro.querySelector('.intro-team-left');
+      const right = intro.querySelector('.intro-team-right');
+      const sub   = intro.querySelector('.intro-vs-sub');
+      const warn  = intro.querySelector('.intro-warn');
+      const vs    = intro.querySelector('.intro-vs-text');
+
+      // 味方ポートレート
+      left.innerHTML = (team || []).filter(t => t && t.def).map((g, i) => {
+        const d = g.def || {};
+        return `
+        <div class="intro-fighter intro-ally" style="animation-delay:${i * 0.08}s">
+          <div class="intro-portrait" style="background:${d.gradient || '#555'}">
+            <img src="assets/characters/${d.id}.png" onerror="this.style.display='none'">
+            <span class="intro-emoji">${d.emoji || '⚔️'}</span>
+          </div>
+          <div class="intro-name">${d.name || ''}${d.element ? ` <span class="intro-elem">${d.element}</span>` : ''}</div>
+        </div>
+      `;}).join('');
+
+      // 敵アイコン (ピクセルスプライト)
+      right.innerHTML = (enemies || []).slice(0, 4).map((e, i) => `
+        <div class="intro-fighter intro-foe" style="animation-delay:${i * 0.08}s">
+          <div class="intro-portrait intro-portrait-foe ${isBoss ? 'intro-portrait-boss' : ''}">
+            ${enemySprite(e, 'lg')}
+          </div>
+          <div class="intro-name">${e.name || ''}${e.element ? ` <span class="intro-elem">${e.element}</span>` : ''}</div>
+        </div>
+      `).join('');
+
+      sub.textContent = stageName || '';
+      intro.classList.remove('hidden');
+      intro.classList.remove('intro-boss');
+      warn.classList.add('hidden');
+      vs.classList.remove('pulse');
+
+      // ボスなら警告フラッシュ → VS
+      const run = () => {
+        void intro.offsetWidth;
+        intro.classList.add('intro-playing');
+        vs.classList.add('pulse');
+        setTimeout(() => {
+          intro.classList.add('intro-fadeout');
+          setTimeout(() => {
+            intro.classList.add('hidden');
+            intro.classList.remove('intro-playing', 'intro-fadeout');
+            onDone();
+          }, 350);
+        }, 1400);
+      };
+
+      if (isBoss) {
+        intro.classList.add('intro-boss');
+        warn.classList.remove('hidden');
+        setTimeout(() => { warn.classList.add('hidden'); run(); }, 850);
+      } else {
+        run();
+      }
     },
 
     showBattleResult(id, result, isBoss) {
@@ -574,10 +782,29 @@ const UI = (() => {
       void banner.offsetWidth;                    // reflow で animation をリセット
       banner.classList.add(win ? 'win' : 'lose');
 
-      // 勝利時の紙吹雪アニメーション
+      // 映画級フィニッシュ演出：勝利=光線バースト / 敗北=画面暗転ビネット
+      const battleResultEl = document.getElementById('battle-result');
+      battleResultEl.classList.remove('finish-win', 'finish-lose', 'finish-boss-win');
+      void battleResultEl.offsetWidth;
+      if (win) {
+        battleResultEl.classList.add('finish-win');
+        if (isBoss) battleResultEl.classList.add('finish-boss-win');
+      } else {
+        battleResultEl.classList.add('finish-lose');
+      }
+
+      // クリティカルが発生していたら画面を一瞬震わす
+      const logArr = (result && result.log) || [];
+      const critCount = logArr.filter(l => typeof l === 'string' && l.includes('暴撃')).length;
+      if (critCount >= 1 && win) {
+        battleResultEl.classList.add('finish-crit-shake');
+        setTimeout(() => battleResultEl.classList.remove('finish-crit-shake'), 700);
+      }
+
+      // 勝利時の紙吹雪アニメーション (設定で OFF なら省略)
       const confettiEl = $('confetti-container');
       confettiEl.innerHTML = '';
-      if (win) {
+      if (win && (!window.__gameSettings || window.__gameSettings.confetti)) {
         const colors = ['#ffd700','#ff6b6b','#4ecdc4','#a8e6cf','#ff8b94','#c3b1e1','#fddb92','#d4fc79'];
         for (let i = 0; i < 45; i++) {
           const piece = document.createElement('div');
@@ -600,19 +827,19 @@ const UI = (() => {
       lootEl.innerHTML = '';
       if (win) {
         const loot = result.loot;
-        if (loot.coins)    lootEl.innerHTML += `<span class="loot-chip">🪙 +${loot.coins.toLocaleString()}</span>`;
-        if (loot.exp)      lootEl.innerHTML += `<span class="loot-chip">✨ EXP +${loot.exp}</span>`;
-        if (loot.crystals) lootEl.innerHTML += `<span class="loot-chip">💎 +${loot.crystals}</span>`;
+        if (loot.coins)    lootEl.innerHTML += `<span class="loot-chip"><span class="picon picon-coin"></span> +${loot.coins.toLocaleString()}</span>`;
+        if (loot.exp)      lootEl.innerHTML += `<span class="loot-chip"><span class="picon picon-exp"></span> EXP +${loot.exp}</span>`;
+        if (loot.crystals) lootEl.innerHTML += `<span class="loot-chip"><span class="picon picon-gem"></span> +${loot.crystals}</span>`;
         if (loot.material) {
           const md = MATERIALS_DATA[loot.material];
-          if (md) lootEl.innerHTML += `<span class="loot-chip">${md.emoji} ${md.name} ×${loot.materialCount||1}</span>`;
+          if (md) lootEl.innerHTML += `<span class="loot-chip">${matIcon(loot.material)} ${md.name} ×${loot.materialCount||1}</span>`;
         }
         if (!isBoss) {
           loot.items?.forEach(inst => {
             const ed = EQUIPMENT_DATA[inst.defId];
             if (ed) lootEl.innerHTML += `<span class="loot-chip rarity-chip-${ed.rarity}">${ed.emoji} ${ed.name}</span>`;
           });
-          if (loot.firstClear?.crystals) lootEl.innerHTML += `<span class="loot-chip first-clear">💎 初回 +${loot.firstClear.crystals}</span>`;
+          if (loot.firstClear?.crystals) lootEl.innerHTML += `<span class="loot-chip first-clear"><span class="picon picon-gem"></span> 初回 +${loot.firstClear.crystals}</span>`;
         }
         if (isBoss && result.attemptsLeft !== undefined) {
           lootEl.innerHTML += `<div class="loot-remaining">残り挑戦: ${result.attemptsLeft}回</div>`;
@@ -625,7 +852,13 @@ const UI = (() => {
         }
         // 連勝ストリーク表示
         if (loot.streak >= 3) {
-          const streakEmoji = loot.streak >= 20 ? '🌈' : loot.streak >= 10 ? '🔥' : loot.streak >= 5 ? '⚡' : '🎯';
+          const streakEmoji = loot.streak >= 20
+            ? '<span class="picon picon-trophy"></span>'
+            : loot.streak >= 10
+              ? '<span class="picon picon-fire"></span>'
+              : loot.streak >= 5
+                ? '<span class="picon picon-stam"></span>'
+                : '<span class="picon picon-target"></span>';
           const multStr = loot.streakMult ? ` (報酬×${loot.streakMult.toFixed(1)})` : '';
           lootEl.innerHTML += `<span class="loot-chip streak-chip">${streakEmoji} ${loot.streak}連勝！${multStr}</span>`;
         }
@@ -638,7 +871,7 @@ const UI = (() => {
         if (st) {
           statsEl.innerHTML = `
             <span class="bstat">⏱ ${result.turns}ターン</span>
-            <span class="bstat">⚔️ ${st.teamDmg.toLocaleString()}ダメ</span>
+            <span class="bstat"><span class="picon picon-sword"></span> ${st.teamDmg.toLocaleString()}ダメ</span>
             ${st.skillCount > 0 ? `<span class="bstat">✨ スキル${st.skillCount}回</span>` : ''}`;
         } else {
           statsEl.innerHTML = `<span class="bstat">⏱ ${result.turns}ターン</span>`;
@@ -648,15 +881,7 @@ const UI = (() => {
       const logEl = $('result-log');
       logEl.innerHTML = '';
       const highlights = BattleEngine.extractHighlights(result.log, 7);
-      highlights.forEach((entry, i) => {
-        setTimeout(() => {
-          const div = document.createElement('div');
-          div.className = `log-entry anim-fadein ${entry.isSkill?'log-skill':''} ${entry.type==='result'?'log-result':''}`;
-          div.textContent = entry.text;
-          logEl.appendChild(div);
-          logEl.scrollTop = logEl.scrollHeight;
-        }, i * 130);
-      });
+      renderLogEntries(highlights, logEl, 130);
 
       // 全ログトグル（ハイライト以外のエントリがある場合のみ表示）
       const toggleBtn = $('result-log-toggle');
@@ -666,35 +891,17 @@ const UI = (() => {
           toggleBtn.classList.remove('hidden');
           toggleBtn.classList.remove('open');
           toggleBtn.textContent = `📜 全ログを見る（${result.log.length}行） ▼`;
-          // 重複バインド防止のためクローン置換
-          const fresh = toggleBtn.cloneNode(true);
-          toggleBtn.replaceWith(fresh);
           let expanded = false;
-          fresh.addEventListener('click', () => {
+          const fresh = bindFresh(toggleBtn, () => {
             expanded = !expanded;
             fresh.classList.toggle('open', expanded);
             fresh.textContent = expanded
               ? '📜 折りたたむ ▲'
               : `📜 全ログを見る（${result.log.length}行） ▼`;
             if (expanded) {
-              // 全エントリを追記
-              logEl.innerHTML = '';
-              result.log.forEach(entry => {
-                const div = document.createElement('div');
-                div.className = `log-entry ${entry.isSkill?'log-skill':''} ${entry.type==='result'?'log-result':''}`;
-                div.textContent = entry.text;
-                logEl.appendChild(div);
-              });
-              logEl.scrollTop = logEl.scrollHeight;
+              renderLogEntries(result.log, logEl);
             } else {
-              // ハイライトに戻す
-              logEl.innerHTML = '';
-              highlights.forEach(entry => {
-                const div = document.createElement('div');
-                div.className = `log-entry ${entry.isSkill?'log-skill':''} ${entry.type==='result'?'log-result':''}`;
-                div.textContent = entry.text;
-                logEl.appendChild(div);
-              });
+              renderLogEntries(highlights, logEl);
             }
           });
         } else {
@@ -702,15 +909,15 @@ const UI = (() => {
         }
       }
 
-      // 再挑戦ボタン（通常ステージの勝利時のみ）
+      // 再挑戦ボタン（通常ステージのみ。勝敗ともに表示）
       const retryBtn = $('result-retry');
       if (retryBtn) {
-        if (!isBoss && win) {
+        if (!isBoss) {
           retryBtn.classList.remove('hidden');
-          // イベントを毎回付け直す（クローン置換で重複防止）
-          const fresh = retryBtn.cloneNode(true);
-          retryBtn.replaceWith(fresh);
-          fresh.addEventListener('click', () => {
+          retryBtn.innerHTML = win
+            ? '<span class="picon picon-play"></span> もう一度'
+            : '<span class="picon picon-play"></span> 再挑戦';
+          bindFresh(retryBtn, () => {
             hide('battle-result');
             setTimeout(() => this.handleBattle(id), 80);
           });
@@ -719,7 +926,62 @@ const UI = (() => {
         }
       }
 
+      // 次のステージボタン (通常ステージ勝利時、次ステージが解放されている場合)
+      const nextBtn = $('result-next');
+      if (nextBtn) {
+        let nextStageId = null;
+        if (!isBoss && win && id && typeof getAllStageIds === 'function') {
+          const ids = getAllStageIds();
+          const idx = ids.indexOf(id);
+          if (idx >= 0 && idx + 1 < ids.length) {
+            const candidate = ids[idx + 1];
+            // 解放済みかチェック (前ステージクリア済が条件)
+            const st = Game.getState ? Game.getState() : {};
+            const cleared = st.progress?.clearedStages || [];
+            if (cleared.includes(id)) {
+              nextStageId = candidate;
+            }
+          }
+        }
+        if (nextStageId) {
+          nextBtn.classList.remove('hidden');
+          const fresh2 = bindFresh(nextBtn, () => {
+            hide('battle-result');
+            setTimeout(() => this.handleBattle(nextStageId), 80);
+          });
+          if (!window.__gameSettings || window.__gameSettings.autofocusNext) {
+            setTimeout(() => fresh2?.focus(), 50);
+          }
+        } else {
+          nextBtn.classList.add('hidden');
+        }
+      }
+
       show('battle-result');
+
+      // ─── 自動連戦モード ───
+      const autoOn = window.__gameSettings && window.__gameSettings.autoReplay;
+      if (autoOn && !isBoss) {
+        if (this._autoReplayTimer) clearTimeout(this._autoReplayTimer);
+        if (win) {
+          const stCur = Game.getStamina ? (Game.getStamina().current ?? 0) : 0;
+          if (stCur >= 1) {
+            // スタミナ十分 → 自動再戦
+            this._autoReplayTimer = setTimeout(() => {
+              if (window.__gameSettings && window.__gameSettings.autoReplay
+                  && Game.getStamina && (Game.getStamina().current ?? 0) >= 1
+                  && !document.getElementById('battle-result').classList.contains('hidden')) {
+                hide('battle-result');
+                setTimeout(() => this.handleBattle(id), 80);
+              }
+            }, 2500);
+          } else {
+            window.__stopAutoReplay?.('⚡ スタミナ切れ。自動連戦を停止しました', 'warn');
+          }
+        } else {
+          window.__stopAutoReplay?.('💀 敗北。自動連戦を停止しました（編成見直しを推奨）', 'error');
+        }
+      }
     }
   };
 
@@ -800,13 +1062,18 @@ const UI = (() => {
         card.className = `general-card rarity-${def.rarity}`;
         const starsStr = '⭐'.repeat(gs.stars || 1);
         const inFm  = inFormation.includes(gid);
+        const expNext = Game.expToNext(gs.level);
+        const expPct  = expNext > 0 ? Math.min(100, Math.round((gs.exp / expNext) * 100)) : 100;
         card.innerHTML = `
           ${makePortrait(def,'md')}
           ${inFm ? '<span class="formation-badge">編成中</span>' : ''}
           <div class="card-footer">
             <div class="card-name">${def.name}</div>
             <div class="card-lv">Lv.${gs.level} <span class="card-stars" style="font-size:9px">${starsStr}</span></div>
-            <div class="card-power">⚔️${power >= 1000 ? (power/1000).toFixed(1)+'K' : power}</div>
+            <div class="card-exp-bar" title="EXP ${gs.exp}/${expNext} (${expPct}%)">
+              <div class="card-exp-fill" style="width:${expPct}%"></div>
+            </div>
+            <div class="card-power"><span class="picon picon-sword"></span> ${power >= 1000 ? (power/1000).toFixed(1)+'K' : power}</div>
           </div>`;
         card.addEventListener('click', () => this.showDetail(gid));
         el.appendChild(card);
@@ -826,7 +1093,11 @@ const UI = (() => {
       const hasCoins = !isAtMaxLv && Game.getState().resources.coins >= lvCost;
 
       const equips = gs.equips;
-      const slotLabels = { weapon: '⚔️ 武器', armor: '🛡️ 防具', accessory: '💍 装飾' };
+      const slotLabels = {
+        weapon:    '<span class="picon picon-sword"></span> 武器',
+        armor:     '<span class="picon picon-shield"></span> 防具',
+        accessory: '<span class="picon picon-ring"></span> 装飾'
+      };
       const equipsHtml = Object.entries(slotLabels).map(([slot, label]) => {
         const iid  = equips[slot];
         const inst = iid ? Game.getState().inventory.equipment.find(e=>e.instanceId===iid) : null;
@@ -1067,15 +1338,35 @@ const UI = (() => {
     showGachaResult(results) {
       const el = $('gacha-result-cards');
       el.innerHTML = '';
+      const hasSSR = results.some(r => r.def.rarity === 'SSR');
+      // SSR出現時は虹色バーストを overlay 内に1回だけ走らせる
+      const overlay = document.getElementById('gacha-result');
+      if (overlay) {
+        overlay.classList.toggle('has-ssr', hasSSR);
+        let burst = overlay.querySelector('.ssr-burst');
+        if (hasSSR) {
+          if (!burst) {
+            burst = document.createElement('div');
+            burst.className = 'ssr-burst';
+            overlay.appendChild(burst);
+          }
+          burst.classList.remove('ssr-burst-play'); void burst.offsetWidth;
+          burst.classList.add('ssr-burst-play');
+        } else if (burst) {
+          burst.remove();
+        }
+      }
       results.forEach(({ def, isNew }, i) => {
         const card = document.createElement('div');
         card.className = `gacha-card rarity-${def.rarity} card-reveal-hidden`;
+        const subHtml = isNew
+          ? '<span class="picon picon-star"></span> NEW！'
+          : '<span class="picon picon-exp"></span> 欠片 +5';
         card.innerHTML = `
           ${makePortrait(def,'md')}
           <div class="gacha-card-name">${def.name}</div>
-          <div class="gacha-card-sub">${isNew ? '🆕 NEW！' : `✨ 欠片 +5`}</div>`;
+          <div class="gacha-card-sub">${subHtml}</div>`;
         el.appendChild(card);
-        // 1枚ずつずらして回転リビール
         setTimeout(() => {
           card.classList.remove('card-reveal-hidden');
           if (def.rarity === 'SSR') card.classList.add('card-revealed');
@@ -1219,7 +1510,7 @@ const UI = (() => {
         const enhLabel = inst.enhanceLevel >= 10
           ? '<span class="enhance-max">MAX</span>'
           : `<button class="btn-enhance" data-iid="${inst.instanceId}" ${coins >= enhCost ? '' : 'disabled'}>
-               🔨 強化 <small>(${enhCost?.toLocaleString()}🪙)</small>
+               <span class="picon picon-hammer"></span> 強化 <small>(${enhCost?.toLocaleString()}<span class="picon picon-coin"></span>)</small>
              </button>`;
         const sellBase = { R: 100, SR: 500, SSR: 2000 }[ed.rarity] || 100;
         const sellVal  = Math.floor(sellBase * (1 + inst.enhanceLevel * 0.5));
@@ -1475,6 +1766,74 @@ const UI = (() => {
         if (e.key === 'Escape') { input.value = current; input.blur(); }
       });
     });
+
+    // ─── 設定モーダル ───────────────────────────────────────────
+    const SETTINGS_KEY = 'mg_settings_v1';
+    const defaultSettings = { scanline: true, vsIntro: true, confetti: true, autofocusNext: true, autoReplay: false, reducedMotion: false };
+    function loadSettings() {
+      try { return { ...defaultSettings, ...(JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}) }; }
+      catch { return { ...defaultSettings }; }
+    }
+    function saveSettings(s) { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch {} }
+    // 自動連戦を停止（メモリ/localStorage/UI 全部同期）
+    function stopAutoReplay(toastMsg, toastType = 'warn') {
+      if (!window.__gameSettings) return;
+      window.__gameSettings.autoReplay = false;
+      try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(window.__gameSettings)); } catch {}
+      const optBtn = document.getElementById('opt-auto-replay');
+      if (optBtn) {
+        optBtn.dataset.on = 'false';
+        optBtn.textContent = 'OFF';
+        optBtn.classList.remove('settings-toggle--on');
+      }
+      const badge = document.getElementById('auto-replay-badge');
+      if (badge) badge.remove();
+      if (toastMsg) showToast(toastMsg, toastType, 4000);
+    }
+    window.__stopAutoReplay = stopAutoReplay;
+
+    function applySettings(s) {
+      document.body.classList.toggle('opt-no-scanline', !s.scanline);
+      document.body.classList.toggle('opt-no-vs-intro', !s.vsIntro);
+      document.body.classList.toggle('opt-no-confetti', !s.confetti);
+      document.body.classList.toggle('opt-no-autofocus', !s.autofocusNext);
+      document.body.classList.toggle('opt-auto-replay-on', !!s.autoReplay);
+      document.body.classList.toggle('opt-reduced-motion', !!s.reducedMotion);
+      // 自動連戦インジケータ
+      let badge = document.getElementById('auto-replay-badge');
+      if (s.autoReplay) {
+        if (!badge) {
+          badge = document.createElement('div');
+          badge.id = 'auto-replay-badge';
+          badge.innerHTML = '<span class="picon picon-play"></span> 自動連戦中';
+          badge.title = 'クリックで停止';
+          badge.addEventListener('click', () => {
+            stopAutoReplay('自動連戦を停止しました', 'info');
+          });
+          document.body.appendChild(badge);
+        }
+      } else if (badge) {
+        badge.remove();
+      }
+      window.__gameSettings = s;
+    }
+    const _settings = loadSettings();
+    applySettings(_settings);
+    function setupSettingsToggle(id, key) {
+      const btn = $(id); if (!btn) return;
+      const sync = () => { btn.dataset.on = String(_settings[key]); btn.textContent = _settings[key] ? 'ON' : 'OFF'; btn.classList.toggle('settings-toggle--on', _settings[key]); };
+      sync();
+      btn.addEventListener('click', () => { _settings[key] = !_settings[key]; saveSettings(_settings); applySettings(_settings); sync(); });
+    }
+    setupSettingsToggle('opt-scanline',       'scanline');
+    setupSettingsToggle('opt-vs-intro',       'vsIntro');
+    setupSettingsToggle('opt-confetti',       'confetti');
+    setupSettingsToggle('opt-autofocus-next', 'autofocusNext');
+    setupSettingsToggle('opt-auto-replay',    'autoReplay');
+    setupSettingsToggle('opt-reduced-motion', 'reducedMotion');
+    $('btn-settings')?.addEventListener('click', () => show('settings-modal'));
+    $('settings-close')?.addEventListener('click', () => hide('settings-modal'));
+    $('settings-modal')?.addEventListener('click', e => { if (e.target === $('settings-modal')) hide('settings-modal'); });
 
     // 放置報酬受取
     $('collect-btn')?.addEventListener('click', () => {
