@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>まほうの庭 — 管理パネル</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Serif JP', 'Yu Mincho', '游明朝', serif;
+      background: #0e0825; color: #f0e8ff;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .panel {
+      background: #1a1040; border: 1px solid #3a2870; border-radius: 16px;
+      padding: 28px 24px; width: 100%; max-width: 480px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.7);
+    }
+    h1 { font-size: 18px; color: #ffd700; margin-bottom: 6px; }
+    .sub { font-size: 12px; color: #8878b0; margin-bottom: 24px; }
+    .section { margin-bottom: 20px; }
+    label { display: block; font-size: 12px; color: #b09cd8; margin-bottom: 5px; }
+    input, select {
+      width: 100%; padding: 9px 12px;
+      background: #231550; border: 1px solid #3a2870; border-radius: 8px;
+      color: #f0e8ff; font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color .2s;
+    }
+    input:focus, select:focus { border-color: #a78bfa; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button {
+      width: 100%; padding: 11px; margin-top: 6px;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      border: none; border-radius: 10px; color: #fff;
+      font-size: 14px; font-weight: bold; font-family: inherit;
+      cursor: pointer; transition: opacity .15s;
+    }
+    button:hover { opacity: .85; }
+    button.secondary {
+      background: #231550; border: 1px solid #3a2870;
+      color: #b09cd8; margin-top: 4px;
+    }
+    .result {
+      margin-top: 16px; padding: 12px;
+      background: #231550; border-radius: 10px;
+      font-size: 13px; line-height: 1.6;
+      border-left: 3px solid #a78bfa;
+      white-space: pre-wrap; word-break: break-all;
+      display: none;
+    }
+    .result.ok   { border-color: #34d399; }
+    .result.err  { border-color: #f87171; }
+    .divider { border: none; border-top: 1px solid #3a2870; margin: 20px 0; }
+    .warn {
+      background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.3);
+      border-radius: 8px; padding: 10px 12px;
+      font-size: 12px; color: #fde68a; margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+<div class="panel">
+  <h1>⚙️ まほうの庭 — 管理パネル</h1>
+  <p class="sub">プレイヤーリソース付与 / 情報確認</p>
+
+  <div class="warn">
+    ⚠️ このページはゲーム運営者専用です。<br>
+    GAS エンドポイントと管理者キーが必要です。
+  </div>
+
+  <!-- GAS設定 -->
+  <div class="section">
+    <label>GAS エンドポイント URL</label>
+    <input id="gas-url" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+  </div>
+  <div class="section">
+    <label>管理者キー (ADMIN_KEY)</label>
+    <input id="admin-key" type="password" placeholder="GAS Script Properties に設定したキー">
+  </div>
+
+  <hr class="divider">
+
+  <!-- プレイヤー情報確認 -->
+  <div class="section">
+    <label>プレイヤー ID</label>
+    <input id="player-id" type="text" placeholder="50ddf67d-83f3-48f1-9...">
+    <button class="secondary" onclick="playerInfo()">📋 プレイヤー情報確認</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- リソース付与 -->
+  <div class="section">
+    <div class="row">
+      <div>
+        <label>リソース種別</label>
+        <select id="resource">
+          <option value="crystals">💎 クリスタル</option>
+          <option value="coins">🪙 コイン</option>
+          <option value="stamina">⚡ スタミナ</option>
+        </select>
+      </div>
+      <div>
+        <label>操作</label>
+        <select id="mode">
+          <option value="grant">加算（追加）</option>
+          <option value="set">絶対値セット</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <label>数量</label>
+      <input id="amount" type="number" value="99999" min="0">
+    </div>
+    <button onclick="grantResource()">✨ 付与 / セット実行</button>
+  </div>
+
+  <div id="result" class="result"></div>
+</div>
+
+<script>
+  // localStorage に設定を保存して再入力を省く
+  const STORE_URL = 'mg_admin_url';
+  const STORE_KEY = 'mg_admin_key';
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const url = localStorage.getItem(STORE_URL);
+    const key = localStorage.getItem(STORE_KEY);
+    if (url) document.getElementById('gas-url').value = url;
+    if (key) document.getElementById('admin-key').value = key;
+  });
+
+  function getConfig() {
+    const url   = document.getElementById('gas-url').value.trim();
+    const key   = document.getElementById('admin-key').value.trim();
+    const pid   = document.getElementById('player-id').value.trim();
+    if (!url) { showResult('GAS エンドポイント URLを入力してください', false); return null; }
+    if (!key) { showResult('管理者キーを入力してください', false); return null; }
+    if (!pid) { showResult('プレイヤー IDを入力してください', false); return null; }
+    localStorage.setItem(STORE_URL, url);
+    localStorage.setItem(STORE_KEY, key);
+    return { url, key, pid };
+  }
+
+  async function callGas(params) {
+    const cfg = getConfig();
+    if (!cfg) return;
+    const qs = new URLSearchParams({ ...params, playerId: cfg.pid, adminKey: cfg.key });
+    const res = await fetch(`${cfg.url}?${qs}`, { redirect: 'follow' });
+    return res.json();
+  }
+
+  async function playerInfo() {
+    showResult('確認中…', null);
+    try {
+      const r = await callGas({ action: 'player_info' });
+      if (!r) return;
+      if (r.ok) {
+        showResult(
+          `✅ プレイヤー情報\n` +
+          `名前: ${r.playerName}\n` +
+          `💎 クリスタル: ${r.resources.crystals ?? 0}\n` +
+          `🪙 コイン:      ${r.resources.coins ?? 0}\n` +
+          `⚡ スタミナ:   ${r.resources.stamina ?? 0}\n` +
+          `副将数: ${r.generals} / クリア数: ${r.clearedStages}`,
+          true
+        );
+      } else {
+        showResult('❌ ' + (r.error || 'エラー'), false);
+      }
+    } catch (e) {
+      showResult('❌ 通信エラー: ' + e.message, false);
+    }
+  }
+
+  async function grantResource() {
+    const resource = document.getElementById('resource').value;
+    const mode     = document.getElementById('mode').value;
+    const amount   = parseInt(document.getElementById('amount').value, 10);
+    if (isNaN(amount) || amount < 0) { showResult('数量が不正です', false); return; }
+
+    const action = mode === 'set' ? 'set_resource' : 'grant';
+    const label  = { crystals: '💎 クリスタル', coins: '🪙 コイン', stamina: '⚡ スタミナ' }[resource];
+    showResult('実行中…', null);
+
+    try {
+      const r = await callGas({ action, resource, amount });
+      if (!r) return;
+      if (r.ok) {
+        showResult(
+          `✅ 完了\n` +
+          `${label}: ${r.before.toLocaleString()} → ${r.after.toLocaleString()}\n` +
+          `操作: ${r.mode === 'set' ? '絶対値セット' : '加算'}`,
+          true
+        );
+      } else {
+        showResult('❌ ' + (r.error || 'エラー'), false);
+      }
+    } catch (e) {
+      showResult('❌ 通信エラー: ' + e.message, false);
+    }
+  }
+
+  function showResult(msg, isOk) {
+    const el = document.getElementById('result');
+    el.textContent = msg;
+    el.className = 'result' + (isOk === true ? ' ok' : isOk === false ? ' err' : '');
+    el.style.display = 'block';
+  }
+</script>
+</body>
+</html>
