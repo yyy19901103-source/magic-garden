@@ -364,7 +364,13 @@ const UI = (() => {
           <span class="dash-icon"><span class="picon picon-people"></span></span>
           <span class="dash-val">${genCnt}<span class="dash-total">/${Object.keys(GENERALS_DATA).length}</span></span>
           <span class="dash-lbl">副将</span>
-        </div>`;
+        </div>
+        ${Game.isTowerUnlocked() ? `
+        <div class="dash-chip dash-chip--tower" title="無限塔 最高到達階" onclick="switchTab('adventure');setTimeout(()=>{document.getElementById('tower-tab-btn')?.click()},100)" style="cursor:pointer">
+          <span class="dash-icon">🗼</span>
+          <span class="dash-val">${Game.getTowerFloor() || '-'}<span class="dash-total">${Game.getTowerFloor() ? 'F' : ''}</span></span>
+          <span class="dash-lbl">無限塔</span>
+        </div>` : ''}`;
 
       // アチーブメントパネルを別途更新
       this.renderAchievements();
@@ -802,8 +808,9 @@ const UI = (() => {
         showToast('⚡ スタミナ不足！', 'warn'); return;
       }
 
-      // バトル演出 → 実行
-      this.showBattleIntro({ team, enemies: [], isBoss: floor % 10 === 0, stageName: `無限塔 ${floor}F` }, () => {
+      // バトル演出 → 実行（敵のプレビューを取得してイントロに渡す）
+      const towerEnemies = Game.getTowerEnemyPreview?.(floor) || [];
+      this.showBattleIntro({ team, enemies: towerEnemies, isBoss: floor % 10 === 0, stageName: `無限塔 ${floor}F` }, () => {
         const result = Game.towerBattle(floor);
         if (!result.win && result.reason) {
           const msgs = { no_stamina: 'スタミナ不足', no_team: '編成が空です', tower_locked: '塔はまだ解放されていません', floor_locked: 'まず前のフロアをクリアしてください' };

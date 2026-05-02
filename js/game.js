@@ -1089,6 +1089,7 @@ const Game = (() => {
     expToNext, levelUpCost,
     setPlayerName,
     getAchievements, checkAchievements,
-    towerBattle, isTowerUnlocked, getTowerFloor
+    towerBattle, isTowerUnlocked, getTowerFloor,
+    getTowerEnemyPreview: _buildTowerEnemies
   };
 })();

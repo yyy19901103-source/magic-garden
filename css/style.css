@@ -903,6 +903,9 @@ body {
 .dash-chip--power   { border-color: rgba(239,68,68,.25);  background: linear-gradient(160deg, rgba(239,68,68,.08),  var(--card)); }
 .dash-chip--idle    { border-color: rgba(52,211,153,.25); background: linear-gradient(160deg, rgba(52,211,153,.08), var(--card)); }
 .dash-chip--generals{ border-color: rgba(139,92,246,.25); background: linear-gradient(160deg, rgba(139,92,246,.08), var(--card)); }
+.dash-chip--tower   { border-color: rgba(160,100,255,.35); background: linear-gradient(160deg, rgba(100,60,220,.12), var(--card));
+                      transition: transform .15s; }
+.dash-chip--tower:hover { transform: translateY(-2px); }
 .dash-chip--streak  { border-color: rgba(249,115,22,.35); background: linear-gradient(160deg, rgba(249,115,22,.12), var(--card));
                       animation: streakPulse 2s ease-in-out infinite; }
 @keyframes streakPulse {
