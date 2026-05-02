@@ -169,10 +169,16 @@ button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.
 }
 /* レアリティ別の額装色 */
 /* 一覧用 (控えめ) */
+.portrait.rarity-LR,  .rarity-LR  .portrait  { border-color: #ff00cc !important; box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 10px rgba(255,0,200,.7), 0 0 20px rgba(255,215,0,.3), inset 0 0 0 var(--px) rgba(255,100,200,.4); animation: lrGlow 2s ease-in-out infinite alternate; }
+.portrait.rarity-MR,  .rarity-MR  .portrait  { border-color: #cc00ff !important; box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 8px rgba(204,0,255,.6), inset 0 0 0 var(--px) rgba(200,100,255,.3); }
+.portrait.rarity-UR,  .rarity-UR  .portrait  { border-color: #ff6600 !important; box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 7px rgba(255,102,0,.55), inset 0 0 0 var(--px) rgba(255,150,50,.3); }
 .portrait.rarity-SSR, .rarity-SSR .portrait { border-color: var(--p-legend) !important; box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 6px rgba(255,170,68,.5), inset 0 0 0 var(--px) rgba(255,200,100,.25); }
 .portrait.rarity-SR,  .rarity-SR  .portrait { border-color: var(--p-rare)   !important; box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 4px rgba(200,154,255,.4), inset 0 0 0 var(--px) rgba(220,180,255,.2); }
 .portrait.rarity-R,   .rarity-R   .portrait { border-color: var(--p-accent) !important; box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 3px rgba(108,211,255,.3), inset 0 0 0 var(--px) rgba(150,220,255,.15); }
 /* 詳細画面 (主役) は強めにグロー */
+.portrait-lg.rarity-LR, .rarity-LR .portrait-lg { box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 24px rgba(255,0,200,.8), 0 0 40px rgba(255,215,0,.4), inset 0 0 0 var(--px) rgba(255,100,200,.5) !important; animation: lrGlow 2s ease-in-out infinite alternate; }
+.portrait-lg.rarity-MR, .rarity-MR .portrait-lg { box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 18px rgba(204,0,255,.7), inset 0 0 0 var(--px) rgba(200,100,255,.4) !important; }
+.portrait-lg.rarity-UR, .rarity-UR .portrait-lg { box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 16px rgba(255,102,0,.65), inset 0 0 0 var(--px) rgba(255,150,50,.4) !important; }
 .portrait-lg.rarity-SSR, .rarity-SSR .portrait-lg { box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 14px rgba(255,170,68,.7), inset 0 0 0 var(--px) rgba(255,200,100,.35) !important; }
 .portrait-lg.rarity-SR,  .rarity-SR  .portrait-lg { box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 10px rgba(200,154,255,.6), inset 0 0 0 var(--px) rgba(220,180,255,.3) !important; }
 .portrait-lg.rarity-R,   .rarity-R   .portrait-lg { box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 0 8px rgba(108,211,255,.5),  inset 0 0 0 var(--px) rgba(150,220,255,.25) !important; }

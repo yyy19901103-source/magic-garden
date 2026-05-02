@@ -5,6 +5,72 @@
  */
 const GENERALS_DATA = {
 
+  // ─── LR (Legendary Rare) ──────────────────────────────────────────────────
+
+  arcana: {
+    id: 'arcana',
+    name: '天帝アルカナ',
+    title: '創造神の化身',
+    rarity: 'LR',
+    type: 'attacker',
+    typeName: '攻撃',
+    element: '光',
+    emoji: '⚜️',
+    gradient: 'linear-gradient(135deg, #fff 0%, #ffd700 15%, #ff69b4 30%, #87cefa 45%, #90ee90 60%, #ffd700 75%, #ff69b4 90%, #fff 100%)',
+    borderColor: '#ff00aa',
+    description: '世界を創りし神の化身。無限の光と神力を操り、その存在だけで戦場を塗り替える伝説を超えた存在。',
+    baseStats: { hp: 25000, atk: 2200, def: 900, spd: 148 },
+    statGrowth: { hp: 600, atk: 60, def: 22, spd: 1.0 },
+    skills: [
+      { name: '創世光波',  sp: 4, type: 'damage_single', power: 5.5, description: '神の力を一点に集中させた究極の一撃' },
+      { name: '天地創造',  sp: 15, type: 'damage_all',   power: 3.5, description: '全てを創り直すほどの光で全体を蹂躙' }
+    ]
+  },
+
+  // ─── MR (Mythic Rare) ─────────────────────────────────────────────────────
+
+  nyx: {
+    id: 'nyx',
+    name: '混沌ニュクス',
+    title: '虚空の支配者',
+    rarity: 'MR',
+    type: 'assassin',
+    typeName: '刺客',
+    element: '闇',
+    emoji: '🌌',
+    gradient: 'linear-gradient(160deg, #060010 0%, #3d0066 40%, #6600aa 70%, #9900dd 100%)',
+    borderColor: '#cc00ff',
+    description: '宇宙の混沌そのものが人の形をとった存在。触れるものを全て虚無に返す、太古からの神。',
+    baseStats: { hp: 17000, atk: 1950, def: 680, spd: 170 },
+    statGrowth: { hp: 420, atk: 55, def: 18, spd: 1.5 },
+    skills: [
+      { name: '虚空葬',   sp: 3, type: 'damage_single', power: 4.5, description: '存在を虚無に葬る必殺の一撃' },
+      { name: '混沌解放', sp: 12, type: 'damage_all',   power: 3.0, description: '混沌の力を解き放ち全てを蹂躙する' }
+    ]
+  },
+
+  // ─── UR (Ultra Rare) ──────────────────────────────────────────────────────
+
+  fafnir: {
+    id: 'fafnir',
+    name: '竜王ファフナー',
+    title: '原初の竜神',
+    rarity: 'UR',
+    type: 'attacker',
+    typeName: '攻撃',
+    element: '炎',
+    emoji: '🐉',
+    gradient: 'linear-gradient(160deg, #1a0000 0%, #7b0000 40%, #c62828 70%, #ff8f00 100%)',
+    borderColor: '#ff6600',
+    description: '太古より眠る最古の竜神。金色の鱗と業火の息吹で全てを焼き尽くす伝説の存在。',
+    baseStats: { hp: 12500, atk: 1380, def: 550, spd: 130 },
+    statGrowth: { hp: 320, atk: 42, def: 15, spd: 0.8 },
+    skills: [
+      { name: '竜炎爪',   sp: 3, type: 'damage_single', power: 3.8, description: '灼熱の爪で単体を引き裂く' },
+      { name: '覇竜烈火', sp: 9, type: 'damage_all',    power: 2.4, description: '竜王の咆哮と共に業火が全体を呑む' }
+    ]
+  },
+
   // ─── SSR ──────────────────────────────────────────────────────────────────
 
   seraphina: {
@@ -47,6 +113,26 @@ const GENERALS_DATA = {
     ]
   },
 
+  sylphia: {
+    id: 'sylphia',
+    name: '氷姫シルフィア',
+    title: '永久氷原の姫君',
+    rarity: 'SSR',
+    type: 'mage',
+    typeName: '魔法',
+    element: '水',
+    emoji: '❄️',
+    gradient: 'linear-gradient(160deg, #e3f2fd 0%, #b3e5fc 45%, #80deea 75%, #e0f7fa 100%)',
+    borderColor: '#26c6da',
+    description: '永久氷原に君臨する氷の姫君。月明かりの下で踊る姿は息を呑む美しさ。凍てつく魔法で全てを静止させる。',
+    baseStats: { hp: 7200, atk: 900, def: 350, spd: 140 },
+    statGrowth: { hp: 180, atk: 28, def: 10, spd: 0.7 },
+    skills: [
+      { name: '氷結剣',   sp: 3, type: 'damage_single', power: 3.0, description: '氷の刃で単体を凍てつかせる' },
+      { name: '吹雪の舞', sp: 8, type: 'damage_all',    power: 1.6, description: '吹雪の舞で全体を凍り付かせる' }
+    ]
+  },
+
   aquaria: {
     id: 'aquaria',
     name: 'アクアリア',
@@ -76,7 +162,7 @@ const GENERALS_DATA = {
     rarity: 'SR',
     type: 'attacker',
     typeName: '攻撃',
-    element: '火',
+    element: '炎',
     emoji: '🔥',
     gradient: 'linear-gradient(160deg, #fff3e0 0%, #ffb74d 60%, #ff7043 100%)',
     borderColor: '#ff5722',
@@ -202,7 +288,7 @@ const GENERALS_DATA = {
     rarity: 'SR',
     type: 'healer',
     typeName: '支援',
-    element: '火',
+    element: '炎',
     emoji: '🎵',
     gradient: 'linear-gradient(160deg, #fce4ec 0%, #f48fb1 60%, #e91e63 100%)',
     borderColor: '#e91e63',
@@ -224,7 +310,7 @@ const GENERALS_DATA = {
     rarity: 'R',
     type: 'speedster',
     typeName: '速攻',
-    element: '火',
+    element: '炎',
     emoji: '💥',
     gradient: 'linear-gradient(160deg, #fff8e1 0%, #ffcc02 60%, #ff6f00 100%)',
     borderColor: '#ff6f00',
@@ -286,7 +372,7 @@ const GENERALS_DATA = {
     rarity: 'SSR',
     type: 'attacker',
     typeName: '攻撃',
-    element: '火',
+    element: '炎',
     emoji: '🔱',
     gradient: 'linear-gradient(160deg, #1a0000 0%, #b71c1c 55%, #ff6d00 100%)',
     borderColor: '#ff3d00',
@@ -356,7 +442,7 @@ const GENERALS_DATA = {
     baseStats: { hp: 5500, atk: 420, def: 350, spd: 120 },
     statGrowth: { hp: 145, atk: 13, def: 11, spd: 0.5 },
     skills: [
-      { name: 'もふもふパワー', sp: 3, type: 'buff_atk', power: 0.4, description: 'もふもふの魔力で仲間の攻撃を上げる' },
+      { name: 'もふもふパワー', sp: 3, type: 'atk_buff', power: 0.4, description: 'もふもふの魔力で仲間の攻撃を上げる' },
       { name: 'みんなへのエール', sp: 6, type: 'heal_all', power: 0.85, description: '全員に元気をわけてあげる' }
     ]
   },
@@ -390,7 +476,7 @@ const GENERALS_DATA = {
     rarity: 'R',
     type: 'mage',
     typeName: '魔法',
-    element: '火',
+    element: '炎',
     emoji: '🍫',
     gradient: 'linear-gradient(160deg, #4e342e 0%, #a1887f 60%, #f8bbd0 100%)',
     borderColor: '#8d6e63',
@@ -418,7 +504,7 @@ const GENERALS_DATA = {
     baseStats: { hp: 10500, atk: 360, def: 560, spd: 55 },
     statGrowth: { hp: 295, atk: 11, def: 16, spd: 0.1 },
     skills: [
-      { name: '鋼の意志', sp: 3, type: 'buff_def',      power: 0.4, description: '鋼鉄の鎧を展開し防御力を大幅強化' },
+      { name: '鋼の意志', sp: 3, type: 'defense_buff',      power: 0.4, description: '鋼鉄の鎧を展開し防御力を大幅強化' },
       { name: '鉄槌',     sp: 6, type: 'damage_single', power: 2.0, description: '巨大な鉄の拳を叩き込む' }
     ]
   }
@@ -427,29 +513,39 @@ const GENERALS_DATA = {
 /**
  * ガチャ排出テーブル
  * weight が高いほど排出されやすい
+ * 合計 weight = 178
+ * LR: 1/178 ≈ 0.6%  MR: 2/178 ≈ 1.1%  UR: 3/178 ≈ 1.7%
+ * SSR: 26/178 ≈ 14.6%  SR: 56/178 ≈ 31.5%  R: 90/178 ≈ 50.6%
  */
 const GACHA_POOL = [
-  // SSR (各3〜4, 合計~15%)
+  // LR (最高レア, 合計~0.6%)
+  { id: 'arcana',    weight: 1 },
+  // MR (合計~1.1%)
+  { id: 'nyx',       weight: 2 },
+  // UR (合計~1.7%)
+  { id: 'fafnir',    weight: 3 },
+  // SSR (各3〜4, 合計~14.6%)
   { id: 'seraphina', weight: 4 },
   { id: 'shadow',    weight: 4 },
   { id: 'aquaria',   weight: 4 },
   { id: 'lucifer',   weight: 4 },
   { id: 'luna',      weight: 3 },
   { id: 'volkhan',   weight: 3 },
-  // SR (各7〜10, 合計~45%)
-  { id: 'flame',     weight: 10 },
-  { id: 'terra',     weight: 10 },
-  { id: 'windel',    weight: 10 },
-  { id: 'aria',      weight: 10 },
+  { id: 'sylphia',   weight: 4 },
+  // SR (各7〜8, 合計~31.5%)
+  { id: 'flame',     weight: 8 },
+  { id: 'terra',     weight: 8 },
+  { id: 'windel',    weight: 8 },
+  { id: 'aria',      weight: 8 },
   { id: 'coral',     weight: 8 },
   { id: 'zephyr',    weight: 8 },
   { id: 'popo',      weight: 8 },
-  // R (各9〜11, 合計~40%)
-  { id: 'arca',      weight: 11 },
-  { id: 'rockus',    weight: 11 },
-  { id: 'blaze',     weight: 10 },
-  { id: 'frost',     weight: 10 },
-  { id: 'lily',      weight: 9 },
-  { id: 'choco',     weight: 9 },
-  { id: 'galdo',     weight: 9 }
+  // R (各10〜13, 合計~50.6%)
+  { id: 'arca',      weight: 13 },
+  { id: 'rockus',    weight: 13 },
+  { id: 'blaze',     weight: 13 },
+  { id: 'frost',     weight: 13 },
+  { id: 'lily',      weight: 12 },
+  { id: 'choco',     weight: 13 },
+  { id: 'galdo',     weight: 13 }
 ];

@@ -1000,11 +1000,13 @@ const UI = (() => {
   // 属性カラーマップ (カード・フィルターボタン共通)
   const ELEM_COLOR = {
     '光': '#ffe566', '闇': '#cc88ff', '水': '#66ccff',
-    '火': '#ff7744', '土': '#aacc66', '風': '#66eedd', '月': '#aabbff'
+    '炎': '#ff7744', '火': '#ff7744', /* 炎が正規、火は旧互換 */
+    '土': '#aacc66', '風': '#66eedd', '月': '#aabbff'
   };
   const ELEM_EMOJI = {
     '光': '☀', '闇': '🌑', '水': '💧',
-    '火': '🔥', '土': '⛰', '風': '🌀', '月': '🌙'
+    '炎': '🔥', '火': '🔥', /* 炎が正規、火は旧互換 */
+    '土': '⛰', '風': '🌀', '月': '🌙'
   };
 
   const GeneralsTab = {
@@ -1084,8 +1086,8 @@ const UI = (() => {
       const total = Object.keys(state.generals).length;
       $('generals-count') && ($('generals-count').textContent = `(${total}体)`);
 
-      // SSR→SR→R 順にソート
-      const order = { SSR: 0, SR: 1, R: 2 };
+      // LR→MR→UR→SSR→SR→R 順にソート
+      const order = { LR: 0, MR: 1, UR: 2, SSR: 3, SR: 4, R: 5 };
       let sorted = Object.keys(state.generals).sort((a, b) => {
         const da = GENERALS_DATA[a], db = GENERALS_DATA[b];
         return (order[da.rarity] - order[db.rarity]) || (state.generals[b].level - state.generals[a].level);

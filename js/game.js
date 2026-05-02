@@ -375,8 +375,8 @@ const Game = (() => {
     if (teamIds.length === 0) return { success: false, reason: 'no_team' };
 
     // ファイター構築（チーム）
-    const TYPE_CRIT = { assassin: 0.18, attacker: 0.12, mage: 0.10, tank: 0.04, healer: 0.05, support: 0.06 };
-    const RARITY_CRIT = { SSR: 0.04, SR: 0.02, R: 0 };
+    const TYPE_CRIT = { assassin: 0.18, attacker: 0.12, mage: 0.10, tank: 0.04, healer: 0.05, support: 0.06, speedster: 0.15 };
+    const RARITY_CRIT = { LR: 0.14, MR: 0.10, UR: 0.07, SSR: 0.04, SR: 0.02, R: 0 };
     const teamRaw = teamIds.map(id => {
       const gs  = state.generals[id];
       const def = GENERALS_DATA[id];
@@ -538,11 +538,12 @@ const Game = (() => {
     const results = [];
     for (let i = 0; i < count; i++) {
       state.progress.gachaPity++;
-      const forceSSR = state.progress.gachaPity >= PITY_LIMIT;
-      if (forceSSR) state.progress.gachaPity = 0;
+      const HIGH_RARITIES = ['LR', 'MR', 'UR', 'SSR'];
+      const forceHighRarity = state.progress.gachaPity >= PITY_LIMIT;
+      if (forceHighRarity) state.progress.gachaPity = 0;
 
-      const pool = forceSSR
-        ? GACHA_POOL.filter(e => GENERALS_DATA[e.id].rarity === 'SSR')
+      const pool = forceHighRarity
+        ? GACHA_POOL.filter(e => HIGH_RARITIES.includes(GENERALS_DATA[e.id].rarity))
         : GACHA_POOL;
 
       const total = pool.reduce((s, e) => s + e.weight, 0);
@@ -637,8 +638,8 @@ const Game = (() => {
     const teamIds = state.formation.filter(id => id && state.generals[id]);
     if (teamIds.length === 0) return { success: false, reason: 'no_team' };
 
-    const TYPE_CRIT2 = { assassin: 0.18, attacker: 0.12, mage: 0.10, tank: 0.04, healer: 0.05, support: 0.06 };
-    const RARITY_CRIT2 = { SSR: 0.04, SR: 0.02, R: 0 };
+    const TYPE_CRIT2 = { assassin: 0.18, attacker: 0.12, mage: 0.10, tank: 0.04, healer: 0.05, support: 0.06, speedster: 0.15 };
+    const RARITY_CRIT2 = { LR: 0.14, MR: 0.10, UR: 0.07, SSR: 0.04, SR: 0.02, R: 0 };
     const teamRaw = teamIds.map(id => {
       const gs  = state.generals[id];
       const def = GENERALS_DATA[id];
