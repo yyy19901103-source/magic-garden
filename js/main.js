@@ -1952,18 +1952,18 @@ const UI = (() => {
       const lbImg = document.getElementById('char-lightbox-img');
       const lbName = document.getElementById('char-lightbox-name');
       if (!lbImg) return;
-      // 超高画質: オリジナル PNG を優先 → WebP フォールバック → 消去
+      // WebP（image_manager変換済み新画像）優先 → PNG（未変換キャラの旧アート）フォールバック
+      // 注意: .webp = 変換アプリで生成した新しい写真, .png = 古い生成アート（逆にしてはいけない）
       lbImg.onerror = function() {
         if (!this.dataset.fb) {
           this.dataset.fb = '1';
-          this.src = `assets/characters/${id}.webp`;
-        } else if (this.dataset.fb === '1') {
-          this.dataset.fb = '2';
+          this.src = `assets/characters/${id}.png`;
+        } else {
           this.alt = '(画像なし)';
         }
       };
       lbImg.dataset.fb = '';
-      lbImg.src = `assets/characters/${id}.png`;  // 元の高解像度PNG（1792×2400等）を最優先
+      lbImg.src = `assets/characters/${id}.webp`;  // 変換済み新画像を最優先
       lbImg.alt = name;
       if (lbName) lbName.textContent = name;
       show('char-lightbox');
