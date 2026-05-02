@@ -2123,7 +2123,7 @@ const UI = (() => {
     $('firebase-config-apply')?.addEventListener('click', () => CloudModal.applyFirebaseConfig());
     $('cloud-save-btn')?.addEventListener('click',        () => CloudModal.saveGasConfig());
     $('cs-restore-btn')?.addEventListener('click',        () => CloudModal.restoreFromCode());
-    $('cloud-pull-btn')?.addEventListener('click',        () => CloudModal.restoreFromCode());
+    $('cloud-pull-btn')?.addEventListener('click',        () => CloudModal.pullCurrent());
     $('cs-advanced-toggle')?.addEventListener('click', () => {
       $('cs-advanced-form')?.classList.toggle('hidden');
     });
@@ -2291,6 +2291,31 @@ const UI = (() => {
       Storage.save(Game.getState());
     },
 
+    // 現在の設定からクラウドを読み込む（コード入力不要）
+    async pullCurrent() {
+      const cfg = Storage.getConfig();
+      if (!cfg.playerId) {
+        this.setStatus('プレイヤーIDが設定されていません', 'err');
+        return;
+      }
+      this.setStatus('☁️ 読み込み中…', 'info');
+      try {
+        const data = await Storage.pullFromCloud();
+        if (data) {
+          Game.init(data);
+          updateResourceBar();
+          HomeTab.update();
+          hide('cloud-modal');
+          switchTab('home');
+          showToast('☁️ クラウドから読み込みました', 'success');
+        } else {
+          this.setStatus('データが見つかりません。クラウドにまだ保存されていない可能性があります。', 'err');
+        }
+      } catch(e) {
+        this.setStatus('読み込みエラー: ' + e.message, 'err');
+      }
+    },
+
     // 別端末から引き継ぎ
     async restoreFromCode() {
       const code = $('cs-restore-input')?.value.trim();
@@ -2425,9 +2450,9 @@ const UI = (() => {
       }
     });
 
-    // スマホでのバックグラウンド移行（pagehide）
+    // スマホでのバックグラウンド移行（pagehide）- debounceをバイパスして即クラウド同期
     window.addEventListener('pagehide', () => {
-      if (Game.getState()) Game.save();
+      if (Game.getState()) Storage.flushSave(Game.getState());
     });
   }
 
