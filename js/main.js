@@ -1,4 +1,4 @@
-/**
+﻿/**
  * main.js — UI制御・イベントバインド・起動処理
  * 4タブ: ホーム / 冒険 / 副将 / ガチャ
  */
@@ -1296,6 +1296,13 @@ const UI = (() => {
         </div>`;
 
       show('general-detail');
+      // スクロール位置を先頭にリセット
+      // iOS Safari: align-items:flex-end の overflow:auto 子要素は初回も底にスクロールするバグあり
+      const panel = document.querySelector('.detail-panel');
+      if (panel) {
+        panel.scrollTop = 0;
+        requestAnimationFrame(() => { panel.scrollTop = 0; });
+      }
 
       // 装備スロットをタップ → EquipPicker を開く
       $('detail-body').querySelectorAll('.equip-slot-row[data-slot]').forEach(row => {
@@ -2375,4 +2382,5 @@ const UI = (() => {
 })();
 
 document.addEventListener('DOMContentLoaded', UI.start);
+
 
