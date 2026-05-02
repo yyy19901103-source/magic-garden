@@ -286,7 +286,7 @@ const STAGES_DATA = [
       {
         id: '4-6', name: '【BOSS】竜王ヴァルグ', isBoss: true,
         enemies: [
-          { name: '竜王ヴァルグ', emoji: '🐲', hp: 200000, atk: 1200, def: 900, spd: 100, element: '炎',
+          { name: '竜王ヴァルグ', emoji: '🐲', hp: 150000, atk: 2600, def: 1100, spd: 140, element: '炎',
             skills: [
               { name: '竜の咆哮',   sp: 3, type: 'atk_down',    power: 0.3,  description: '雄叫びで全体の攻撃力を下げる' },
               { name: '業火の息',   sp: 5, type: 'damage_all',  power: 1.3,  description: '炎のブレスで全体を焼き尽くす' },
@@ -362,7 +362,7 @@ const STAGES_DATA = [
       {
         id: '5-5', name: '【最終BOSS】天空の守護神', isBoss: true,
         enemies: [
-          { name: '天空の守護神', emoji: '⚡', hp: 500000, atk: 1800, def: 1200, spd: 140, element: '雷',
+          { name: '天空の守護神', emoji: '⚡', hp: 380000, atk: 3200, def: 1500, spd: 165, element: '雷',
             skills: [
               { name: '天罰',       sp: 2, type: 'damage_single', power: 3.5,  description: '神の裁きを一点に集中させる' },
               { name: '神聖波動',   sp: 5, type: 'damage_all',    power: 1.5,  description: '聖なる衝撃波で全体を薙ぎ払う' },
@@ -454,9 +454,9 @@ const STAGES_DATA = [
       {
         id: '6-6', name: '【最終BOSS】夢魔女王リリス', isBoss: true,
         enemies: [
-          { name: '夢魔女王リリス', emoji: '🦋', hp: 800000, atk: 2200, def: 1600, spd: 180, element: '夢',
+          { name: '夢魔女王リリス', emoji: '🦋', hp: 580000, atk: 5200, def: 2100, spd: 225, element: '夢',
             skills: [
-              { name: '夢の誘惑',     sp: 2, type: 'debuff_atk',  power: 0.35, description: '甘い夢で全体の攻撃力を下げる' },
+              { name: '夢の誘惑',     sp: 2, type: 'atk_down',    power: 0.35, description: '甘い夢で全体の攻撃力を下げる' },
               { name: '蝶の乱舞',     sp: 4, type: 'damage_all',  power: 1.4,  description: '無数の蝶が全体を切り裂く' },
               { name: '幻夢回復',     sp: 6, type: 'heal_single', power: 3.5,  description: '夢の力で大回復' },
               { name: '深淵の叫び',   sp: 7, type: 'damage_single', power: 4.5, description: '選ばれし者に全力の一撃' },
