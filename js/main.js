@@ -567,25 +567,41 @@ const UI = (() => {
   const AdventureTab = {
     currentChapter: 0,
     isBossTab: false,
+    isTowerTab: false,
 
-    update() { this.isBossTab ? this.renderBossSection() : this.renderChapter(); },
+    update() {
+      if (this.isTowerTab) { this.renderTower(); return; }
+      this.isBossTab ? this.renderBossSection() : this.renderChapter();
+      // 無限塔タブの表示/非表示制御
+      const towerBtn = $('tower-tab-btn');
+      if (towerBtn) towerBtn.classList.toggle('hidden', !Game.isTowerUnlocked());
+    },
 
-    _switchView(isBoss) {
-      this.isBossTab = isBoss;
-      const stageList = $('stage-list');
+    _switchView(mode) {
+      // mode: 'chapter' | 'boss' | 'tower'
+      this.isBossTab  = mode === 'boss';
+      this.isTowerTab = mode === 'tower';
+      const stageList   = $('stage-list');
       const bossSection = $('daily-boss-section');
-      if (stageList)   stageList.classList.toggle('hidden', isBoss);
-      if (bossSection) bossSection.classList.toggle('hidden', !isBoss);
+      const towerSection= $('tower-section');
+      if (stageList)    stageList.classList.toggle('hidden', mode !== 'chapter');
+      if (bossSection)  bossSection.classList.toggle('hidden', mode !== 'boss');
+      if (towerSection) towerSection.classList.toggle('hidden', mode !== 'tower');
 
       document.querySelectorAll('.chapter-tab').forEach(btn => {
-        const bossBtnMatch = isBoss && btn.dataset.boss;
-        const chapterBtnMatch = !isBoss && parseInt(btn.dataset.chapter) === this.currentChapter;
-        btn.classList.toggle('active', bossBtnMatch || chapterBtnMatch);
+        const isTowerBtn   = !!btn.dataset.tower;
+        const isBossBtn    = !!btn.dataset.boss;
+        const isChapterBtn = btn.dataset.chapter !== undefined;
+        let active = false;
+        if (mode === 'tower'   && isTowerBtn)   active = true;
+        if (mode === 'boss'    && isBossBtn)     active = true;
+        if (mode === 'chapter' && isChapterBtn && parseInt(btn.dataset.chapter) === this.currentChapter) active = true;
+        btn.classList.toggle('active', active);
       });
     },
 
     renderChapter() {
-      this._switchView(false);
+      this._switchView('chapter');
       const ch = STAGES_DATA[this.currentChapter];
       if (!ch) return;
       const cleared = Game.getState().progress.clearedStages;
@@ -667,7 +683,7 @@ const UI = (() => {
     },
 
     renderBossSection() {
-      this._switchView(true);
+      this._switchView('boss');
       const bossState = Game.getDailyBossState();
       const attemptsEl = $('boss-attempts-text');
       if (attemptsEl) attemptsEl.textContent = `本日の挑戦: ${bossState.attemptsLeft}回残り（3回/日）`;
@@ -705,6 +721,143 @@ const UI = (() => {
 
       el.querySelectorAll('.btn-boss-fight[data-boss]').forEach(btn => {
         btn.addEventListener('click', () => this.handleBossBattle(btn.dataset.boss));
+      });
+    },
+
+    // ─── 無限塔 ─────────────────────────────────────────────────────────────
+
+    renderTower() {
+      this._switchView('tower');
+      const el = $('tower-section');
+      if (!el) return;
+
+      const maxFloor   = Game.getTowerFloor();
+      const nextFloor  = maxFloor + 1;
+      const unlocked   = Game.isTowerUnlocked();
+
+      if (!unlocked) {
+        el.innerHTML = `<div class="tower-locked">
+          <div class="tower-locked-icon">🗼</div>
+          <div class="tower-locked-text">第6章「幻夢の回廊」を全クリアすると解放されます</div>
+        </div>`;
+        return;
+      }
+
+      // フロアカード表示（現在挑戦中フロア + 直近5フロア履歴）
+      const displayFloors = [];
+      for (let f = Math.max(1, maxFloor - 2); f <= nextFloor + 2; f++) {
+        displayFloors.push(f);
+      }
+
+      let cardsHtml = displayFloors.map(f => {
+        const isCleared = f <= maxFloor;
+        const isNext    = f === nextFloor;
+        const isLocked  = f > nextFloor;
+        const isBoss    = f % 10 === 0;
+
+        const icon = isCleared ? '⭐' : isNext ? '⚔️' : '🔒';
+        const cls  = isCleared ? 'cleared' : isNext ? 'challenge' : 'locked';
+        const bossLabel = isBoss ? '<span class="tower-boss-badge">👹 BOSS</span>' : '';
+
+        // 報酬プレビュー
+        const coinReward = f * 80;
+        const crystalReward = f % 10 === 0 ? `<span class="reward-chip"><span class="picon picon-gem"></span> +${f}</span>` : '';
+
+        return `<div class="tower-floor-card ${cls}">
+          <div class="tower-floor-head">
+            <span class="tower-floor-num">${icon} ${f}F ${bossLabel}</span>
+          </div>
+          <div class="tower-floor-rewards">
+            <span class="reward-chip"><span class="picon picon-coin"></span> ~${coinReward}</span>
+            <span class="reward-chip"><span class="picon picon-exp"></span> ~${Math.floor(coinReward*0.6)}</span>
+            ${crystalReward}
+          </div>
+          ${!isLocked
+            ? `<button class="btn-tower-fight ${isNext?'btn-challenge':''}" data-floor="${f}">
+                ${isCleared ? '🔁 再挑戦' : '<span class="picon picon-sword"></span> 挑戦'}</button>`
+            : `<button class="btn-tower-fight" disabled>🔒</button>`}
+        </div>`;
+      }).join('');
+
+      el.innerHTML = `
+        <div class="tower-header">
+          <div class="tower-title">🗼 無限塔</div>
+          <div class="tower-record">最高到達階: <strong>${maxFloor === 0 ? '未挑戦' : maxFloor + 'F'}</strong></div>
+          <div class="tower-hint">10の倍数フロアでボス戦！💎クリスタルが手に入ります</div>
+        </div>
+        <div class="tower-floors">${cardsHtml}</div>`;
+
+      el.querySelectorAll('.btn-tower-fight[data-floor]').forEach(btn => {
+        btn.addEventListener('click', () => this.handleTowerBattle(parseInt(btn.dataset.floor)));
+      });
+    },
+
+    handleTowerBattle(floor) {
+      const team = Game.getFormationTeam ? Game.getFormationTeam() : [];
+      if (!team || team.filter(t => t).length === 0) {
+        showToast('👥 編成に副将を入れてください！', 'warn'); return;
+      }
+      const stCur = Game.getStamina ? (Game.getStamina().current ?? 0) : 999;
+      if (stCur < 1) {
+        showToast('⚡ スタミナ不足！', 'warn'); return;
+      }
+
+      // バトル演出 → 実行
+      this.showBattleIntro({ team, enemies: [], isBoss: floor % 10 === 0, stageName: `無限塔 ${floor}F` }, () => {
+        const result = Game.towerBattle(floor);
+        if (!result.win && result.reason) {
+          const msgs = { no_stamina: 'スタミナ不足', no_team: '編成が空です', tower_locked: '塔はまだ解放されていません', floor_locked: 'まず前のフロアをクリアしてください' };
+          showToast(msgs[result.reason] || result.reason, 'warn'); return;
+        }
+        updateResourceBar();
+        this.showTowerResult(floor, result);
+      });
+    },
+
+    showTowerResult(floor, result) {
+      const overlay = document.createElement('div');
+      overlay.className = 'battle-result-overlay';
+      const isBoss = floor % 10 === 0;
+      const winEmoji = result.win ? (isBoss ? '🏆' : '⭐') : '💀';
+      const titleText = result.win
+        ? (isBoss ? `${floor}F BOSS 討伐！` : `${floor}F クリア！`)
+        : `${floor}F 敗北…`;
+
+      let lootHtml = '';
+      if (result.win && result.loot) {
+        const l = result.loot;
+        lootHtml = `<div class="battle-loot">
+          <div class="loot-item"><span class="picon picon-coin"></span> +${l.coins.toLocaleString()}</div>
+          <div class="loot-item"><span class="picon picon-exp"></span> +${l.exp.toLocaleString()}</div>
+          ${l.crystals ? `<div class="loot-item"><span class="picon picon-gem"></span> +${l.crystals} 💎ボーナス！</div>` : ''}
+        </div>`;
+      }
+
+      overlay.innerHTML = `
+        <div class="battle-result-card ${result.win ? 'win' : 'lose'}">
+          <div class="battle-result-title">${winEmoji} ${titleText}</div>
+          <div class="battle-result-turns">🕐 ${result.turns}ターン</div>
+          ${lootHtml}
+          <div class="battle-result-actions">
+            <button class="btn btn-primary" id="tower-result-next">
+              ${result.win ? (floor < (Game.getTowerFloor() + 1) ? '✅ 閉じる' : `⚔️ ${floor + 1}Fへ挑戦`) : '🔁 再挑戦'}
+            </button>
+            <button class="btn btn-outline" id="tower-result-close">一覧に戻る</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+
+      const closeAndUpdate = () => { overlay.remove(); this.renderTower(); };
+      $('tower-result-close')?.addEventListener('click', closeAndUpdate);
+      $('tower-result-next')?.addEventListener('click', () => {
+        overlay.remove();
+        if (result.win && floor === Game.getTowerFloor()) {
+          this.handleTowerBattle(floor + 1);
+        } else if (!result.win) {
+          this.handleTowerBattle(floor);
+        } else {
+          this.renderTower();
+        }
       });
     },
 
@@ -2024,14 +2177,20 @@ const UI = (() => {
       if (tog) { tog.classList.add('hidden'); tog.classList.remove('open'); }
     });
 
-    // 章タブ（data-chapter / data-boss で判定）
+    // 章タブ（data-chapter / data-boss / data-tower で判定）
     document.querySelectorAll('.chapter-tab').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (btn.dataset.boss) {
-          AdventureTab.isBossTab = true;
+        if (btn.dataset.tower) {
+          AdventureTab.isTowerTab = true;
+          AdventureTab.isBossTab  = false;
+          AdventureTab.renderTower();
+        } else if (btn.dataset.boss) {
+          AdventureTab.isBossTab  = true;
+          AdventureTab.isTowerTab = false;
           AdventureTab.renderBossSection();
         } else {
-          AdventureTab.isBossTab = false;
+          AdventureTab.isBossTab  = false;
+          AdventureTab.isTowerTab = false;
           AdventureTab.currentChapter = parseInt(btn.dataset.chapter);
           AdventureTab.renderChapter();
         }

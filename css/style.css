@@ -794,6 +794,56 @@ body {
 
 .daily-boss-section { display: flex; flex-direction: column; gap: 12px; }
 .daily-boss-section.hidden { display: none; }
+
+/* ─── 無限塔 ─────────────────────────────────────────── */
+.tower-section { display: flex; flex-direction: column; gap: 12px; }
+.tower-section.hidden { display: none; }
+.tower-header {
+  background: linear-gradient(135deg, #1a1040 0%, #2d1b69 100%);
+  border-radius: var(--radius); padding: 16px; text-align: center;
+  border: 1px solid rgba(120, 80, 240, 0.4);
+}
+.tower-title { font-size: 1.3em; font-weight: 700; color: #c8a8ff; margin-bottom: 4px; }
+.tower-record { color: var(--text-sub); font-size: .9em; }
+.tower-record strong { color: #e0c0ff; }
+.tower-hint { font-size: .78em; color: #9870cc; margin-top: 6px; }
+.tower-floors { display: flex; flex-direction: column; gap: 8px; }
+.tower-floor-card {
+  background: var(--card); border-radius: var(--radius-sm);
+  padding: 12px 14px; border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  transition: border-color .2s;
+}
+.tower-floor-card.cleared { border-color: rgba(100, 200, 100, 0.4); opacity: .85; }
+.tower-floor-card.challenge {
+  border-color: rgba(120, 80, 240, 0.7);
+  box-shadow: 0 0 8px rgba(120, 80, 240, 0.25);
+}
+.tower-floor-card.locked { opacity: .45; }
+.tower-floor-head { flex: 0 0 auto; min-width: 110px; }
+.tower-floor-num { font-weight: 600; font-size: .95em; color: var(--text); }
+.tower-boss-badge {
+  display: inline-block; font-size: .7em; padding: 1px 6px;
+  background: rgba(200, 50, 50, 0.3); border: 1px solid rgba(220, 80, 80, 0.5);
+  border-radius: 4px; color: #ff9090; margin-left: 4px;
+}
+.tower-floor-card .battle-result-actions { display: flex; gap: 8px; margin-top: 14px; }
+.tower-floor-card .tower-floor-rewards { flex: 1; display: flex; flex-wrap: wrap; gap: 4px; }
+.btn-tower-fight {
+  flex: 0 0 auto; padding: 6px 14px;
+  background: var(--primary); border: none; border-radius: var(--radius-sm);
+  color: #fff; cursor: pointer; font-size: .85em; white-space: nowrap;
+  transition: background .2s;
+}
+.btn-tower-fight:disabled { background: var(--border); color: var(--text-sub); cursor: default; }
+.btn-tower-fight.btn-challenge { background: #6030c0; }
+.btn-tower-fight.btn-challenge:hover { background: #7040e0; }
+.tower-locked {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 20px; gap: 12px; text-align: center; color: var(--text-sub);
+}
+.tower-locked-icon { font-size: 3em; opacity: .5; }
+.tower-locked-text { font-size: .9em; max-width: 240px; line-height: 1.5; }
 .boss-attempts-bar {
   background: var(--card); border-radius: var(--radius-sm);
   padding: 10px 14px; border: 1px solid var(--border);

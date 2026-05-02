@@ -483,6 +483,135 @@ const Game = (() => {
     return { win: result.win, log: result.log, loot, turns: result.turns, stats: result.stats, newAchievements };
   }
 
+  // ─── 無限塔 ─────────────────────────────────────────────────────────────
+
+  // 無限塔のアンロック条件: 6-6（第6章最終ステージ）クリア済み
+  function isTowerUnlocked() {
+    return state.progress.clearedStages.includes('6-6');
+  }
+
+  // 最高到達階（0 = 未挑戦）
+  function getTowerFloor() {
+    return state.progress.towerFloor || 0;
+  }
+
+  // フロアに応じた敵データを動的生成
+  function _buildTowerEnemies(floor) {
+    // 基礎パラメータ（フロアに応じてスケール）
+    const scale = 1 + (floor - 1) * 0.18;   // 1階 x1.00 → 10階 x2.62 → 30階 x6.22
+    const r = n => Math.round(n * scale);
+
+    // 敵プール（属性ローテーション）
+    const ENEMY_POOL = [
+      { name: 'スライム騎士',  emoji: '🛡️',  baseHp: 90,  baseAtk: 14, baseDef: 8,  baseSpd: 10, element: '水' },
+      { name: '炎の魔獣',      emoji: '🔥',  baseHp: 110, baseAtk: 18, baseDef: 6,  baseSpd: 14, element: '炎' },
+      { name: '氷の精霊',      emoji: '❄️',  baseHp: 80,  baseAtk: 16, baseDef: 10, baseSpd: 16, element: '氷' },
+      { name: '雷鬼',          emoji: '⚡',  baseHp: 100, baseAtk: 20, baseDef: 5,  baseSpd: 18, element: '雷' },
+      { name: '闇の刺客',      emoji: '🌑',  baseHp: 95,  baseAtk: 22, baseDef: 4,  baseSpd: 20, element: '闇' },
+      { name: '光の守護者',    emoji: '✨',  baseHp: 130, baseAtk: 15, baseDef: 15, baseSpd: 12, element: '光' },
+      { name: '風の踊り子',    emoji: '🌪️', baseHp: 85,  baseAtk: 17, baseDef: 7,  baseSpd: 22, element: '風' },
+      { name: '大地の巨人',    emoji: '🪨',  baseHp: 160, baseAtk: 12, baseDef: 18, baseSpd: 8,  element: '土' },
+    ];
+    // ボスプール（10階ごと）
+    const BOSS_POOL = [
+      { name: '塔の番人 α',   emoji: '👹',  baseHp: 280, baseAtk: 28, baseDef: 18, baseSpd: 14, element: '炎' },
+      { name: '深淵の竜',      emoji: '🐉',  baseHp: 350, baseAtk: 32, baseDef: 22, baseSpd: 12, element: '闇' },
+      { name: '魔眼の君主',    emoji: '👁️', baseHp: 300, baseAtk: 35, baseDef: 16, baseSpd: 18, element: '雷' },
+      { name: '永劫の巨王',    emoji: '🗿',  baseHp: 400, baseAtk: 25, baseDef: 30, baseSpd: 10, element: '土' },
+    ];
+
+    const isBossFloor = floor % 10 === 0;
+    let enemies = [];
+
+    if (isBossFloor) {
+      // 10の倍数フロア: ボス + 取り巻き1体
+      const boss = BOSS_POOL[Math.floor((floor / 10 - 1)) % BOSS_POOL.length];
+      const minion = ENEMY_POOL[floor % ENEMY_POOL.length];
+      enemies = [
+        { name: boss.name, emoji: boss.emoji, element: boss.element,
+          hp: r(boss.baseHp), atk: r(boss.baseAtk), def: r(boss.baseDef), spd: r(boss.baseSpd) },
+        { name: minion.name, emoji: minion.emoji, element: minion.element,
+          hp: r(minion.baseHp * 0.7), atk: r(minion.baseAtk * 0.7), def: r(minion.baseDef * 0.7), spd: r(minion.baseSpd) },
+      ];
+    } else {
+      // 通常フロア: 2〜3体
+      const count = floor % 5 === 0 ? 3 : 2;
+      for (let i = 0; i < count; i++) {
+        const e = ENEMY_POOL[(floor + i) % ENEMY_POOL.length];
+        enemies.push({ name: e.name, emoji: e.emoji, element: e.element,
+          hp: r(e.baseHp), atk: r(e.baseAtk), def: r(e.baseDef), spd: r(e.baseSpd) });
+      }
+    }
+
+    return enemies.map(e => ({
+      name: e.name, emoji: e.emoji, element: e.element || null, skills: [],
+      stats: { hp: e.hp, atk: e.atk, def: e.def, spd: e.spd }, isEnemy: true
+    }));
+  }
+
+  /**
+   * 無限塔バトル
+   * @param {number} floor 挑戦するフロア（1〜）
+   */
+  function towerBattle(floor) {
+    if (!isTowerUnlocked()) return { success: false, reason: 'tower_locked' };
+
+    const maxFloor = getTowerFloor();
+    if (floor > maxFloor + 1) return { success: false, reason: 'floor_locked' };
+    if (!consumeStamina(1)) return { success: false, reason: 'no_stamina' };
+
+    const teamIds = state.formation.filter(id => id && state.generals[id]);
+    if (teamIds.length === 0) return { success: false, reason: 'no_team' };
+
+    // チームビルド（通常バトルと同じロジック）
+    const TYPE_CRIT  = { assassin: 0.18, attacker: 0.12, mage: 0.10, tank: 0.04, healer: 0.05, support: 0.06, speedster: 0.15 };
+    const RARITY_CRIT= { LR: 0.14, MR: 0.10, UR: 0.07, SSR: 0.04, SR: 0.02, R: 0 };
+    const teamRaw = teamIds.map(id => {
+      const gs = state.generals[id]; const def = GENERALS_DATA[id];
+      const critRate = (TYPE_CRIT[def.type] || 0.07) + (RARITY_CRIT[def.rarity] || 0);
+      return { id, name: def.name, emoji: def.emoji, stats: calcCharStats(gs, def),
+               isEnemy: false, element: def.element, type: def.type, critRate };
+    });
+    const team = _applySkillLevelsToTeam(teamRaw);
+    const enemies = _buildTowerEnemies(floor);
+
+    const result = BattleEngine.simulate(team, enemies);
+
+    // バトル統計更新
+    state.daily.battles = Math.min((state.daily.battles || 0) + 1, 99);
+    state.progress.battleCount++;
+    if (state.weekly) state.weekly.battles = (state.weekly.battles || 0) + 1;
+
+    const loot = { coins: 0, exp: 0, crystals: 0, floor, isBossFloor: floor % 10 === 0 };
+
+    if (result.win) {
+      // 最高到達階を更新
+      if (floor > maxFloor) {
+        state.progress.towerFloor = floor;
+      }
+
+      // 報酬: フロアに比例
+      const base = floor * 80;
+      loot.coins = Math.floor(base * (0.8 + Math.random() * 0.4));
+      loot.exp   = Math.floor(base * 0.6 * (0.8 + Math.random() * 0.4));
+      state.resources.coins += loot.coins;
+
+      // EXP配布
+      const share = Math.floor(loot.exp / teamIds.length);
+      teamIds.forEach(id => _applyExp(id, share));
+
+      // 10階ごとのボーナス: クリスタル
+      if (floor % 10 === 0) {
+        loot.crystals = floor;   // 10F→💎10、20F→💎20、30F→💎30…
+        state.resources.crystals += loot.crystals;
+      }
+    }
+
+    const newAchievements = checkAchievements();
+    Storage.save(state);
+    return { win: result.win, log: result.log, loot, turns: result.turns, newAchievements };
+  }
+
   // ─── 育成 ────────────────────────────────────────────────────────────────
 
   function levelUpGeneral(generalId) {
@@ -959,6 +1088,7 @@ const Game = (() => {
     getIdleRate, calcTeamPower,
     expToNext, levelUpCost,
     setPlayerName,
-    getAchievements, checkAchievements
+    getAchievements, checkAchievements,
+    towerBattle, isTowerUnlocked, getTowerFloor
   };
 })();
