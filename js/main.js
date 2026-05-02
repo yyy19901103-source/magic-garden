@@ -969,26 +969,50 @@ const UI = (() => {
 
       // ─── 自動連戦モード ───
       const autoOn = window.__gameSettings && window.__gameSettings.autoReplay;
+      const arBar  = document.getElementById('auto-replay-bar');
+      const arCnt  = document.getElementById('auto-replay-counter');
       if (autoOn && !isBoss) {
         if (this._autoReplayTimer) clearTimeout(this._autoReplayTimer);
+        const MAX_AUTO = 30; // 最大周回数
+        const MAX_LOSS = 2;  // 連敗停止閾値
         if (win) {
-          const stCur = Game.getStamina ? (Game.getStamina().current ?? 0) : 0;
-          if (stCur >= 1) {
-            // スタミナ十分 → 自動再戦
-            this._autoReplayTimer = setTimeout(() => {
-              if (window.__gameSettings && window.__gameSettings.autoReplay
-                  && Game.getStamina && (Game.getStamina().current ?? 0) >= 1
-                  && !document.getElementById('battle-result').classList.contains('hidden')) {
-                hide('battle-result');
-                setTimeout(() => this.handleBattle(id), 80);
-              }
-            }, 2500);
+          this._autoLossStreak = 0;
+          this._autoReplayCount = (this._autoReplayCount || 0) + 1;
+          if (this._autoReplayCount >= MAX_AUTO) {
+            window.__stopAutoReplay?.(`⏹ ${MAX_AUTO}周完了。自動連戦を停止しました`, 'info');
           } else {
-            window.__stopAutoReplay?.('⚡ スタミナ切れ。自動連戦を停止しました', 'warn');
+            const stCur = Game.getStamina ? (Game.getStamina().current ?? 0) : 0;
+            if (stCur >= 1) {
+              // 自動連戦バー表示・カウント更新
+              if (arBar)  arBar.classList.remove('hidden');
+              if (arCnt)  arCnt.textContent = `自動連戦中 ${this._autoReplayCount}/${MAX_AUTO}`;
+              // スタミナ十分 → 自動再戦
+              this._autoReplayTimer = setTimeout(() => {
+                if (window.__gameSettings && window.__gameSettings.autoReplay
+                    && Game.getStamina && (Game.getStamina().current ?? 0) >= 1
+                    && !document.getElementById('battle-result').classList.contains('hidden')) {
+                  hide('battle-result');
+                  if (arBar) arBar.classList.add('hidden');
+                  setTimeout(() => this.handleBattle(id), 80);
+                }
+              }, 2000);
+            } else {
+              if (arBar) arBar.classList.add('hidden');
+              window.__stopAutoReplay?.('⚡ スタミナ切れ。自動連戦を停止しました', 'warn');
+            }
           }
         } else {
-          window.__stopAutoReplay?.('💀 敗北。自動連戦を停止しました（編成見直しを推奨）', 'error');
+          this._autoLossStreak = (this._autoLossStreak || 0) + 1;
+          if (arBar) arBar.classList.add('hidden');
+          if (this._autoLossStreak >= MAX_LOSS) {
+            window.__stopAutoReplay?.(`💀 ${MAX_LOSS}連敗。自動連戦を停止しました（編成を見直してください）`, 'error');
+          } else {
+            window.__stopAutoReplay?.('💀 敗北。自動連戦を停止しました', 'error');
+          }
         }
+      } else {
+        // 自動連戦OFF時はバーを隠す
+        if (arBar) arBar.classList.add('hidden');
       }
     }
   };
@@ -1858,6 +1882,13 @@ const UI = (() => {
     }
     window.__stopAutoReplay = stopAutoReplay;
 
+    // 自動連戦「停止」ボタン（リザルト内）
+    document.getElementById('auto-replay-stop-btn')?.addEventListener('click', () => {
+      stopAutoReplay('自動連戦を停止しました', 'info');
+      const arBar = document.getElementById('auto-replay-bar');
+      if (arBar) arBar.classList.add('hidden');
+    });
+
     function applySettings(s) {
       document.body.classList.toggle('opt-no-scanline', !s.scanline);
       document.body.classList.toggle('opt-no-vs-intro', !s.vsIntro);
@@ -1896,6 +1927,13 @@ const UI = (() => {
     setupSettingsToggle('opt-confetti',       'confetti');
     setupSettingsToggle('opt-autofocus-next', 'autofocusNext');
     setupSettingsToggle('opt-auto-replay',    'autoReplay');
+    // 自動連戦ON切替時にカウンターリセット
+    $('opt-auto-replay')?.addEventListener('click', () => {
+      if (AdventureTab) {
+        AdventureTab._autoReplayCount = 0;
+        AdventureTab._autoLossStreak = 0;
+      }
+    });
     setupSettingsToggle('opt-reduced-motion', 'reducedMotion');
     $('btn-settings')?.addEventListener('click', () => show('settings-modal'));
     $('settings-close')?.addEventListener('click', () => hide('settings-modal'));
