@@ -182,10 +182,10 @@ const UI = (() => {
     const errHandler = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${fallbackSrc}';}else{this.remove();}`;
     return `
       <div class="portrait ${sizeClass} rarity-${def.rarity}" style="background:${def.gradient}">
-        <span class="portrait-emoji">${def.emoji}</span>
-        <img ${lazyAttrs} src="${primarySrc}"
+        <span class="portrait-emoji" aria-hidden="true">${def.emoji}</span>
+        <img ${lazyAttrs} src="${primarySrc}" alt="${def.name}のポートレート"
              onload="this.classList.add('loaded')" onerror="${errHandler}">
-        <span class="rarity-badge badge-${def.rarity}">${def.rarity}</span>
+        <span class="rarity-badge badge-${def.rarity}" aria-label="レアリティ ${def.rarity}">${def.rarity}</span>
       </div>`;
   }
 

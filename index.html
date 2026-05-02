@@ -7,9 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=53">
-  <link rel="stylesheet" href="css/pixel-theme.css?v=53">
-  <link rel="stylesheet" href="css/pixel-sprites.css?v=53">
+  <link rel="stylesheet" href="css/style.css?v=54">
+  <link rel="stylesheet" href="css/pixel-theme.css?v=54">
+  <link rel="stylesheet" href="css/pixel-sprites.css?v=54">
 </head>
 <body>
 
@@ -37,19 +37,19 @@
     </div>
     <div class="hd-player">
       <span id="player-name">まほうつかい</span>
-      <button id="btn-edit-name" class="btn-edit-name" title="名前を変更">✏️</button>
+      <button id="btn-edit-name" class="btn-edit-name" title="名前を変更" aria-label="名前を変更">✏️</button>
     </div>
     <div class="hd-icons">
-      <button id="btn-bgm" class="btn-icon" title="BGM">🔊</button>
-      <button id="btn-settings" class="btn-icon" title="設定">⚙️</button>
-      <button id="btn-cloud-settings" class="btn-cloud-icon" title="クラウド設定">☁️</button>
+      <button id="btn-bgm" class="btn-icon" title="BGM" aria-label="BGM切替">🔊</button>
+      <button id="btn-settings" class="btn-icon" title="設定" aria-label="設定を開く">⚙️</button>
+      <button id="btn-cloud-settings" class="btn-cloud-icon" title="クラウド設定" aria-label="クラウド設定">☁️</button>
     </div>
   </header>
 
   <!-- 設定モーダル -->
-  <div id="settings-modal" class="overlay hidden">
+  <div id="settings-modal" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-heading">
     <div class="settings-panel">
-      <h2 class="settings-title">⚙ 設定</h2>
+      <h2 id="settings-heading" class="settings-title">⚙ 設定</h2>
       <div class="settings-row">
         <label class="settings-label">スキャンライン (CRT効果)</label>
         <button id="opt-scanline" class="settings-toggle" data-on="true">ON</button>
@@ -96,10 +96,10 @@
     <div id="tab-home" class="tab-panel active">
 
       <!-- 放置報酬ポップアップ -->
-      <div id="idle-reward" class="overlay hidden">
+      <div id="idle-reward" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="idle-reward-heading">
         <div class="popup-card">
           <span class="popup-icon">🌸</span>
-          <h3 class="popup-title">おかえり！</h3>
+          <h3 id="idle-reward-heading" class="popup-title">おかえり！</h3>
           <p id="idle-reward-text" class="popup-text">コインを集めておいたよ！</p>
           <button id="collect-btn" class="btn btn-primary">受け取る ✓</button>
         </div>
@@ -160,7 +160,7 @@
       </div>
 
       <!-- バトル結果オーバーレイ -->
-      <div id="battle-result" class="overlay hidden">
+      <div id="battle-result" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="result-banner">
         <div id="confetti-container" class="confetti-container"></div>
         <div class="victory-rays"></div>
         <div class="defeat-vignette"></div>
@@ -333,7 +333,7 @@
 </div><!-- /screen-game -->
 
 <!-- ═══ クラウドセーブモーダル ═══ -->
-<div id="cloud-modal" class="overlay hidden">
+<div id="cloud-modal" class="overlay hidden" role="dialog" aria-modal="true" aria-label="クラウドセーブ設定">
   <div class="popup-card cloud-modal-card">
 
     <!-- ════ 状態A: 未接続（初回） ════ -->
@@ -401,51 +401,51 @@
 <!-- ══ 全タブ共通オーバーレイ群 (iOS overflow バグ回避のため tab-content の外に配置) ══ -->
 
 <!-- 副将詳細オーバーレイ -->
-<div id="general-detail" class="detail-overlay hidden">
+<div id="general-detail" class="detail-overlay hidden" role="dialog" aria-modal="true" aria-label="副将詳細">
   <div class="detail-panel">
-    <button id="detail-back-home" class="detail-back-home" title="ホームに戻る">
+    <button id="detail-back-home" class="detail-back-home" title="ホームに戻る" aria-label="ホームに戻る">
       <span class="picon picon-home"></span> ホーム
     </button>
-    <button id="detail-close" class="detail-close">✕</button>
+    <button id="detail-close" class="detail-close" aria-label="閉じる">✕</button>
     <div id="detail-body" class="detail-body"></div>
   </div>
 </div>
 
 <!-- キャライラスト全画面表示 (Lightbox) -->
-<div id="char-lightbox" class="char-lightbox hidden">
-  <button id="char-lightbox-close" class="char-lightbox-close" title="閉じる">✕</button>
+<div id="char-lightbox" class="char-lightbox hidden" role="dialog" aria-modal="true" aria-label="キャラクターイラスト拡大表示">
+  <button id="char-lightbox-close" class="char-lightbox-close" title="閉じる" aria-label="閉じる">✕</button>
   <img id="char-lightbox-img" class="char-lightbox-img" alt="">
   <div id="char-lightbox-name" class="char-lightbox-name"></div>
 </div>
 
 <!-- ガチャ結果オーバーレイ -->
-<div id="gacha-result" class="overlay hidden">
+<div id="gacha-result" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="gacha-result-heading">
   <div class="gacha-result-panel">
-    <h3 class="gacha-result-title">✨ 召喚結果！</h3>
+    <h3 id="gacha-result-heading" class="gacha-result-title">✨ 召喚結果！</h3>
     <div id="gacha-result-cards" class="gacha-result-grid"></div>
     <button id="gacha-result-close" class="btn btn-primary">閉じる</button>
   </div>
 </div>
 
 <!-- 装備ピッカーオーバーレイ（全タブ共通） -->
-<div id="equip-picker" class="detail-overlay hidden">
+<div id="equip-picker" class="detail-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="equip-picker-title">
   <div class="detail-panel equip-picker-panel">
-    <button id="equip-picker-close" class="detail-close">✕</button>
+    <button id="equip-picker-close" class="detail-close" aria-label="閉じる">✕</button>
     <h3 id="equip-picker-title" class="equip-picker-title">装備を選ぶ</h3>
     <div id="equip-picker-list" class="equip-picker-list"></div>
   </div>
 </div>
 
 <!-- JS 読み込み順序は依存関係を考慮 -->
-<script src="js/generals_data.js?v=53"></script>
-<script src="js/stages_data.js?v=53"></script>
-<script src="js/battle_engine.js?v=53"></script>
-<script src="js/bgm.js?v=53"></script>
-<script src="js/firebase_auth.js?v=53"></script>
-<script src="js/storage.js?v=53"></script>
-<script src="js/idle.js?v=53"></script>
-<script src="js/game.js?v=53"></script>
-<script src="js/main.js?v=53"></script>
+<script src="js/generals_data.js?v=54"></script>
+<script src="js/stages_data.js?v=54"></script>
+<script src="js/battle_engine.js?v=54"></script>
+<script src="js/bgm.js?v=54"></script>
+<script src="js/firebase_auth.js?v=54"></script>
+<script src="js/storage.js?v=54"></script>
+<script src="js/idle.js?v=54"></script>
+<script src="js/game.js?v=54"></script>
+<script src="js/main.js?v=54"></script>
 
 </body>
 </html>
