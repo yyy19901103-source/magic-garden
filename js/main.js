@@ -136,13 +136,21 @@ const UI = (() => {
 
   function makePortrait(def, size='md') {
     const sizeClass = size === 'lg' ? 'portrait-lg' : 'portrait-md';
+    const isLg = size === 'lg';
     // 一覧用 (md) は lazy + async decoding で副将タブの読み込み爆発を抑制
-    const lazyAttrs = size === 'lg' ? '' : 'loading="lazy" decoding="async"';
+    const lazyAttrs = isLg ? '' : 'loading="lazy" decoding="async"';
+    // 詳細用は本体WebP / 一覧はサムネWebP / 失敗時PNGフォールバック
+    const primarySrc = isLg
+      ? `assets/characters/${def.id}.webp`
+      : `assets/characters/thumbs/${def.id}.webp`;
+    const fallbackSrc = `assets/characters/${def.id}.png`;
+    // onerror で WebP→PNG→消去 の段階フォールバック
+    const errHandler = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${fallbackSrc}';}else{this.remove();}`;
     return `
       <div class="portrait ${sizeClass} rarity-${def.rarity}" style="background:${def.gradient}">
         <span class="portrait-emoji">${def.emoji}</span>
-        <img ${lazyAttrs} src="assets/characters/${def.id}.png"
-             onload="this.classList.add('loaded')" onerror="this.remove()">
+        <img ${lazyAttrs} src="${primarySrc}"
+             onload="this.classList.add('loaded')" onerror="${errHandler}">
         <span class="rarity-badge badge-${def.rarity}">${def.rarity}</span>
       </div>`;
   }
