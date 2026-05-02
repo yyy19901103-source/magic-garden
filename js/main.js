@@ -1780,6 +1780,25 @@ const UI = (() => {
     },
 
     renderShop() {
+      // リフレッシュボタンの状態更新
+      const shopState = Game.getState().shop || {};
+      const today     = new Date().toISOString().slice(0, 10);
+      const isFreeAvail = !shopState.freeRefreshDate || shopState.freeRefreshDate !== today;
+      const refreshBtn  = $('shop-refresh-btn');
+      const refreshLabel= $('shop-refresh-label');
+      if (refreshBtn && refreshLabel) {
+        refreshLabel.textContent = isFreeAvail ? '無料更新' : '💎30更新';
+        refreshBtn.title = isFreeAvail ? '1日1回無料でショップを更新できます' : '30💎でショップを更新します';
+      }
+      // スタミナポーション購入ボタン状態
+      const st = Game.getStamina ? Game.getStamina() : { current: 0, max: 30 };
+      const staminaFull = st.current >= st.max;
+      const buyStBtn = $('buy-stamina-btn');
+      if (buyStBtn) {
+        buyStBtn.disabled = staminaFull || Game.getState().resources.coins < 1000;
+        buyStBtn.title = staminaFull ? 'スタミナは満タンです' : 'スタミナを10回復します';
+      }
+
       const el = $('shop-list');
       if (!el) return;
       const items  = Game.getShop();
@@ -2386,6 +2405,32 @@ const UI = (() => {
     $('equip-sort-sel')?.addEventListener('change', e => {
       GachaTab._equipSort = e.target.value;
       GachaTab.renderEquipInventory();
+    });
+
+    // ショップリフレッシュ
+    $('shop-refresh-btn')?.addEventListener('click', () => {
+      const r = Game.refreshShop();
+      if (r.success) {
+        updateResourceBar();
+        GachaTab.renderShop();
+        showToast(r.free ? '🔄 ショップを更新しました（無料）' : `🔄 ショップを更新しました（💎${r.cost}消費）`, 'success');
+      } else if (r.reason === 'no_crystals') {
+        showToast(`💎 クリスタル不足！ 必要: ${r.needed}`, 'warn');
+      }
+    });
+
+    // スタミナポーション購入
+    $('buy-stamina-btn')?.addEventListener('click', () => {
+      const r = Game.buyStaminaPotion();
+      if (r.success) {
+        updateResourceBar();
+        GachaTab.renderShop();
+        showToast(`⚡ スタミナ+${r.recovered}！`, 'success');
+      } else if (r.reason === 'no_coins') {
+        showToast(`🪙 コイン不足！ 必要: 1,000`, 'warn');
+      } else if (r.reason === 'stamina_full') {
+        showToast('⚡ スタミナはすでに満タンです', 'info');
+      }
     });
 
   }

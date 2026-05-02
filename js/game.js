@@ -926,6 +926,47 @@ const Game = (() => {
     }));
   }
 
+  /** ショップを手動リフレッシュ（30💎消費、1日1回まで無料） */
+  function refreshShop() {
+    if (!state.shop) state.shop = { items: [], refreshedAt: null };
+    const today = _todayStr();
+
+    // 無料リフレッシュ（1日1回）
+    if (!state.shop.freeRefreshDate || state.shop.freeRefreshDate !== today) {
+      state.shop.items          = _buildShopItems();
+      state.shop.refreshedAt    = today;
+      state.shop.freeRefreshDate= today;
+      Storage.save(state);
+      return { success: true, free: true };
+    }
+
+    // 有料リフレッシュ（30💎）
+    const COST = 30;
+    if (state.resources.crystals < COST)
+      return { success: false, reason: 'no_crystals', needed: COST };
+
+    state.resources.crystals -= COST;
+    state.shop.items       = _buildShopItems();
+    state.shop.refreshedAt = today;
+    Storage.save(state);
+    return { success: true, free: false, cost: COST };
+  }
+
+  /** スタミナ回復（コイン購入、スタミナが最大値未満の場合のみ） */
+  function buyStaminaPotion() {
+    const COST = 1000;
+    const RECOVER = 10;
+    if (state.resources.coins < COST)
+      return { success: false, reason: 'no_coins', needed: COST };
+    const st = getStamina();
+    if (st.current >= st.max)
+      return { success: false, reason: 'stamina_full' };
+    state.resources.coins -= COST;
+    state.resources.stamina = Math.min(st.max, (state.resources.stamina || st.current) + RECOVER);
+    Storage.save(state);
+    return { success: true, recovered: RECOVER };
+  }
+
   function buyShopItem(idx) {
     _refreshShopIfNeeded();
     const item = state.shop.items[idx];
@@ -1090,6 +1131,7 @@ const Game = (() => {
     setPlayerName,
     getAchievements, checkAchievements,
     towerBattle, isTowerUnlocked, getTowerFloor,
-    getTowerEnemyPreview: _buildTowerEnemies
+    getTowerEnemyPreview: _buildTowerEnemies,
+    refreshShop, buyStaminaPotion
   };
 })();

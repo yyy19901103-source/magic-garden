@@ -309,7 +309,23 @@
 
       <!-- ショップ -->
       <section class="home-section">
-        <h3 class="section-label">🛒 装備ショップ <span class="shop-refresh-label">毎日更新</span></h3>
+        <div class="shop-header-row">
+          <h3 class="section-label">🛒 装備ショップ</h3>
+          <button id="shop-refresh-btn" class="btn-shop-refresh" title="ショップを更新">
+            🔄 <span id="shop-refresh-label">無料更新</span>
+          </button>
+        </div>
+        <!-- スタミナポーション（特別販売） -->
+        <div id="shop-special" class="shop-special">
+          <div class="shop-special-item">
+            <span class="shop-special-icon">⚡</span>
+            <div class="shop-special-info">
+              <div class="shop-special-name">スタミナポーション</div>
+              <div class="shop-special-desc">スタミナ+10回復</div>
+            </div>
+            <button id="buy-stamina-btn" class="btn-shop-buy-special">🪙 1,000</button>
+          </div>
+        </div>
         <div id="shop-list" class="shop-list"></div>
       </section>
 
@@ -464,8 +480,8 @@
 <script src="js/firebase_auth.js?v=55"></script>
 <script src="js/storage.js?v=59"></script>
 <script src="js/idle.js?v=55"></script>
-<script src="js/game.js?v=61"></script>
-<script src="js/main.js?v=63"></script>
+<script src="js/game.js?v=64"></script>
+<script src="js/main.js?v=64"></script>
 
 </body>
 </html>
