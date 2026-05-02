@@ -14,7 +14,7 @@
     }
     .panel {
       background: #1a1040; border: 1px solid #3a2870; border-radius: 16px;
-      padding: 28px 24px; width: 100%; max-width: 480px;
+      padding: 28px 24px; width: 100%; max-width: 520px;
       box-shadow: 0 8px 40px rgba(0,0,0,.7);
     }
     h1 { font-size: 18px; color: #ffd700; margin-bottom: 6px; }
@@ -57,6 +57,25 @@
       border-radius: 8px; padding: 10px 12px;
       font-size: 12px; color: #fde68a; margin-bottom: 18px;
     }
+    .tab-row {
+      display: flex; gap: 8px; margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1; padding: 9px; border-radius: 8px; border: 1px solid #3a2870;
+      background: #231550; color: #b09cd8; font-size: 13px; font-weight: bold;
+      cursor: pointer; text-align: center; transition: all .2s;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, #4c1d95, #7c3aed);
+      border-color: #7c3aed; color: #fff;
+    }
+    .pane { display: none; }
+    .pane.active { display: block; }
+    .info-box {
+      background: rgba(167,139,250,.07); border: 1px solid rgba(167,139,250,.2);
+      border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #c4b5fd;
+      margin-bottom: 14px; line-height: 1.7;
+    }
   </style>
 </head>
 <body>
@@ -65,71 +84,236 @@
   <p class="sub">プレイヤーリソース付与 / 情報確認</p>
 
   <div class="warn">
-    ⚠️ このページはゲーム運営者専用です。<br>
-    GAS エンドポイントと管理者キーが必要です。
+    ⚠️ このページはゲーム運営者専用です。
   </div>
 
-  <!-- GAS設定 -->
-  <div class="section">
-    <label>GAS エンドポイント URL</label>
-    <input id="gas-url" type="url" placeholder="https://script.google.com/macros/s/.../exec">
-  </div>
-  <div class="section">
-    <label>管理者キー (ADMIN_KEY)</label>
-    <input id="admin-key" type="password" placeholder="GAS Script Properties に設定したキー">
+  <!-- バックエンド選択タブ -->
+  <div class="tab-row">
+    <div class="tab active" id="tab-firebase" onclick="switchTab('firebase')">🔥 Firebase</div>
+    <div class="tab" id="tab-gas" onclick="switchTab('gas')">⚡ GAS</div>
   </div>
 
-  <hr class="divider">
-
-  <!-- プレイヤー情報確認 -->
-  <div class="section">
-    <label>プレイヤー ID</label>
-    <input id="player-id" type="text" placeholder="50ddf67d-83f3-48f1-9...">
-    <button class="secondary" onclick="playerInfo()">📋 プレイヤー情報確認</button>
-  </div>
-
-  <hr class="divider">
-
-  <!-- リソース付与 -->
-  <div class="section">
-    <div class="row">
-      <div>
-        <label>リソース種別</label>
-        <select id="resource">
-          <option value="crystals">💎 クリスタル</option>
-          <option value="coins">🪙 コイン</option>
-          <option value="stamina">⚡ スタミナ</option>
-        </select>
-      </div>
-      <div>
-        <label>操作</label>
-        <select id="mode">
-          <option value="grant">加算（追加）</option>
-          <option value="set">絶対値セット</option>
-        </select>
-      </div>
+  <!-- ─── Firebase ペイン ─── -->
+  <div class="pane active" id="pane-firebase">
+    <div class="info-box">
+      Firebase Realtime Database を使用している場合。<br>
+      プレイヤーID = Firebase UID（匿名認証の場合はブラウザのDevTools → Application → IndexedDB の firebase:authUser:[key] から確認可）<br>
+      Database Secret = Firebase Console → プロジェクトの設定 → サービスアカウント → データベースのシークレット
     </div>
-    <div style="margin-top:10px">
-      <label>数量</label>
-      <input id="amount" type="number" value="99999" min="0">
+    <div class="section">
+      <label>Firebase Database URL</label>
+      <input id="fb-url" type="url" placeholder="https://your-project-default-rtdb.firebaseio.com">
     </div>
-    <button onclick="grantResource()">✨ 付与 / セット実行</button>
+    <div class="section">
+      <label>Database Secret（管理者用レガシーキー）</label>
+      <input id="fb-secret" type="password" placeholder="Firebase Console → サービスアカウント → シークレット">
+    </div>
+    <div class="section">
+      <label>プレイヤー UID</label>
+      <input id="fb-uid" type="text" placeholder="Firebase Auth UID">
+      <button class="secondary" onclick="fbPlayerInfo()">📋 Firebase プレイヤー情報確認</button>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section">
+      <div class="row">
+        <div>
+          <label>リソース種別</label>
+          <select id="fb-resource">
+            <option value="crystals">💎 クリスタル</option>
+            <option value="coins">🪙 コイン</option>
+            <option value="stamina">⚡ スタミナ</option>
+          </select>
+        </div>
+        <div>
+          <label>操作</label>
+          <select id="fb-mode">
+            <option value="set">絶対値セット</option>
+            <option value="grant">加算（追加）</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label>数量</label>
+        <input id="fb-amount" type="number" value="99999" min="0">
+      </div>
+      <button onclick="fbGrantResource()">✨ Firebase 付与 / セット実行</button>
+    </div>
+  </div>
+
+  <!-- ─── GAS ペイン ─── -->
+  <div class="pane" id="pane-gas">
+    <div class="info-box">
+      GAS（Google Apps Script）保存を使用している場合。<br>
+      プレイヤーID = UUID形式（xxxx-xxxx-4xxx...）<br>
+      ADMIN_KEY = GAS プロジェクト設定 → スクリプトプロパティ → ADMIN_KEY
+    </div>
+    <div class="section">
+      <label>GAS エンドポイント URL</label>
+      <input id="gas-url" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <div class="section">
+      <label>管理者キー (ADMIN_KEY)</label>
+      <input id="admin-key" type="password" placeholder="GAS Script Properties に設定したキー">
+    </div>
+    <div class="section">
+      <label>プレイヤー ID</label>
+      <input id="player-id" type="text" placeholder="50ddf67d-83f3-48f1-9...">
+      <button class="secondary" onclick="playerInfo()">📋 GAS プレイヤー情報確認</button>
+    </div>
+
+    <hr class="divider">
+
+    <div class="section">
+      <div class="row">
+        <div>
+          <label>リソース種別</label>
+          <select id="resource">
+            <option value="crystals">💎 クリスタル</option>
+            <option value="coins">🪙 コイン</option>
+            <option value="stamina">⚡ スタミナ</option>
+          </select>
+        </div>
+        <div>
+          <label>操作</label>
+          <select id="mode">
+            <option value="grant">加算（追加）</option>
+            <option value="set">絶対値セット</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label>数量</label>
+        <input id="amount" type="number" value="99999" min="0">
+      </div>
+      <button onclick="grantResource()">✨ GAS 付与 / セット実行</button>
+    </div>
   </div>
 
   <div id="result" class="result"></div>
 </div>
 
 <script>
-  // localStorage に設定を保存して再入力を省く
-  const STORE_URL = 'mg_admin_url';
-  const STORE_KEY = 'mg_admin_key';
+  // ─── タブ切替 ────────────────────────────────────────────────────────────
+  const STORE_TAB = 'mg_admin_tab';
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('pane-' + name).classList.add('active');
+    localStorage.setItem(STORE_TAB, name);
+    clearResult();
+  }
+
+  // ─── 設定キャッシュ ───────────────────────────────────────────────────────
+  const STORE_GAS_URL  = 'mg_admin_url';
+  const STORE_GAS_KEY  = 'mg_admin_key';
+  const STORE_FB_URL   = 'mg_admin_fb_url';
+  const STORE_FB_SEC   = 'mg_admin_fb_secret';
 
   window.addEventListener('DOMContentLoaded', () => {
-    const url = localStorage.getItem(STORE_URL);
-    const key = localStorage.getItem(STORE_KEY);
+    // GAS
+    const url = localStorage.getItem(STORE_GAS_URL);
+    const key = localStorage.getItem(STORE_GAS_KEY);
     if (url) document.getElementById('gas-url').value = url;
     if (key) document.getElementById('admin-key').value = key;
+    // Firebase
+    const fbUrl = localStorage.getItem(STORE_FB_URL);
+    const fbSec = localStorage.getItem(STORE_FB_SEC);
+    if (fbUrl) document.getElementById('fb-url').value = fbUrl;
+    if (fbSec) document.getElementById('fb-secret').value = fbSec;
+    // タブ復元
+    const tab = localStorage.getItem(STORE_TAB) || 'firebase';
+    switchTab(tab);
   });
+
+  // ─── Firebase ────────────────────────────────────────────────────────────
+
+  function getFbConfig(requireUid) {
+    const url    = document.getElementById('fb-url').value.trim().replace(/\/$/, '');
+    const secret = document.getElementById('fb-secret').value.trim();
+    const uid    = document.getElementById('fb-uid').value.trim();
+    if (!url)    { showResult('Firebase Database URL を入力してください', false); return null; }
+    if (!secret) { showResult('Database Secret を入力してください', false); return null; }
+    if (requireUid && !uid) { showResult('プレイヤー UID を入力してください', false); return null; }
+    localStorage.setItem(STORE_FB_URL, url);
+    localStorage.setItem(STORE_FB_SEC, secret);
+    return { url, secret, uid };
+  }
+
+  async function fbGet(path, cfg) {
+    const res = await fetch(`${cfg.url}/${path}.json?auth=${encodeURIComponent(cfg.secret)}`, {
+      signal: AbortSignal.timeout(12000)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+    return res.json();
+  }
+
+  async function fbPatch(path, data, cfg) {
+    const res = await fetch(`${cfg.url}/${path}.json?auth=${encodeURIComponent(cfg.secret)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      signal: AbortSignal.timeout(12000)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+    return res.json();
+  }
+
+  async function fbPlayerInfo() {
+    const cfg = getFbConfig(true);
+    if (!cfg) return;
+    showResult('確認中…', null);
+    try {
+      const data = await fbGet(`players/${cfg.uid}`, cfg);
+      if (!data) { showResult('❌ プレイヤーが見つかりません（UID: ' + cfg.uid + '）', false); return; }
+      const r = data.resources || {};
+      showResult(
+        `✅ Firebase プレイヤー情報\n` +
+        `UID: ${cfg.uid}\n` +
+        `名前: ${data.player?.name || '?'}\n` +
+        `💎 クリスタル: ${r.crystals ?? 0}\n` +
+        `🪙 コイン:      ${r.coins ?? 0}\n` +
+        `⚡ スタミナ:   ${r.stamina ?? 0}\n` +
+        `副将数: ${Object.keys(data.generals || {}).length} / クリア数: ${(data.progress?.clearedStages || []).length}`,
+        true
+      );
+    } catch(e) {
+      showResult('❌ エラー: ' + e.message + '\n\nヒント: Database Secret が正しいか、セキュリティルールを確認してください', false);
+    }
+  }
+
+  async function fbGrantResource() {
+    const cfg      = getFbConfig(true);
+    if (!cfg) return;
+    const resource = document.getElementById('fb-resource').value;
+    const mode     = document.getElementById('fb-mode').value;
+    const amount   = parseInt(document.getElementById('fb-amount').value, 10);
+    if (isNaN(amount) || amount < 0) { showResult('数量が不正です', false); return; }
+    const label    = { crystals: '💎 クリスタル', coins: '🪙 コイン', stamina: '⚡ スタミナ' }[resource];
+    showResult('実行中…', null);
+    try {
+      // 現在値を取得
+      const data = await fbGet(`players/${cfg.uid}`, cfg);
+      if (!data) { showResult('❌ プレイヤーが見つかりません', false); return; }
+      const before = (data.resources || {})[resource] ?? 0;
+      const after  = mode === 'set' ? amount : (before + amount);
+      // 部分更新（PATCH）
+      await fbPatch(`players/${cfg.uid}/resources`, { [resource]: after }, cfg);
+      showResult(
+        `✅ 完了（Firebase）\n` +
+        `${label}: ${before.toLocaleString()} → ${after.toLocaleString()}\n` +
+        `操作: ${mode === 'set' ? '絶対値セット' : '加算'}`,
+        true
+      );
+    } catch(e) {
+      showResult('❌ エラー: ' + e.message, false);
+    }
+  }
+
+  // ─── GAS ─────────────────────────────────────────────────────────────────
 
   function getConfig() {
     const url   = document.getElementById('gas-url').value.trim();
@@ -138,8 +322,8 @@
     if (!url) { showResult('GAS エンドポイント URLを入力してください', false); return null; }
     if (!key) { showResult('管理者キーを入力してください', false); return null; }
     if (!pid) { showResult('プレイヤー IDを入力してください', false); return null; }
-    localStorage.setItem(STORE_URL, url);
-    localStorage.setItem(STORE_KEY, key);
+    localStorage.setItem(STORE_GAS_URL, url);
+    localStorage.setItem(STORE_GAS_KEY, key);
     return { url, key, pid };
   }
 
@@ -147,7 +331,7 @@
     const cfg = getConfig();
     if (!cfg) return;
     const qs = new URLSearchParams({ ...params, playerId: cfg.pid, adminKey: cfg.key });
-    const res = await fetch(`${cfg.url}?${qs}`, { redirect: 'follow' });
+    const res = await fetch(`${cfg.url}?${qs}`, { redirect: 'follow', signal: AbortSignal.timeout(15000) });
     return res.json();
   }
 
@@ -158,7 +342,7 @@
       if (!r) return;
       if (r.ok) {
         showResult(
-          `✅ プレイヤー情報\n` +
+          `✅ GAS プレイヤー情報\n` +
           `名前: ${r.playerName}\n` +
           `💎 クリスタル: ${r.resources.crystals ?? 0}\n` +
           `🪙 コイン:      ${r.resources.coins ?? 0}\n` +
@@ -189,7 +373,7 @@
       if (!r) return;
       if (r.ok) {
         showResult(
-          `✅ 完了\n` +
+          `✅ 完了（GAS）\n` +
           `${label}: ${r.before.toLocaleString()} → ${r.after.toLocaleString()}\n` +
           `操作: ${r.mode === 'set' ? '絶対値セット' : '加算'}`,
           true
@@ -200,6 +384,13 @@
     } catch (e) {
       showResult('❌ 通信エラー: ' + e.message, false);
     }
+  }
+
+  // ─── 共通 ────────────────────────────────────────────────────────────────
+  function clearResult() {
+    const el = document.getElementById('result');
+    el.style.display = 'none';
+    el.textContent = '';
   }
 
   function showResult(msg, isOk) {
