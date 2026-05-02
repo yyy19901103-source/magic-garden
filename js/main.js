@@ -2131,8 +2131,11 @@ const UI = (() => {
       $('cs-restore-form')?.classList.toggle('hidden');
     });
     $('cs-copy-code')?.addEventListener('click', () => {
-      const code = $('cs-player-code')?.textContent;
-      if (code && code !== '----') {
+      // 表示は20文字に切り捨てているが、コピーは完全なIDを使う（CODEX指摘修正）
+      const fullId = Storage.getConfig().playerId ||
+                     (typeof FirebaseAuth !== 'undefined' && FirebaseAuth.getUID?.()) || '';
+      const code = fullId || $('cs-player-code')?.textContent;
+      if (code && code !== '----' && code !== '---') {
         navigator.clipboard?.writeText(code).catch(() => {});
         CloudModal.setStatus('コードをコピーしました ✓', 'ok');
       }
@@ -2321,7 +2324,9 @@ const UI = (() => {
       const code = $('cs-restore-input')?.value.trim();
       if (!code) { this.setStatus('引き継ぎコードを入力してください', 'err'); return; }
       this.setStatus('📥 読み込み中…', 'info');
-      Storage.setConfig(null, code, 'gas');
+      // 既存の type（'gas' or 'firebase'）を保持してIDだけ上書き（CODEX指摘修正）
+      const existingType = Storage.getConfig().type || 'gas';
+      Storage.setConfig(null, code, existingType);
       const data = await Storage.pullFromCloud();
       if (data) {
         Game.init(data);
