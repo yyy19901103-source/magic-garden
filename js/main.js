@@ -2239,9 +2239,8 @@ const UI = (() => {
         const ok = await Storage.ping(endpoint, 'gas');
         if (!ok) throw new Error('サーバーに接続できませんでした');
 
-        // 即セーブ
-        await Storage._doSaveCloudNow?.(Game.getState());
-        Storage.save(Game.getState());
+        // 即セーブ（flushSaveでdebounceをキャンセルして即クラウド同期）
+        Storage.flushSave(Game.getState());
 
         $('btn-cloud-settings')?.classList.add('connected');
         this.setStatus('✅ 自動セーブを有効にしました！', 'ok');

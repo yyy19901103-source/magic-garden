@@ -341,8 +341,6 @@ const Storage = (() => {
     return data;
   }
 
-  function _sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
   return {
     save, load, flushSave, pullFromCloud, clear,
     getConfig, setConfig, isConfigured,
