@@ -1141,8 +1141,9 @@ const UI = (() => {
 
       $('detail-body').innerHTML = `
         <div class="detail-top">
-          <div class="detail-portrait-wrap">
+          <div class="detail-portrait-wrap" data-char-id="${def.id}" data-char-name="${escapeAttr(def.name)}" title="タップで全画面表示">
             ${makePortrait(def,'lg')}
+            <span class="detail-portrait-zoom-hint">🔍 タップで拡大</span>
           </div>
           <div class="detail-meta">
             <h2 class="detail-name">${def.name}</h2>
@@ -1877,6 +1878,47 @@ const UI = (() => {
     $('detail-close')?.addEventListener('click', () => hide('general-detail'));
     $('general-detail')?.addEventListener('click', e => {
       if (e.target === $('general-detail')) hide('general-detail');
+    });
+
+    // ホームに戻るボタン
+    $('detail-back-home')?.addEventListener('click', () => {
+      hide('general-detail');
+      // 副将タブ → ホームタブへ切替
+      document.querySelector('.tab-btn[data-tab="home"]')?.click();
+    });
+
+    // キャライラストのタップで全画面 lightbox 表示 (event delegation)
+    document.body.addEventListener('click', e => {
+      const wrap = e.target.closest('.detail-portrait-wrap');
+      if (!wrap) return;
+      const id = wrap.dataset.charId;
+      const name = wrap.dataset.charName || '';
+      if (!id) return;
+      const lbImg = document.getElementById('char-lightbox-img');
+      const lbName = document.getElementById('char-lightbox-name');
+      if (!lbImg) return;
+      // 詳細用 WebP を優先・PNG にフォールバック
+      lbImg.onerror = function() {
+        if (!this.dataset.fb) {
+          this.dataset.fb = '1';
+          this.src = `assets/characters/${id}.png`;
+        }
+      };
+      lbImg.dataset.fb = '';
+      lbImg.src = `assets/characters/${id}.webp`;
+      lbImg.alt = name;
+      if (lbName) lbName.textContent = name;
+      show('char-lightbox');
+    });
+
+    $('char-lightbox-close')?.addEventListener('click', () => hide('char-lightbox'));
+    $('char-lightbox')?.addEventListener('click', e => {
+      if (e.target === $('char-lightbox') || e.target.tagName === 'IMG') hide('char-lightbox');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('char-lightbox').classList.contains('hidden')) {
+        hide('char-lightbox');
+      }
     });
 
     // ガチャ
