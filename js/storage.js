@@ -1,6 +1,13 @@
 /**
  * storage.js — 保存・読込モジュール v4.0
  *
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * 【アーキテクチャ要約（AI向け）】
+ *   このゲームのバックエンドは Firebase Realtime Database が主。スプレッドシートは不使用。
+ *   GAS (Code.gs) はフォールバックのみ。GASはPropertiesServiceを使用（SpreadsheetApp不使用）。
+ *   管理操作: admin.html → Firebase REST API (database secret) or GAS admin endpoint
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *
  * 保存の優先順位:
  *  1. LocalStorage（即時・同期）← 常に実行
  *  2. Firebase Auth SDK（推奨）← FirebaseAuth が初期化済みの場合
