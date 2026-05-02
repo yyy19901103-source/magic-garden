@@ -997,12 +997,54 @@ const UI = (() => {
   // 副将タブ
   // ═══════════════════════════════════════════════════════════════════════════
 
+  // 属性カラーマップ (カード・フィルターボタン共通)
+  const ELEM_COLOR = {
+    '光': '#ffe566', '闇': '#cc88ff', '水': '#66ccff',
+    '火': '#ff7744', '土': '#aacc66', '風': '#66eedd', '月': '#aabbff'
+  };
+  const ELEM_EMOJI = {
+    '光': '☀', '闇': '🌑', '水': '💧',
+    '火': '🔥', '土': '⛰', '風': '🌀', '月': '🌙'
+  };
+
   const GeneralsTab = {
     _nameFilter:   '',
     _rarityFilter: 'all',
+    _elemFilter:   'all',
+
+    // 属性フィルターボタンを動的生成 (初回のみ)
+    initElemFilter() {
+      const row = $('elem-filter-row');
+      if (!row || row.dataset.built) return;
+      row.dataset.built = '1';
+      // データから属性一覧を収集
+      const elems = [...new Set(Object.values(GENERALS_DATA).map(d => d.element))].sort();
+      const all = document.createElement('button');
+      all.className = 'elem-filter-btn active';
+      all.dataset.elem = 'all';
+      all.textContent = '全属性';
+      row.appendChild(all);
+      elems.forEach(el => {
+        const btn = document.createElement('button');
+        btn.className = 'elem-filter-btn';
+        btn.dataset.elem = el;
+        btn.style.setProperty('--ec', ELEM_COLOR[el] || '#fff');
+        btn.innerHTML = `${ELEM_EMOJI[el] || ''} ${el}`;
+        row.appendChild(btn);
+      });
+      row.addEventListener('click', e => {
+        const btn = e.target.closest('.elem-filter-btn');
+        if (!btn) return;
+        this._elemFilter = btn.dataset.elem;
+        row.querySelectorAll('.elem-filter-btn').forEach(b =>
+          b.classList.toggle('active', b.dataset.elem === this._elemFilter));
+        this.renderGrid();
+      });
+    },
 
     update() {
       this.renderFormationEditor();
+      this.initElemFilter();
       this.renderGrid();
       // フィルター状態の同期
       const searchEl = $('generals-search');
@@ -1052,11 +1094,15 @@ const UI = (() => {
       // フィルター適用
       const nameQ  = (this._nameFilter || '').trim().toLowerCase();
       const rarQ   = this._rarityFilter;
+      const elemQ  = this._elemFilter;
       if (nameQ) {
         sorted = sorted.filter(gid => GENERALS_DATA[gid]?.name.toLowerCase().includes(nameQ));
       }
       if (rarQ && rarQ !== 'all') {
         sorted = sorted.filter(gid => GENERALS_DATA[gid]?.rarity === rarQ);
+      }
+      if (elemQ && elemQ !== 'all') {
+        sorted = sorted.filter(gid => GENERALS_DATA[gid]?.element === elemQ);
       }
 
       el.innerHTML = '';
@@ -1072,8 +1118,10 @@ const UI = (() => {
         const inFm  = inFormation.includes(gid);
         const expNext = Game.expToNext(gs.level);
         const expPct  = expNext > 0 ? Math.min(100, Math.round((gs.exp / expNext) * 100)) : 100;
+        const elemColor = ELEM_COLOR[def.element] || '#ccc';
         card.innerHTML = `
           ${makePortrait(def,'md')}
+          <span class="card-elem-badge" style="--ec:${elemColor}">${ELEM_EMOJI[def.element] || ''} ${def.element}</span>
           ${inFm ? '<span class="formation-badge">編成中</span>' : ''}
           <div class="card-footer">
             <div class="card-name">${def.name}</div>

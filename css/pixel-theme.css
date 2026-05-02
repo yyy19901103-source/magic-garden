@@ -709,6 +709,49 @@ body.opt-reduced-motion .victory-rays { display: none !important; }
   50%     { box-shadow: 0 0 0 var(--px) var(--p-bg-deep), 0 calc(var(--px)*2) 0 var(--p-bg-deep), 0 0 28px rgba(102,221,102,1); }
 }
 
+/* ─── 副将一覧: 属性フィルターボタン & カード属性バッジ ─── */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.elem-filter-btn {
+  font-family: var(--p-font-main) !important;
+  font-size: 11px !important;
+  padding: 5px 10px !important;
+  border: var(--px) solid rgba(255,255,255,.18) !important;
+  background: var(--p-bg) !important;
+  color: var(--p-text-dim) !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  transition: filter .1s;
+}
+.elem-filter-btn.active {
+  border-color: var(--ec, var(--p-gold)) !important;
+  color: var(--ec, var(--p-gold)) !important;
+  background: var(--p-bg-hi) !important;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--ec, var(--p-gold)) 50%, transparent);
+}
+.elem-filter-btn:hover { filter: brightness(1.2); }
+
+/* カード上部左端に属性バッジ (絶対配置、formation-badge は右上なので左上) */
+.card-elem-badge {
+  position: absolute;
+  top: 4px; left: 4px;
+  font-family: var(--p-font-main);
+  font-size: 9px;
+  padding: 2px 5px;
+  background: rgba(10,10,20,.8);
+  color: var(--ec, #fff);
+  border: var(--px) solid var(--ec, #888);
+  border-radius: 0;
+  line-height: 1.2;
+  pointer-events: none;
+  z-index: 3;
+  text-shadow: 0 var(--px) 0 #000;
+}
+
 /* ─── 材料アイコン (絵文字を統一ピクセル枠で囲んでアセット感を出す) ─── */
 .mat-icon {
   display: inline-flex;
