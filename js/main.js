@@ -379,8 +379,7 @@ const UI = (() => {
       const pct = Math.round(unlockedCount / total * 100);
 
       el.innerHTML = `
-        <div class="ach-header">
-          <span class="ach-title">🏅 実績</span>
+        <div class="ach-progress-row">
           <span class="ach-progress">${unlockedCount}/${total} <span class="ach-pct">(${pct}%)</span></span>
         </div>
         <div class="ach-grid">
@@ -776,14 +775,17 @@ const UI = (() => {
       const warn  = intro.querySelector('.intro-warn');
       const vs    = intro.querySelector('.intro-vs-text');
 
-      // 味方ポートレート
+      // 味方ポートレート (WebP優先・PNG fallback・alt付き)
       left.innerHTML = (team || []).filter(t => t && t.def).map((g, i) => {
         const d = g.def || {};
+        const webp = `assets/characters/${d.id}.webp`;
+        const png  = `assets/characters/${d.id}.png`;
+        const err  = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${png}';}else{this.style.display='none';}`;
         return `
         <div class="intro-fighter intro-ally" style="animation-delay:${i * 0.08}s">
           <div class="intro-portrait" style="background:${d.gradient || '#555'}">
-            <img src="assets/characters/${d.id}.png" onerror="this.style.display='none'">
-            <span class="intro-emoji">${d.emoji || '⚔️'}</span>
+            <img src="${webp}" onerror="${err}" alt="${d.name || ''}">
+            <span class="intro-emoji" aria-hidden="true">${d.emoji || '⚔️'}</span>
           </div>
           <div class="intro-name">${d.name || ''}${d.element ? ` <span class="intro-elem">${d.element}</span>` : ''}</div>
         </div>

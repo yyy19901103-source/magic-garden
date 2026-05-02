@@ -16,10 +16,10 @@
   --border:      #3a2870;
   --border-lt:   #4e3a8a;
 
-  /* テキスト */
-  --text:        #f0e8ff;
-  --text-mid:    #b09cd8;
-  --text-dim:    #6b5a96;
+  /* テキスト (読みやすさ改善: コントラスト引き上げ) */
+  --text:        #f5f0ff;
+  --text-mid:    #cfc0f0;
+  --text-dim:    #8878b0;
 
   /* アクセント */
   --primary:     #a78bfa;
@@ -53,7 +53,7 @@
 .hidden { display: none !important; }
 
 body {
-  font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', 'Yu Gothic', 'Noto Sans JP', sans-serif;
+  font-family: 'Noto Serif JP', 'Hiragino Mincho Pro', 'Yu Mincho', '游明朝', serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -160,7 +160,7 @@ body {
 .tab-btn {
   flex: 1; padding: 7px 4px; border: none; border-radius: var(--radius-sm);
   background: transparent; color: var(--text-dim);
-  font-size: 11px; font-family: inherit; font-weight: 500;
+  font-size: 13px; font-family: inherit; font-weight: 500;
   cursor: pointer; transition: background .15s, color .15s; line-height: 1.4;
   text-align: center;
 }
@@ -252,7 +252,7 @@ body {
 
 .rarity-badge {
   position: absolute; bottom: 3px; left: 3px;
-  font-size: 9px; font-weight: bold; padding: 2px 5px;
+  font-size: 13px; font-weight: bold; padding: 2px 5px;
   border-radius: 3px; line-height: 1; z-index: 2;
 }
 .badge-LR  { background: linear-gradient(135deg,#ff00cc,#ffd700,#00ccff,#ff69b4); color: #000; font-weight: 900; animation: lrBadgeShine 2s linear infinite; background-size: 200% auto; }
@@ -303,9 +303,9 @@ body {
   min-width: 0;
 }
 .slot-empty  { font-size: 22px; color: var(--text-dim); text-align: center; padding: 20px 0; }
-.slot-name   { font-size: 11px; font-weight: bold; color: var(--text); text-align: center; line-height: 1.2; }
-.slot-lv     { font-size: 10px; color: var(--text-dim); }
-.slot-power  { font-size: 10px; color: var(--gold); font-weight: bold; }
+.slot-name   { font-size: 13px; font-weight: bold; color: var(--text); text-align: center; line-height: 1.2; }
+.slot-lv     { font-size: 12px; color: var(--text-dim); }
+.slot-power  { font-size: 12px; color: var(--gold); font-weight: bold; }
 
 /* 編成ボーナスバー */
 .formation-bonus-bar {
@@ -314,7 +314,7 @@ body {
   border-radius: var(--radius-sm); border: 1px dashed rgba(139,92,246,.3);
 }
 .fm-bonus {
-  font-size: 10px; color: var(--primary); font-weight: 500;
+  font-size: 12px; color: var(--primary); font-weight: 500;
   background: rgba(139,92,246,.12); padding: 2px 8px;
   border-radius: 10px; border: 1px solid rgba(139,92,246,.2);
 }
@@ -331,7 +331,7 @@ body {
 .task-icon  { font-size: 18px; flex-shrink: 0; }
 .task-info  { flex: 1; min-width: 0; }
 .task-label { font-size: 13px; font-weight: 500; }
-.task-count { font-size: 11px; color: var(--text-mid); margin-left: 6px; }
+.task-count { font-size: 13px; color: var(--text-mid); margin-left: 6px; }
 .task-progress-wrap { height: 4px; background: var(--border); border-radius: 99px; margin-top: 4px; overflow: hidden; }
 .task-progress-bar  { height: 100%; background: var(--primary); border-radius: 99px; transition: width .4s; }
 .task-reward        { font-size: 12px; font-weight: bold; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
@@ -377,7 +377,7 @@ body {
   margin-bottom: 10px; justify-content: center;
 }
 .bstat {
-  font-size: 11px; color: var(--text-mid);
+  font-size: 13px; color: var(--text-mid);
   background: rgba(255,255,255,.06); border: 1px solid var(--border);
   border-radius: 99px; padding: 3px 9px;
 }
@@ -452,7 +452,7 @@ body {
 
 .cloud-modal-card { width: 100%; max-width: 360px; }
 .cloud-modal-desc { font-size: 12px; color: var(--text-mid); margin-bottom: 14px; line-height: 1.6; }
-.cloud-label { display: block; font-size: 11px; color: var(--text-mid); margin: 10px 0 4px; }
+.cloud-label { display: block; font-size: 13px; color: var(--text-mid); margin: 10px 0 4px; }
 .cloud-input {
   width: 100%; padding: 9px 12px; background: var(--surface);
   border: 1px solid var(--border); border-radius: var(--radius-sm);
@@ -491,7 +491,7 @@ body {
 .cloud-steps-list a { color: var(--primary); }
 .cloud-steps-list code {
   background: rgba(255,255,255,.08); padding: 1px 4px;
-  border-radius: 3px; font-size: 11px;
+  border-radius: 3px; font-size: 13px;
 }
 
 /* 章タブ */
@@ -543,7 +543,7 @@ body {
 .stage-enemies{ font-size: 16px; margin-top: 2px; }
 .stage-rewards-preview { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
 .reward-chip {
-  font-size: 10px; padding: 1px 6px; border-radius: 10px;
+  font-size: 12px; padding: 1px 6px; border-radius: 10px;
   background: rgba(139,92,246,.12); color: var(--text-dim);
   border: 1px solid rgba(139,92,246,.25); white-space: nowrap;
 }
@@ -582,7 +582,7 @@ body {
 .detail-title { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
 .detail-tags  { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
 .tag {
-  font-size: 11px; font-weight: bold; padding: 3px 8px;
+  font-size: 13px; font-weight: bold; padding: 3px 8px;
   border-radius: 99px; border: 1px solid;
 }
 .tag-elem { background: rgba(167,139,250,.15); border-color: var(--primary); color: var(--primary); }
@@ -593,7 +593,7 @@ body {
 .level-row  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .level-num  { font-size: 14px; font-weight: bold; }
 .level-num strong { font-size: 20px; color: var(--primary); }
-.exp-text   { font-size: 11px; color: var(--text-dim); }
+.exp-text   { font-size: 13px; color: var(--text-dim); }
 .exp-bar-wrap { height: 12px; background: var(--card); border-radius: 99px; overflow: hidden; }
 .exp-bar      { height: 100%; background: linear-gradient(90deg,#a78bfa,#ec4899); border-radius: 99px; transition: width .5s; }
 
@@ -610,7 +610,7 @@ body {
 /* ステータスバー（詳細画面） */
 .detail-stats-bars { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .stat-bar-row { display: flex; align-items: center; gap: 8px; }
-.stat-bar-label { font-size: 11px; color: var(--text-dim); width: 44px; flex-shrink: 0; }
+.stat-bar-label { font-size: 13px; color: var(--text-dim); width: 44px; flex-shrink: 0; }
 .stat-bar-track {
   flex: 1; height: 10px; background: rgba(255,255,255,.06);
   border-radius: 99px; overflow: hidden;
@@ -619,7 +619,7 @@ body {
   height: 100%; border-radius: 99px;
   transition: width .6s cubic-bezier(.34,1.56,.64,1);
 }
-.stat-bar-val { font-size: 11px; font-weight: bold; color: var(--text-mid); min-width: 42px; text-align: right; }
+.stat-bar-val { font-size: 13px; font-weight: bold; color: var(--text-mid); min-width: 42px; text-align: right; }
 
 .detail-section { margin-bottom: 14px; }
 .detail-section h4 { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; letter-spacing: .05em; }
@@ -629,10 +629,10 @@ body {
 }
 .skill-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
 .skill-name   { font-size: 13px; font-weight: bold; color: var(--primary); }
-.skill-sp     { font-size: 11px; background: var(--primary-lt); color: var(--primary); padding: 1px 6px; border-radius: 99px; }
+.skill-sp     { font-size: 13px; background: var(--primary-lt); color: var(--primary); padding: 1px 6px; border-radius: 99px; }
 .skill-desc   { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
 .skill-preview {
-  font-size: 11px; color: var(--text-dim); margin-top: 4px;
+  font-size: 13px; color: var(--text-dim); margin-top: 4px;
   background: rgba(139,92,246,.08); border-radius: 4px; padding: 2px 6px; display: inline-block;
 }
 .skill-preview strong { color: var(--primary); }
@@ -658,8 +658,8 @@ body {
 }
 .fe-slot:hover { border-color: var(--primary); }
 .fe-empty { font-size: 22px; color: var(--text-dim); text-align: center; padding: 20px 0; }
-.fe-name  { font-size: 11px; font-weight: bold; text-align: center; line-height: 1.2; }
-.fe-lv    { font-size: 10px; color: var(--text-dim); }
+.fe-name  { font-size: 13px; font-weight: bold; text-align: center; line-height: 1.2; }
+.fe-lv    { font-size: 12px; color: var(--text-dim); }
 
 /* 副将グリッド */
 .generals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -684,12 +684,12 @@ body {
 .formation-badge {
   position: absolute; top: 4px; right: 4px;
   background: var(--primary); color: #fff;
-  font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 3px; z-index: 2;
+  font-size: 13px; font-weight: bold; padding: 2px 5px; border-radius: 3px; z-index: 2;
 }
 .card-footer  { padding: 5px 6px 7px; }
-.card-name    { font-size: 11px; font-weight: bold; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-lv      { font-size: 10px; color: var(--text-dim); }
-.card-power   { font-size: 9px; color: var(--gold); margin-top: 2px; font-weight: bold; }
+.card-name    { font-size: 13px; font-weight: bold; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-lv      { font-size: 12px; color: var(--text-dim); }
+.card-power   { font-size: 13px; color: var(--gold); margin-top: 2px; font-weight: bold; }
 
 /* ─── ガチャタブ ────────────────────────────────────────────────────────── */
 
@@ -708,7 +708,7 @@ body {
 .rate-sr      { font-size: 12px; font-weight: bold; color: var(--blue); background: rgba(96,165,250,.1); padding: 3px 10px; border-radius: 99px; border: 1px solid rgba(96,165,250,.3); }
 .rate-r       { font-size: 12px; font-weight: bold; color: var(--text-dim); background: rgba(107,114,128,.1); padding: 3px 10px; border-radius: 99px; border: 1px solid rgba(107,114,128,.3); }
 .gacha-btns   { display: flex; gap: 10px; margin-bottom: 10px; }
-.pity-text    { font-size: 11px; color: var(--text-dim); }
+.pity-text    { font-size: 13px; color: var(--text-dim); }
 
 /* ガチャ結果 */
 .gacha-result-panel {
@@ -731,8 +731,8 @@ body {
 .rarity-UR.gacha-card  { border-color: var(--ur); box-shadow: 0 0 12px rgba(255,102,0,.45); }
 .rarity-SSR.gacha-card { border-color: var(--ssr); box-shadow: 0 0 12px rgba(255,215,0,.4); }
 .rarity-SR.gacha-card  { border-color: var(--sr); }
-.gacha-card-name { font-size: 10px; font-weight: bold; padding: 4px 4px 0; line-height: 1.2; }
-.gacha-card-sub  { font-size: 9px; color: var(--text-dim); padding: 2px 4px 6px; }
+.gacha-card-name { font-size: 12px; font-weight: bold; padding: 4px 4px 0; line-height: 1.2; }
+.gacha-card-sub  { font-size: 13px; color: var(--text-dim); padding: 2px 4px 6px; }
 .rarity-LR .gacha-card-sub { color: var(--lr); font-weight: bold; }
 .rarity-MR .gacha-card-sub { color: var(--mr); font-weight: bold; }
 .rarity-UR .gacha-card-sub { color: var(--ur); font-weight: bold; }
@@ -750,15 +750,15 @@ body {
 .equip-emoji { font-size: 24px; flex-shrink: 0; }
 .equip-info  { flex: 1; min-width: 0; }
 .equip-name  { font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-.equip-rarity{ font-size: 10px; color: var(--text-dim); }
-.equip-stats { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
+.equip-rarity{ font-size: 12px; color: var(--text-dim); }
+.equip-stats { font-size: 13px; color: var(--text-mid); margin-top: 2px; }
 .equip-enhance-col { flex-shrink: 0; text-align: right; }
 .enhance-badge {
-  font-size: 11px; font-weight: bold; color: var(--gold);
+  font-size: 13px; font-weight: bold; color: var(--gold);
   background: rgba(255,215,0,.15); border: 1px solid rgba(255,215,0,.4);
   border-radius: 4px; padding: 1px 5px;
 }
-.enhance-max { font-size: 11px; font-weight: bold; color: var(--green); }
+.enhance-max { font-size: 13px; font-weight: bold; color: var(--green); }
 
 /* 装備グロウ: 強化レベルに応じた輝き */
 .equip-item[data-enh="5"]  .equip-emoji { filter: drop-shadow(0 0 4px #ffd700); }
@@ -769,7 +769,7 @@ body {
 .btn-enhance {
   background: linear-gradient(135deg,#f59e0b,#d97706); color: #1a0a00;
   border: none; border-radius: 6px; padding: 5px 8px;
-  font-size: 11px; font-weight: bold; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
   transition: opacity .15s; white-space: nowrap;
 }
 .btn-enhance:disabled { opacity: .3; cursor: not-allowed; }
@@ -781,7 +781,7 @@ body {
   font-size: 18px; letter-spacing: 2px; margin: 4px 0 2px;
   text-shadow: 0 0 8px rgba(255,215,0,.6);
 }
-.detail-shards { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+.detail-shards { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
 .btn-awaken {
   width: 100%; background: linear-gradient(135deg,#7c3aed,#4c1d95); color: #fff;
   border: none; border-radius: var(--radius-sm); padding: 11px;
@@ -812,7 +812,7 @@ body {
 .boss-emoji       { font-size: 36px; }
 .boss-card-img    { width: 72px; height: 96px; object-fit: cover; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border); }
 .boss-name        { font-size: 15px; font-weight: bold; }
-.boss-difficulty-label { font-size: 11px; color: var(--text-dim); }
+.boss-difficulty-label { font-size: 13px; color: var(--text-dim); }
 .boss-rewards     { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .boss-reward-chip {
   background: var(--surface); border: 1px solid var(--border);
@@ -831,7 +831,7 @@ body {
 .loot-remaining { font-size: 12px; color: var(--text-mid); margin-top: 4px; width: 100%; }
 
 /* 章タブ（6ボタン対応でテキスト縮小） */
-.chapter-tab { font-size: 11px; padding: 8px 4px; }
+.chapter-tab { font-size: 13px; padding: 8px 4px; }
 
 /* ─── ホームダッシュボード ──────────────────────────────────────────────── */
 
@@ -862,8 +862,8 @@ body {
 
 .dash-icon  { font-size: 16px; line-height: 1; }
 .dash-val   { font-size: 13px; font-weight: bold; color: var(--text); line-height: 1.2; }
-.dash-total { font-size: 10px; font-weight: normal; color: var(--text-dim); }
-.dash-lbl   { font-size: 9px; color: var(--text-dim); }
+.dash-total { font-size: 12px; font-weight: normal; color: var(--text-dim); }
+.dash-lbl   { font-size: 13px; color: var(--text-dim); }
 
 /* クリア進捗バー */
 .dash-progress-wrap {
@@ -901,7 +901,7 @@ body {
 .auth-status-text { font-size: 12px; color: var(--text-mid); flex: 1; }
 .btn-text-link {
   background: none; border: none; color: var(--primary);
-  font-size: 11px; cursor: pointer; padding: 2px 4px;
+  font-size: 13px; cursor: pointer; padding: 2px 4px;
   text-decoration: underline; flex-shrink: 0;
 }
 
@@ -919,31 +919,31 @@ body {
   margin-bottom: 8px;
 }
 .auth-note {
-  font-size: 10px; color: var(--text-dim); margin: 6px 0 2px; line-height: 1.4;
+  font-size: 12px; color: var(--text-dim); margin: 6px 0 2px; line-height: 1.4;
 }
 .auth-section-sep { height: 8px; }
 
 .cloud-textarea {
   height: auto; resize: vertical;
-  font-family: monospace; font-size: 11px; line-height: 1.4;
+  font-family: monospace; font-size: 13px; line-height: 1.4;
 }
 
 /* 週間ミッション */
 .weekly-task { border-color: rgba(139,92,246,.2) !important; }
 .weekly-bar  { background: linear-gradient(90deg, var(--primary), #a78bfa) !important; }
-.weekly-reset-label { font-size: 11px; color: var(--text-dim); font-weight: normal; margin-left: 6px; }
+.weekly-reset-label { font-size: 13px; color: var(--text-dim); font-weight: normal; margin-left: 6px; }
 
 .btn-claim {
   background: linear-gradient(135deg, #10b981, #059669); color: #fff;
   border: none; border-radius: 6px; padding: 5px 9px;
-  font-size: 11px; font-weight: bold; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
   white-space: nowrap; transition: opacity .15s; flex-shrink: 0;
 }
 .btn-claim:hover { opacity: .85; }
 
 /* ─── キャラカード 星表示 ────────────────────────────────────────────────── */
 
-.card-stars { font-size: 9px; letter-spacing: 0; color: var(--gold); }
+.card-stars { font-size: 13px; letter-spacing: 0; color: var(--gold); }
 
 /* ─── 素材インベントリ ───────────────────────────────────────────────────── */
 
@@ -1039,16 +1039,16 @@ body {
 .skill-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
 .skill-right  { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .skill-lv {
-  font-size: 10px; font-weight: bold; color: var(--gold);
+  font-size: 12px; font-weight: bold; color: var(--gold);
   background: rgba(255,215,0,.15); border: 1px solid rgba(255,215,0,.4);
   border-radius: 4px; padding: 1px 6px;
 }
-.skill-lv-max { font-size: 10px; font-weight: bold; color: var(--green); }
+.skill-lv-max { font-size: 12px; font-weight: bold; color: var(--green); }
 .skill-upgrade-row { margin-top: 5px; }
 .btn-skill-up {
   background: linear-gradient(135deg,#10b981,#047857); color: #fff;
   border: none; border-radius: 6px; padding: 4px 8px;
-  font-size: 11px; font-weight: bold; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
   transition: opacity .15s; white-space: nowrap;
 }
 .btn-skill-up:disabled       { opacity: .3; cursor: not-allowed; }
@@ -1057,7 +1057,7 @@ body {
 /* ─── ショップ ───────────────────────────────────────────────────────────── */
 
 .shop-refresh-label {
-  font-size: 10px; color: var(--text-dim); font-weight: normal; margin-left: 6px;
+  font-size: 12px; color: var(--text-dim); font-weight: normal; margin-left: 6px;
 }
 .shop-list { display: flex; flex-direction: column; gap: 6px; }
 .shop-row {
@@ -1083,11 +1083,11 @@ body {
 .btn-sell {
   background: linear-gradient(135deg,#ef4444,#b91c1c); color: #fff;
   border: none; border-radius: 6px; padding: 5px 8px;
-  font-size: 11px; font-weight: bold; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
   transition: opacity .15s; white-space: nowrap;
 }
 .btn-sell:hover  { opacity: .85; }
-.sell-equipped   { font-size: 11px; color: var(--text-dim); }
+.sell-equipped   { font-size: 13px; color: var(--text-dim); }
 
 /* ─── 素材リスト（列レイアウトに変更） ──────────────────────────────────── */
 
@@ -1101,7 +1101,7 @@ body {
 .btn-synth {
   background: linear-gradient(135deg,#8b5cf6,#6d28d9); color: #fff;
   border: none; border-radius: 6px; padding: 5px 8px;
-  font-size: 11px; font-weight: bold; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
   transition: opacity .15s; white-space: nowrap; flex-shrink: 0;
 }
 .btn-synth:disabled       { opacity: .3; cursor: not-allowed; }
@@ -1128,10 +1128,10 @@ body {
   width: 56px; height: 56px; border-radius: var(--radius-xs);
   display: flex; align-items: center; justify-content: center;
 }
-.zukan-name    { font-size: 11px; font-weight: bold; line-height: 1.2; word-break: break-all; }
-.zukan-rarity  { font-size: 9px; padding: 1px 5px; border-radius: 4px; background: rgba(255,255,255,.1); }
-.zukan-stars   { font-size: 9px; color: var(--gold); }
-.zukan-lv      { font-size: 10px; color: var(--text-mid); }
+.zukan-name    { font-size: 13px; font-weight: bold; line-height: 1.2; word-break: break-all; }
+.zukan-rarity  { font-size: 13px; padding: 1px 5px; border-radius: 4px; background: rgba(255,255,255,.1); }
+.zukan-stars   { font-size: 13px; color: var(--gold); }
+.zukan-lv      { font-size: 12px; color: var(--text-mid); }
 .zukan-unknown .zukan-name { color: var(--text-dim); }
 
 .zukan-chapter {
@@ -1166,7 +1166,7 @@ body {
 .hd-player { display: flex; align-items: center; gap: 4px; }
 .btn-edit-name {
   background: none; border: none; cursor: pointer;
-  font-size: 11px; line-height: 1; padding: 2px;
+  font-size: 13px; line-height: 1; padding: 2px;
   opacity: 0; transition: opacity .2s;
   color: inherit;
 }
@@ -1213,16 +1213,16 @@ body {
   background: linear-gradient(135deg, var(--primary), #7c3aed);
   box-shadow: 0 4px 16px rgba(139,92,246,.4);
 }
-.cs-note { font-size: 11px; color: var(--text-dim); text-align: center; margin-bottom: 12px; }
+.cs-note { font-size: 13px; color: var(--text-dim); text-align: center; margin-bottom: 12px; }
 
 .cs-advanced-wrap { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
 .cs-alt-link {
   background: none; border: none; color: var(--text-dim);
-  font-size: 11px; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-family: inherit; cursor: pointer;
   padding: 4px 0; transition: color .15s;
 }
 .cs-alt-link:hover { color: var(--primary); }
-.cs-adv-note { font-size: 11px; color: var(--text-mid); margin-bottom: 6px; }
+.cs-adv-note { font-size: 13px; color: var(--text-mid); margin-bottom: 6px; }
 
 .cs-status-badge {
   border-radius: var(--radius-sm); padding: 10px 14px;
@@ -1236,7 +1236,7 @@ body {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px;
 }
-.cs-code-label   { font-size: 11px; color: var(--text-mid); margin-bottom: 8px; line-height: 1.4; }
+.cs-code-label   { font-size: 13px; color: var(--text-mid); margin-bottom: 8px; line-height: 1.4; }
 .cs-code-display {
   font-size: 18px; font-weight: bold; color: var(--gold);
   letter-spacing: .12em; text-align: center;
@@ -1260,7 +1260,7 @@ body {
 /* ─── スタミナ回復タイマー ──────────────────────────────────────────────── */
 
 .stamina-timer {
-  font-size: 10px; color: var(--text-dim);
+  font-size: 12px; color: var(--text-dim);
   background: rgba(255,255,255,.06);
   border-radius: 99px; padding: 1px 7px;
   font-variant-numeric: tabular-nums;
@@ -1278,7 +1278,7 @@ body {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 7px;
 }
-.pity-label     { font-size: 11px; color: var(--text-mid); font-weight: bold; }
+.pity-label     { font-size: 13px; color: var(--text-mid); font-weight: bold; }
 .pity-count-num { font-size: 12px; color: var(--gold); font-weight: bold; }
 .pity-bar-wrap  {
   height: 8px; background: rgba(255,255,255,.1);
@@ -1291,15 +1291,15 @@ body {
   transition: width .5s cubic-bezier(.4,0,.2,1);
 }
 .pity-footer  { display: flex; justify-content: space-between; align-items: center; }
-.pity-hint    { font-size: 10px; color: var(--text-dim); }
-.pity-drawn   { font-size: 10px; color: var(--text-dim); }
+.pity-hint    { font-size: 12px; color: var(--text-dim); }
+.pity-drawn   { font-size: 12px; color: var(--text-dim); }
 
 /* ─── バトルログトグル ────────────────────────────────────────────────────── */
 
 .btn-log-toggle {
   width: 100%; background: none; border: 1px dashed var(--border);
   color: var(--text-dim); border-radius: var(--radius-sm);
-  padding: 6px; font-size: 11px; font-family: inherit; cursor: pointer;
+  padding: 6px; font-size: 13px; font-family: inherit; cursor: pointer;
   transition: all .15s; margin-top: 4px;
 }
 .btn-log-toggle:hover { border-color: var(--primary); color: var(--primary); }
@@ -1321,7 +1321,7 @@ body {
 .rarity-filter-btn {
   background: var(--surface); border: 1px solid var(--border);
   color: var(--text-mid); border-radius: 99px; padding: 4px 10px;
-  font-size: 11px; font-weight: bold; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-weight: bold; font-family: inherit; cursor: pointer;
   transition: all .15s; white-space: nowrap;
 }
 .rarity-filter-btn:hover { border-color: var(--primary); }
@@ -1339,7 +1339,7 @@ body {
 .equip-filter-btn {
   background: var(--surface); border: 1px solid var(--border);
   color: var(--text-mid); border-radius: 99px; padding: 4px 10px;
-  font-size: 11px; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-family: inherit; cursor: pointer;
   transition: all .15s; white-space: nowrap; flex-shrink: 0;
 }
 .equip-filter-btn:hover { border-color: var(--primary); color: var(--text); }
@@ -1350,7 +1350,7 @@ body {
 .equip-sort-sel {
   background: var(--surface); border: 1px solid var(--border);
   color: var(--text-mid); border-radius: 99px; padding: 4px 8px;
-  font-size: 11px; font-family: inherit; cursor: pointer;
+  font-size: 13px; font-family: inherit; cursor: pointer;
   outline: none; margin-left: auto; flex-shrink: 0;
 }
 .equip-sort-sel:focus { border-color: var(--primary); }
@@ -1371,7 +1371,7 @@ body {
   display: inline-block;
   background: var(--surface2, rgba(255,255,255,.08));
   color: var(--text2, #aaa);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 99px;
@@ -1404,7 +1404,7 @@ body {
 .btn-banner-setup {
   background: var(--primary, #a78bfa);
   color: #fff; border: none; border-radius: 6px;
-  padding: 4px 10px; font-size: 11px; font-weight: 600;
+  padding: 4px 10px; font-size: 13px; font-weight: 600;
   cursor: pointer; flex-shrink: 0; white-space: nowrap;
 }
 .btn-banner-setup:hover { opacity: .85; }
@@ -1493,10 +1493,10 @@ body {
   .res-crystals { font-size: 13px; }
   .hd-resources { gap: 7px; }
   .st-bar-wrap  { width: 40px; }
-  .st-label     { font-size: 11px; }
+  .st-label     { font-size: 13px; }
 
   /* タブラベルを絵文字のみにして省スペース */
-  .tab-btn { font-size: 10px; padding: 5px 2px; }
+  .tab-btn { font-size: 12px; padding: 5px 2px; }
 
   /* ダッシュボードチップを2列に */
   .home-dashboard { grid-template-columns: 1fr 1fr; }
@@ -1587,21 +1587,15 @@ textarea {
 }
 .ach-toast-icon { font-size: 30px; flex-shrink: 0; }
 .ach-toast-body { display: flex; flex-direction: column; gap: 2px; }
-.ach-toast-label { font-size: 10px; color: #fde68a; letter-spacing: .08em; text-transform: uppercase; }
+.ach-toast-label { font-size: 12px; color: #fde68a; letter-spacing: .08em; text-transform: uppercase; }
 .ach-toast-name  { font-size: 14px; font-weight: 700; color: #ffd700; }
-.ach-toast-desc  { font-size: 11px; color: rgba(255,255,255,.7); }
+.ach-toast-desc  { font-size: 13px; color: rgba(255,255,255,.7); }
 
 /* ═══ アチーブメントパネル（ダッシュボード内） ═══ */
 .achievement-panel {
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 12px; padding: 12px 14px;
+  /* home-section がカード枠を提供するため独自背景・ボーダーは不要 */
 }
-.ach-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 10px;
-}
-.ach-title  { font-size: 13px; font-weight: 700; color: var(--gold); }
+.ach-progress-row { margin-bottom: 8px; }
 .ach-progress { font-size: 12px; color: rgba(255,255,255,.6); }
 .ach-pct    { color: var(--gold); }
 .ach-grid   {
@@ -1625,8 +1619,8 @@ textarea {
   opacity: .55;
 }
 .ach-emoji  { font-size: 22px; }
-.ach-name   { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.2; }
-.ach-locked .ach-name { color: rgba(255,255,255,.4); }
+.ach-name   { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.9); line-height: 1.3; }
+.ach-locked .ach-name { color: rgba(255,255,255,.45); }
 
 /* ═══ 映画級バトル開始VS演出 ═══ */
 .battle-intro {
@@ -1722,7 +1716,7 @@ textarea {
 .intro-elem {
   display: inline-block; margin-left: 4px;
   padding: 1px 6px; border-radius: 8px;
-  background: rgba(255,255,255,.15); font-size: 11px;
+  background: rgba(255,255,255,.15); font-size: 13px;
 }
 
 .intro-vs {
