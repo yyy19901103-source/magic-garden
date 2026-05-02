@@ -2209,7 +2209,7 @@ const UI = (() => {
         const playerId = Storage.getConfig().playerId ||
                          (typeof FirebaseAuth !== 'undefined' && FirebaseAuth.getUID?.()) || '---';
         const codeEl = $('cs-player-code');
-        if (codeEl) codeEl.textContent = playerId;
+        if (codeEl) codeEl.textContent = playerId.slice(0, 20);
         // GAS設定の既存値を反映
         $('cloud-endpoint') && ($('cloud-endpoint').value = Storage.getConfig().endpoint || '');
         $('cloud-playerid') && ($('cloud-playerid').value = Storage.getConfig().playerId || '');
@@ -2246,7 +2246,7 @@ const UI = (() => {
         $('cs-setup')?.classList.add('hidden');
         $('cs-connected')?.classList.remove('hidden');
         const codeEl = $('cs-player-code');
-        if (codeEl) codeEl.textContent = playerId;
+        if (codeEl) codeEl.textContent = playerId.slice(0, 20);
       } catch(e) {
         this.setStatus(`接続失敗: ${e.message}`, 'err');
         if ($btn) { $btn.disabled = false; $btn.textContent = '✨ ワンタップで自動セーブを始める'; }
