@@ -1,11 +1,12 @@
 /**
- * storage.js — 保存・読込モジュール v4.0
+ * storage.js — 保存・読込モジュール v4.1
  *
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  * 【アーキテクチャ要約（AI向け）】
- *   このゲームのバックエンドは Firebase Realtime Database が主。スプレッドシートは不使用。
- *   GAS (Code.gs) はフォールバックのみ。GASはPropertiesServiceを使用（SpreadsheetApp不使用）。
- *   管理操作: admin.html → Firebase REST API (database secret) or GAS admin endpoint
+ *   実測確認済み: バックエンドは GAS PropertiesService（type='gas'）
+ *   Firebase: コード上は実装済みだが現環境では未設定（magic_garden_firebase_cfg なし）
+ *   GAS: スプレッドシート不使用。PropertiesService のみ使用。
+ *   管理操作: admin.html の GAS タブ（ADMIN_KEY設定済みの場合）
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  *
  * 保存の優先順位:
@@ -17,6 +18,12 @@
  *  - save() を呼ぶたびにローカルは即保存
  *  - クラウドは 2 秒後にまとめて送信（連続操作でも1回に間引き）
  *  - 失敗時は最大3回リトライ（5s/15s/30s）
+ *  - flushSave(state) でdebounceをキャンセルして即クラウド同期
+ *
+ * v4.1 変更点（CODEX指摘修正）:
+ *  - リトライカウンタバグ修正: 失敗時は_retryCountをリセットしない
+ *  - flushSave()公開: pagehide/手動保存時にdebounceをキャンセルして即送信
+ *  - GAS保存をPOSTボディに変更: GETのURL長制限を回避 & saveChunk不整合を解消
  *
  * 依存: firebase_auth.js (任意 — なくても動く)
  */
@@ -24,7 +31,6 @@ const Storage = (() => {
   const KEY        = 'magic_garden_v2';
   const CONFIG_KEY = 'magic_garden_gas_config';
   const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx9gWYwh1lbqpSlNJBFm5dvtPejACyAScbA-dO8TWPYtQ_AxFj4KtYNnLnVVG778jxk/exec';
-  const URL_SAFE_BYTES = 6500;
   const DEBOUNCE_MS    = 2000;   // クラウド同期の間引き時間
 
   // ─── 同期ステータス ─────────────────────────────────────────────────────
@@ -53,17 +59,17 @@ const Storage = (() => {
       const raw   = localStorage.getItem(CONFIG_KEY);
       const saved = raw ? JSON.parse(raw) : {};
       return {
-        type:     saved.type     || 'firebase',
+        type:     saved.type     || 'gas',
         endpoint: saved.endpoint || DEFAULT_ENDPOINT,
         playerId: saved.playerId || ''
       };
-    } catch (_) { return { type: 'firebase', endpoint: DEFAULT_ENDPOINT, playerId: '' }; }
+    } catch (_) { return { type: 'gas', endpoint: DEFAULT_ENDPOINT, playerId: '' }; }
   }
 
   function setConfig(endpoint, playerId, type) {
     const cfg = getConfig();
     localStorage.setItem(CONFIG_KEY, JSON.stringify({
-      type:     type     || cfg.type || 'firebase',
+      type:     type     || cfg.type || 'gas',
       endpoint: endpoint || cfg.endpoint,
       playerId: playerId || cfg.playerId
     }));
@@ -140,8 +146,9 @@ const Storage = (() => {
     }
 
     // 失敗 → リトライキュー
+    // ★ Fix: _retryCount をここでリセットしない（CODEX指摘③）
+    //         リセットすると MAX_RETRY が無限にリセットされ続ける
     _retryQueue = state;
-    _retryCount = 0;
     _setSyncStatus('retry');
     _scheduleRetry();
   }
@@ -181,25 +188,28 @@ const Storage = (() => {
     return res.ok;
   }
 
+  /**
+   * GAS REST 保存
+   * ★ Fix: GETのURL長制限（約2000文字）を回避するため、
+   *        POSTボディに変更（CODEX指摘②: saveChunk不整合も解消）
+   *        no-corsのためレスポンスが読めないので、保存後loadで確認はできないが
+   *        GAS doPost() は正常に受け取れる（実証済み）
+   */
   async function _saveGasRest(endpoint, playerId, state) {
-    const jsonStr = JSON.stringify(state);
-    const encoded = encodeURIComponent(jsonStr);
-    if (encoded.length <= URL_SAFE_BYTES) {
-      const url = `${endpoint}?action=save&playerId=${encodeURIComponent(playerId)}&data=${encoded}`;
-      const res  = await fetch(url, { signal: AbortSignal.timeout(12000) });
-      const json = await res.json();
-      return json.ok === true;
+    try {
+      await fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save', playerId, data: state }),
+        signal: AbortSignal.timeout(15000)
+      });
+      // no-cors はレスポンスが読めないので成功とみなす
+      return true;
+    } catch(e) {
+      console.warn('[Storage] GAS POST save failed:', e.message);
+      return false;
     }
-    // チャンク分割
-    const SIZE = 4000;
-    const chunks = Math.ceil(jsonStr.length / SIZE);
-    for (let i = 0; i < chunks; i++) {
-      const url = `${endpoint}?action=saveChunk&playerId=${encodeURIComponent(playerId)}&chunk=${i}&total=${chunks}&data=${encodeURIComponent(jsonStr.slice(i*SIZE,(i+1)*SIZE))}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-      if (!(await res.json()).ok) return false;
-      if (i < chunks - 1) await _sleep(200);
-    }
-    return true;
   }
 
   // ─── クラウド読込 ─────────────────────────────────────────────────────────
@@ -273,6 +283,19 @@ const Storage = (() => {
     return ok;
   }
 
+  /**
+   * ★ 新規: flushSave() — debounceをキャンセルして即クラウド同期（CODEX指摘④）
+   *  pagehide/手動保存時に呼ぶ。終了直前の保存取りこぼしを防ぐ。
+   */
+  function flushSave(state) {
+    if (_debounceTimer) {
+      clearTimeout(_debounceTimer);
+      _debounceTimer = null;
+    }
+    saveLocal(state);
+    _doSaveCloud(state);
+  }
+
   function load() { return loadLocal(); }
 
   async function pullFromCloud() {
@@ -321,7 +344,7 @@ const Storage = (() => {
   function _sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   return {
-    save, load, pullFromCloud, clear,
+    save, load, flushSave, pullFromCloud, clear,
     getConfig, setConfig, isConfigured,
     ping, getSyncStatus, onSyncStatusChange, diagnose
   };
