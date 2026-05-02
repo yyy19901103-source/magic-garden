@@ -195,6 +195,19 @@
 </div>
 
 <script>
+  // ─── 自動読み込みバナー ───────────────────────────────────────────────────
+  function _showAutoLoadBanner() {
+    const fbUrl = document.getElementById('fb-url').value;
+    const pid   = document.getElementById('fb-uid').value;
+    if (!fbUrl && !pid) return;
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:8px 12px;font-size:12px;color:#6ee7b7;margin-bottom:14px;';
+    banner.textContent = '✅ ゲームの設定から自動読み込みしました' +
+      (fbUrl ? '（Firebase URL）' : '') + (pid ? '（プレイヤーID）' : '');
+    document.querySelector('.panel').insertBefore(banner, document.querySelector('.tab-row'));
+    setTimeout(() => banner.style.opacity = '0.3', 4000);
+  }
+
   // ─── タブ切替 ────────────────────────────────────────────────────────────
   const STORE_TAB = 'mg_admin_tab';
 
@@ -212,8 +225,30 @@
   const STORE_GAS_KEY  = 'mg_admin_key';
   const STORE_FB_URL   = 'mg_admin_fb_url';
   const STORE_FB_SEC   = 'mg_admin_fb_secret';
+  const STORE_FB_UID   = 'mg_admin_fb_uid';
 
   window.addEventListener('DOMContentLoaded', () => {
+    // ─── ゲームのlocalStorageから自動読み込み ───────────────────────────────
+    // Firebase設定 (magic_garden_firebase_cfg)
+    try {
+      const fbCfg = JSON.parse(localStorage.getItem('magic_garden_firebase_cfg') || '{}');
+      if (fbCfg.databaseURL) {
+        localStorage.setItem(STORE_FB_URL, fbCfg.databaseURL);
+      }
+    } catch(_) {}
+    // playerId (GAS config → fb-uid に流用)
+    try {
+      const gasCfg = JSON.parse(localStorage.getItem('magic_garden_gas_config') || '{}');
+      if (gasCfg.playerId && !document.getElementById('fb-uid').value) {
+        document.getElementById('fb-uid').value = gasCfg.playerId;
+        document.getElementById('player-id').value = gasCfg.playerId;
+      }
+      if (gasCfg.endpoint) {
+        localStorage.setItem(STORE_GAS_URL, gasCfg.endpoint);
+      }
+    } catch(_) {}
+
+    // ─── キャッシュ値を復元 ────────────────────────────────────────────────
     // GAS
     const url = localStorage.getItem(STORE_GAS_URL);
     const key = localStorage.getItem(STORE_GAS_KEY);
@@ -224,9 +259,17 @@
     const fbSec = localStorage.getItem(STORE_FB_SEC);
     if (fbUrl) document.getElementById('fb-url').value = fbUrl;
     if (fbSec) document.getElementById('fb-secret').value = fbSec;
+
+    // playerId を fb-uid へ（まだ空なら）
+    const cachedPid = localStorage.getItem('mg_admin_fb_uid');
+    if (cachedPid) document.getElementById('fb-uid').value = cachedPid;
+
     // タブ復元
     const tab = localStorage.getItem(STORE_TAB) || 'firebase';
     switchTab(tab);
+
+    // 自動読み込み結果を表示
+    _showAutoLoadBanner();
   });
 
   // ─── Firebase ────────────────────────────────────────────────────────────
@@ -240,6 +283,7 @@
     if (requireUid && !uid) { showResult('プレイヤー UID を入力してください', false); return null; }
     localStorage.setItem(STORE_FB_URL, url);
     localStorage.setItem(STORE_FB_SEC, secret);
+    localStorage.setItem(STORE_FB_UID, uid);
     return { url, secret, uid };
   }
 
