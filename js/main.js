@@ -1509,6 +1509,24 @@ const UI = (() => {
           }).join('')}</div>`;
         })()}
 
+        ${(() => {
+          // 属性相性表示（BattleEngine.getElementInfo が利用可能な場合のみ）
+          if (!def.element || typeof BattleEngine === 'undefined' || !BattleEngine.getElementInfo) return '';
+          const ei = BattleEngine.getElementInfo(def.element);
+          const chipHtml = (arr, color, label) =>
+            arr.length === 0 ? '' :
+            `<div class="elem-compat-row">
+              <span class="elem-compat-label">${label}</span>
+              <span class="elem-compat-chips">${arr.map(e => `<span class="elem-chip" style="color:${color}">${e}</span>`).join('')}</span>
+            </div>`;
+          return `<div class="detail-section detail-section--elem">
+            <h4 class="section-label">属性相性 <span class="elem-self-chip">${def.element}</span></h4>
+            ${chipHtml(ei.strong, '#f97316', '⚔️ 得意（×1.4）')}
+            ${chipHtml(ei.weak,   '#ef4444', '💀 弱点（×1.4受）')}
+            ${chipHtml(ei.resist, '#10b981', '🛡️ 耐性（×0.72受）')}
+          </div>`;
+        })()}
+
         <div class="detail-section">
           <h4 class="section-label">スキル</h4>
           ${def.skills.map((sk, idx) => {

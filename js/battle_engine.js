@@ -403,5 +403,31 @@ const BattleEngine = (() => {
     return result;
   }
 
-  return { simulate, extractHighlights };
+  /**
+   * 属性相性情報を返すユーティリティ
+   * @param {string} elem キャラの属性
+   * @returns {{ strong: string[], weak: string[], resist: string[] }}
+   *   strong  = このキャラが攻撃時に+40%ボーナスを得る相手属性
+   *   weak    = このキャラが被ダメ時に+40%受けてしまう攻撃属性
+   *   resist  = このキャラが被ダメ時に×0.72で軽減できる攻撃属性
+   */
+  function getElementInfo(elem) {
+    if (!elem) return { strong: [], weak: [], resist: [] };
+    // 攻撃時ボーナス: 自分の属性が相手の弱点
+    const strong = ELEMENT_WEAKNESS[elem] || [];
+    // 被ダメ弱点: 相手の属性の弱点リストに自分が含まれる
+    const weak = Object.entries(ELEMENT_WEAKNESS)
+      .filter(([, v]) => v.includes(elem))
+      .map(([k]) => k);
+    // 被ダメ耐性: 自分の弱点リストに含まれる属性の攻撃は自分への耐性（逆関係）
+    // 炎→氷/森/甘 が弱点なので、氷/森/甘から炎への攻撃は耐性
+    const resist = (ELEMENT_WEAKNESS[elem] || []).reduce((acc, defElem) => {
+      const defWeak = ELEMENT_WEAKNESS[defElem] || [];
+      if (defWeak.includes(elem)) acc.push(defElem); // defElemが炎に弱い = 炎は耐性
+      return acc;
+    }, []);
+    return { strong, weak, resist };
+  }
+
+  return { simulate, extractHighlights, getElementInfo };
 })();
