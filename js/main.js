@@ -134,6 +134,40 @@ const UI = (() => {
     el._t = setTimeout(() => { el.classList.remove('toast-show'); }, ms);
   }
 
+  function showAchievementToast(ach) {
+    // 既存のアチーブメントトーストがあれば削除して順次表示
+    let el = document.getElementById('achievement-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'achievement-toast';
+      document.body.appendChild(el);
+    }
+    el.innerHTML = `<span class="ach-toast-icon">${ach.emoji}</span>
+      <div class="ach-toast-body">
+        <div class="ach-toast-label">実績解除！</div>
+        <div class="ach-toast-name">${ach.name}</div>
+        <div class="ach-toast-desc">${ach.desc}</div>
+      </div>`;
+    el.classList.remove('ach-toast-show');
+    void el.offsetWidth;
+    el.classList.add('ach-toast-show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('ach-toast-show'), 4000);
+  }
+
+  function handleNewAchievements(newAchievements) {
+    if (!newAchievements || newAchievements.length === 0) return;
+    // 複数解除時は50msずつずらして表示
+    newAchievements.forEach((ach, i) => {
+      setTimeout(() => showAchievementToast(ach), i * 600);
+    });
+    // ダッシュボードを更新
+    if (typeof HomeTab !== 'undefined' && HomeTab.renderAchievements) {
+      setTimeout(() => HomeTab.renderAchievements(), 200);
+    }
+    Game.save();
+  }
+
   function makePortrait(def, size='md') {
     const sizeClass = size === 'lg' ? 'portrait-lg' : 'portrait-md';
     const isLg = size === 'lg';
@@ -330,6 +364,31 @@ const UI = (() => {
           <span class="dash-icon"><span class="picon picon-people"></span></span>
           <span class="dash-val">${genCnt}<span class="dash-total">/${Object.keys(GENERALS_DATA).length}</span></span>
           <span class="dash-lbl">副将</span>
+        </div>`;
+
+      // アチーブメントパネルを別途更新
+      this.renderAchievements();
+    },
+
+    renderAchievements() {
+      const el = document.getElementById('achievement-panel');
+      if (!el) return;
+      const achs = Game.getAchievements ? Game.getAchievements() : [];
+      const unlockedCount = achs.filter(a => a.unlocked).length;
+      const total = achs.length;
+      const pct = Math.round(unlockedCount / total * 100);
+
+      el.innerHTML = `
+        <div class="ach-header">
+          <span class="ach-title">🏅 実績</span>
+          <span class="ach-progress">${unlockedCount}/${total} <span class="ach-pct">(${pct}%)</span></span>
+        </div>
+        <div class="ach-grid">
+          ${achs.map(a => `
+            <div class="ach-badge ${a.unlocked ? 'ach-unlocked' : 'ach-locked'}" title="${a.desc}">
+              <span class="ach-emoji">${a.unlocked ? a.emoji : '🔒'}</span>
+              <span class="ach-name">${a.unlocked ? a.name : '???'}</span>
+            </div>`).join('')}
         </div>`;
     },
 
@@ -1014,6 +1073,11 @@ const UI = (() => {
         // 自動連戦OFF時はバーを隠す
         if (arBar) arBar.classList.add('hidden');
       }
+
+      // アチーブメント解除通知
+      if (result.newAchievements && result.newAchievements.length > 0) {
+        handleNewAchievements(result.newAchievements);
+      }
     }
   };
 
@@ -1423,6 +1487,9 @@ const UI = (() => {
       GeneralsTab.update();
       HomeTab.renderFormation();
       this.showGachaResult(result.results);
+      if (result.newAchievements && result.newAchievements.length > 0) {
+        setTimeout(() => handleNewAchievements(result.newAchievements), 800);
+      }
     },
 
     showGachaResult(results) {

@@ -1568,6 +1568,66 @@ textarea {
 #game-toast.toast-error { border-color: rgba(239,68,68,.5); color: #fca5a5; }
 #game-toast.toast-success { border-color: rgba(16,185,129,.5); color: #6ee7b7; }
 
+/* ═══ アチーブメントトースト ═══ */
+#achievement-toast {
+  position: fixed; bottom: 130px; right: 16px;
+  background: linear-gradient(135deg, rgba(20,10,50,.97) 0%, rgba(40,20,80,.97) 100%);
+  color: #fff; border-radius: 14px;
+  border: 1.5px solid rgba(251,191,36,.6);
+  box-shadow: 0 4px 24px rgba(251,191,36,.25), 0 2px 8px rgba(0,0,0,.5);
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+  min-width: 220px; max-width: 280px;
+  pointer-events: none; opacity: 0;
+  transform: translateX(320px);
+  transition: opacity .3s, transform .35s cubic-bezier(.17,.67,.35,1.2);
+  z-index: 9998;
+}
+#achievement-toast.ach-toast-show {
+  opacity: 1; transform: translateX(0);
+}
+.ach-toast-icon { font-size: 30px; flex-shrink: 0; }
+.ach-toast-body { display: flex; flex-direction: column; gap: 2px; }
+.ach-toast-label { font-size: 10px; color: #fde68a; letter-spacing: .08em; text-transform: uppercase; }
+.ach-toast-name  { font-size: 14px; font-weight: 700; color: #ffd700; }
+.ach-toast-desc  { font-size: 11px; color: rgba(255,255,255,.7); }
+
+/* ═══ アチーブメントパネル（ダッシュボード内） ═══ */
+.achievement-panel {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px; padding: 12px 14px;
+}
+.ach-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 10px;
+}
+.ach-title  { font-size: 13px; font-weight: 700; color: var(--gold); }
+.ach-progress { font-size: 12px; color: rgba(255,255,255,.6); }
+.ach-pct    { color: var(--gold); }
+.ach-grid   {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+}
+.ach-badge  {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px; border-radius: 10px;
+  text-align: center; cursor: default;
+  transition: transform .15s;
+}
+.ach-badge:hover { transform: scale(1.08); }
+.ach-unlocked {
+  background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(139,92,246,.18));
+  border: 1px solid rgba(251,191,36,.4);
+}
+.ach-locked {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  opacity: .55;
+}
+.ach-emoji  { font-size: 22px; }
+.ach-name   { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.2; }
+.ach-locked .ach-name { color: rgba(255,255,255,.4); }
+
 /* ═══ 映画級バトル開始VS演出 ═══ */
 .battle-intro {
   position: fixed; inset: 0; z-index: 9999;

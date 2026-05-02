@@ -35,9 +35,12 @@ const Game = (() => {
     progress: {
       clearedStages: [],
       battleCount: 0,
+      totalWins: 0,
+      totalDraws: 0,
       gachaPity: 0,
       winStreak: 0,    // 現在の連勝数
-      maxWinStreak: 0  // 最大連勝記録
+      maxWinStreak: 0, // 最大連勝記録
+      achievements: [] // 解放済みアチーブメントID配列
     },
     daily: {
       date: null,
@@ -407,6 +410,7 @@ const Game = (() => {
 
     // ─── 連勝ストリーク更新 ────────────────────────────────────────────────
     if (result.win) {
+      state.progress.totalWins = (state.progress.totalWins || 0) + 1;
       state.progress.winStreak = (state.progress.winStreak || 0) + 1;
       if (state.progress.winStreak > (state.progress.maxWinStreak || 0)) {
         state.progress.maxWinStreak = state.progress.winStreak;
@@ -475,7 +479,8 @@ const Game = (() => {
       }
     }
 
-    return { win: result.win, log: result.log, loot, turns: result.turns, stats: result.stats };
+    const newAchievements = checkAchievements();
+    return { win: result.win, log: result.log, loot, turns: result.turns, stats: result.stats, newAchievements };
   }
 
   // ─── 育成 ────────────────────────────────────────────────────────────────
@@ -534,6 +539,7 @@ const Game = (() => {
     state.resources.crystals -= cost;
     state.daily.drew = true;
     if (state.weekly) state.weekly.draws = (state.weekly.draws || 0) + count;
+    state.progress.totalDraws = (state.progress.totalDraws || 0) + count;
 
     const results = [];
     for (let i = 0; i < count; i++) {
@@ -566,7 +572,8 @@ const Game = (() => {
       results.push({ def, isNew });
     }
 
-    return { success: true, results };
+    const newAchievements = checkAchievements();
+    return { success: true, results, newAchievements };
   }
 
   // ─── 覚醒（星アップ）────────────────────────────────────────────────────
@@ -611,7 +618,8 @@ const Game = (() => {
     inst.enhanceLevel++;
     state.daily.enhanced = true;
     if (state.weekly) state.weekly.enhanced = (state.weekly.enhanced || 0) + 1;
-    return { success: true, newLevel: inst.enhanceLevel, cost };
+    const newAchievements = checkAchievements();
+    return { success: true, newLevel: inst.enhanceLevel, cost, newAchievements };
   }
 
   function getEnhanceCost(instanceId) {
@@ -880,6 +888,51 @@ const Game = (() => {
     return { success: true, name };
   }
 
+  // ─── アチーブメント ──────────────────────────────────────────────────────
+
+  const ACHIEVEMENTS = [
+    // 戦闘マイルストーン
+    { id: 'first_win',   name: '初陣',       emoji: '⚔️',  desc: '初めての勝利を収めた'            , check: s => (s.progress.totalWins||0) >= 1   },
+    { id: 'wins_10',     name: '歴戦の士',   emoji: '🏆',  desc: '累計10勝を達成した'             , check: s => (s.progress.totalWins||0) >= 10  },
+    { id: 'wins_50',     name: '猛将',       emoji: '🔥',  desc: '累計50勝を達成した'             , check: s => (s.progress.totalWins||0) >= 50  },
+    { id: 'wins_100',    name: '伝説の将',   emoji: '👑',  desc: '累計100勝を達成した'            , check: s => (s.progress.totalWins||0) >= 100 },
+    // 連勝
+    { id: 'streak_3',    name: '三連勝',     emoji: '⚡',  desc: '3連勝を達成した'                , check: s => (s.progress.maxWinStreak||0) >= 3   },
+    { id: 'streak_10',   name: '無双将軍',   emoji: '🌟',  desc: '10連勝を達成した'               , check: s => (s.progress.maxWinStreak||0) >= 10  },
+    // ステージクリア
+    { id: 'ch1_clear',   name: '第一章制覇', emoji: '🏰',  desc: '第一章を全ステージクリアした'    , check: s => [1,2,3,4,5,6].every(n=>s.progress.clearedStages.includes(`1-${n}`)) },
+    { id: 'ch3_clear',   name: '神殿の覇者', emoji: '⛩️',  desc: '第三章を全ステージクリアした'    , check: s => [1,2,3,4,5,6].every(n=>s.progress.clearedStages.includes(`3-${n}`)) },
+    { id: 'ch6_clear',   name: '幻夢の覇者', emoji: '✨',  desc: '第六章を全ステージクリアした'    , check: s => [1,2,3,4,5,6].every(n=>s.progress.clearedStages.includes(`6-${n}`)) },
+    // ガチャ・コレクション
+    { id: 'first_draw',  name: '運命の出会い', emoji: '🎲', desc: '初めてガチャを引いた'          , check: s => (s.progress.totalDraws||0) >= 1   },
+    { id: 'draws_100',   name: 'ガチャ廃人',   emoji: '💎', desc: '累計100回ガチャを引いた'       , check: s => (s.progress.totalDraws||0) >= 100  },
+    { id: 'own_5',       name: '仲間集め',   emoji: '📚',  desc: '5体の副将を獲得した'            , check: s => Object.keys(s.generals).length >= 5  },
+    { id: 'own_15',      name: 'コレクター', emoji: '💼',  desc: '15体の副将を獲得した'           , check: s => Object.keys(s.generals).length >= 15 },
+    { id: 'get_ssr',     name: 'SSR降臨',   emoji: '💫',  desc: 'SSR以上を初めて獲得した'         , check: s => Object.keys(s.generals).some(id => ['SSR','UR','MR','LR'].includes(GENERALS_DATA[id]?.rarity)) },
+    { id: 'get_lr',      name: '天帝降臨',   emoji: '⚜️',  desc: 'LRレアリティを獲得した'         , check: s => Object.keys(s.generals).some(id => GENERALS_DATA[id]?.rarity === 'LR') },
+    // 成長
+    { id: 'lv10',        name: '高みへの道', emoji: '📈',  desc: '副将をLv.10にした'              , check: s => Object.values(s.generals).some(g => g.level >= 10) },
+    { id: 'enhance_max', name: '鍛冶の極み', emoji: '🔨',  desc: '装備を+10まで強化した'           , check: s => s.inventory.equipment.some(e => (e.enhanceLevel||0) >= 10) },
+  ];
+
+  function checkAchievements() {
+    if (!state.progress.achievements) state.progress.achievements = [];
+    const unlocked = state.progress.achievements;
+    const newlyUnlocked = [];
+    for (const ach of ACHIEVEMENTS) {
+      if (!unlocked.includes(ach.id) && ach.check(state)) {
+        unlocked.push(ach.id);
+        newlyUnlocked.push(ach);
+      }
+    }
+    return newlyUnlocked;
+  }
+
+  function getAchievements() {
+    const unlocked = state.progress.achievements || [];
+    return ACHIEVEMENTS.map(a => ({ ...a, unlocked: unlocked.includes(a.id) }));
+  }
+
   // ─── ユーティリティ ──────────────────────────────────────────────────────
 
   function _randInt(min, max) { return Math.floor(min + Math.random() * (max - min + 1)); }
@@ -905,6 +958,7 @@ const Game = (() => {
     getCharStats, getFormationTeam,
     getIdleRate, calcTeamPower,
     expToNext, levelUpCost,
-    setPlayerName
+    setPlayerName,
+    getAchievements, checkAchievements
   };
 })();
