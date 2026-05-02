@@ -236,6 +236,16 @@
             <button class="rarity-filter-btn" data-rarity="R">R</button>
           </div>
           <div class="filter-row" id="elem-filter-row"><!-- 属性フィルターをJSで動的生成 --></div>
+          <div class="filter-row">
+            <label class="filter-label">並び替え:</label>
+            <select id="generals-sort" class="generals-sort-sel">
+              <option value="rarity">レア度順</option>
+              <option value="level">レベル高順</option>
+              <option value="power">戦力高順</option>
+              <option value="atk">攻撃力高順</option>
+              <option value="spd">速度高順</option>
+            </select>
+          </div>
         </div>
         <div id="generals-grid" class="generals-grid"></div>
       </section>
@@ -455,7 +465,7 @@
 <script src="js/storage.js?v=59"></script>
 <script src="js/idle.js?v=55"></script>
 <script src="js/game.js?v=61"></script>
-<script src="js/main.js?v=61"></script>
+<script src="js/main.js?v=62"></script>
 
 </body>
 </html>

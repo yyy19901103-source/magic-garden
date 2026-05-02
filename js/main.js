@@ -1336,11 +1336,33 @@ const UI = (() => {
       const total = Object.keys(state.generals).length;
       $('generals-count') && ($('generals-count').textContent = `(${total}体)`);
 
-      // LR→MR→UR→SSR→SR→R 順にソート
+      // ソートモード取得（セレクト or デフォルト）
+      const sortMode = $('generals-sort')?.value || this._sortMode || 'rarity';
       const order = { LR: 0, MR: 1, UR: 2, SSR: 3, SR: 4, R: 5 };
+
       let sorted = Object.keys(state.generals).sort((a, b) => {
         const da = GENERALS_DATA[a], db = GENERALS_DATA[b];
-        return (order[da.rarity] - order[db.rarity]) || (state.generals[b].level - state.generals[a].level);
+        const ga = state.generals[a], gb = state.generals[b];
+        if (sortMode === 'level') return gb.level - ga.level;
+        if (sortMode === 'power') {
+          const pa = Game.calcCharStats?.(ga, da);
+          const pb = Game.calcCharStats?.(gb, db);
+          const powA = pa ? (pa.atk*2 + pa.hp*0.5 + pa.def + pa.spd) : 0;
+          const powB = pb ? (pb.atk*2 + pb.hp*0.5 + pb.def + pb.spd) : 0;
+          return powB - powA;
+        }
+        if (sortMode === 'atk') {
+          const pa = Game.calcCharStats?.(ga, da);
+          const pb = Game.calcCharStats?.(gb, db);
+          return (pb?.atk||0) - (pa?.atk||0);
+        }
+        if (sortMode === 'spd') {
+          const pa = Game.calcCharStats?.(ga, da);
+          const pb = Game.calcCharStats?.(gb, db);
+          return (pb?.spd||0) - (pa?.spd||0);
+        }
+        // デフォルト: レア度→レベル
+        return (order[da.rarity] - order[db.rarity]) || (gb.level - ga.level);
       });
 
       // フィルター適用
@@ -2326,6 +2348,12 @@ const UI = (() => {
           b.classList.toggle('active', b === btn));
         GeneralsTab.renderGrid();
       });
+    });
+
+    // 副将ソートセレクト
+    $('generals-sort')?.addEventListener('change', e => {
+      GeneralsTab._sortMode = e.target.value;
+      GeneralsTab.renderGrid();
     });
 
     // 装備フィルターバー
