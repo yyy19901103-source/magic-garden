@@ -1897,15 +1897,18 @@ const UI = (() => {
       const lbImg = document.getElementById('char-lightbox-img');
       const lbName = document.getElementById('char-lightbox-name');
       if (!lbImg) return;
-      // 詳細用 WebP を優先・PNG にフォールバック
+      // 超高画質: オリジナル PNG を優先 → WebP フォールバック → 消去
       lbImg.onerror = function() {
         if (!this.dataset.fb) {
           this.dataset.fb = '1';
-          this.src = `assets/characters/${id}.png`;
+          this.src = `assets/characters/${id}.webp`;
+        } else if (this.dataset.fb === '1') {
+          this.dataset.fb = '2';
+          this.alt = '(画像なし)';
         }
       };
       lbImg.dataset.fb = '';
-      lbImg.src = `assets/characters/${id}.webp`;
+      lbImg.src = `assets/characters/${id}.png`;  // 元の高解像度PNG（1792×2400等）を最優先
       lbImg.alt = name;
       if (lbName) lbName.textContent = name;
       show('char-lightbox');

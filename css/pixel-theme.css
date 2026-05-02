@@ -544,11 +544,19 @@ body.opt-reduced-motion .confetti-container,
 body.opt-reduced-motion .ssr-burst,
 body.opt-reduced-motion .victory-rays { display: none !important; }
 
+/* ─── 副将詳細: ボタン共通 z-index (portrait-wrap/portrait-lg より確実に上へ) ─── */
+/* 原因: .detail-portrait-wrap は position:relative で DOM順が後なため z-index:auto だと上に来る */
+/* .detail-close (style.css) は z-index 未指定のため portrait-wrap に隠れる → ここで上書き */
+.detail-close {
+  z-index: 50 !important;
+  position: absolute !important;
+}
+
 /* ─── 副将詳細: ホーム戻るボタン ─── */
 .detail-back-home {
   position: absolute;
   top: 8px; left: 8px;
-  z-index: 10;
+  z-index: 50;
   background: linear-gradient(180deg, var(--p-bg-hi) 0%, var(--p-bg-soft) 50%, var(--p-bg) 100%) !important;
   color: var(--p-gold) !important;
   font-family: var(--p-font-main) !important;
@@ -564,6 +572,9 @@ body.opt-reduced-motion .victory-rays { display: none !important; }
 }
 .detail-back-home:hover { filter: brightness(1.15); }
 .detail-back-home .picon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
+
+/* detail-body の上端に余白を確保してボタンとコンテンツが重ならないように */
+.detail-body { padding-top: 44px; }
 
 /* ─── 詳細画面のキャラポートレートにタップヒント ─── */
 .detail-portrait-wrap {
@@ -609,8 +620,8 @@ body.opt-reduced-motion .victory-rays { display: none !important; }
   to   { opacity: 1; }
 }
 .char-lightbox-img {
-  max-width: min(95vw, 800px);
-  max-height: 85vh;
+  max-width: min(95vw, 1100px);
+  max-height: 90vh;
   object-fit: contain;
   border: calc(var(--px)*2) solid var(--p-gold);
   box-shadow:
