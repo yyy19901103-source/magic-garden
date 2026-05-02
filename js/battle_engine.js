@@ -6,7 +6,7 @@
  */
 const BattleEngine = (() => {
 
-  const MAX_TURNS = 120;
+  const MAX_TURNS = 60; // ③ 短縮: 120→60（長期膠着防止）
 
   // ─── 属性相性テーブル ────────────────────────────────────────────────────────
   // キー: 攻撃側属性 → 配列: 弱点となる防御側属性
@@ -65,6 +65,45 @@ const BattleEngine = (() => {
 
   function calcHeal(atk, power = 1.0) {
     return Math.floor(atk * power * (0.9 + Math.random() * 0.2));
+  }
+
+  // ─── ① スキル発動条件チェック ────────────────────────────────────────────
+  /**
+   * スキルを今使うべきか判断する（無駄打ち防止）
+   * - 回復系: 誰かが HP 80% 未満の時のみ
+   * - バフ系: バトル中1回のみ（actor._atkBuffed / _defBuffed フラグで管理）
+   * - デバフ系: 敵に未適用の時のみ（actor._atkDownUsed フラグ）
+   * - ダメージ系: 常時OK
+   */
+  function shouldUseSkill(actor, sk, allies) {
+    const t = sk.type || '';
+
+    // 回復系 — 誰かがHP80%以下の時だけ
+    if (t === 'heal_single' || t === 'heal_all') {
+      const minRatio = Math.min(...allies.map(a => a.currentHp / a.stats.hp));
+      return minRatio < 0.80;
+    }
+
+    // 攻撃バフ — 1回のみ
+    if (t === 'atk_buff') {
+      if (actor._atkBuffed) return false;
+      return true; // フラグは useSkill 内で立てる
+    }
+
+    // 防御バフ・全体シールド — 1回のみ
+    if (t === 'defense_buff' || t === 'shield_all') {
+      if (actor._defBuffed) return false;
+      return true;
+    }
+
+    // 敵デバフ（攻撃力低下）— 1回のみ
+    if (t === 'atk_down') {
+      if (actor._atkDownUsed) return false;
+      return true;
+    }
+
+    // ダメージ系・その他は常時OK
+    return true;
   }
 
   // ─── スキル実行 ──────────────────────────────────────────────────────────
@@ -145,27 +184,29 @@ const BattleEngine = (() => {
       }
 
       case 'shield_all': {
-        // 防御バフ: 簡易実装（DEFを一時的に1.3倍）
         allies.forEach(a => { a.stats.def = Math.floor(a.stats.def * 1.3); });
+        actor._defBuffed = true; // ① バフ使用フラグ
         log.push({ type: 'skill', text: `🛡️ ${aName}の【${skill.name}】！ 全体の防御力が上がった！`, isSkill: true });
         break;
       }
 
       case 'defense_buff': {
         actor.stats.def = Math.floor(actor.stats.def * (1 + skill.power));
+        actor._defBuffed = true; // ① バフ使用フラグ
         log.push({ type: 'skill', text: `🛡️ ${aName}の【${skill.name}】！ 防御力が大きく上がった！`, isSkill: true });
         break;
       }
 
       case 'atk_buff': {
         actor.stats.atk = Math.floor(actor.stats.atk * (1 + skill.power));
+        actor._atkBuffed = true; // ① バフ使用フラグ
         log.push({ type: 'skill', text: `💢 ${aName}の【${skill.name}】！ 攻撃力が上がった！`, isSkill: true });
         break;
       }
 
       case 'atk_down': {
-        // 敵全体の攻撃力を下げる
         enemies.forEach(e => { e.stats.atk = Math.floor(e.stats.atk * (1 - skill.power)); });
+        actor._atkDownUsed = true; // ① デバフ使用フラグ
         log.push({ type: 'skill', text: `🌀 ${aName}の【${skill.name}】！ 敵全体の攻撃力が下がった！`, isSkill: true });
         break;
       }
@@ -232,10 +273,10 @@ const BattleEngine = (() => {
     const hasAttacker = teamRoles.has('attacker') || teamRoles.has('assassin') || teamRoles.has('mage');
     const roleCoverage = (hasTank ? 1 : 0) + (hasHealer ? 1 : 0) + (hasAttacker ? 1 : 0);
 
-    // 同属性ボーナス: チーム全員のATK +20%
+    // 同属性ボーナス: チーム全員のATK +15%
     if (allSameElem) {
-      teamFighters.forEach(f => { f.stats.atk = Math.floor(f.stats.atk * 1.20); });
-      log.push({ type: 'skill', text: `✨ 全員が「${teamElems[0]}」属性！ 属性共鳴 ATK+20%！`, isSkill: true });
+      teamFighters.forEach(f => { f.stats.atk = Math.floor(f.stats.atk * 1.15); });
+      log.push({ type: 'skill', text: `✨ 全員が「${teamElems[0]}」属性！ 属性共鳴 ATK+15%！`, isSkill: true });
     }
     // 役割カバーボーナス (タンク+ヒーラー+アタッカー) → チームATK+10%
     if (roleCoverage >= 3) {
@@ -275,13 +316,14 @@ const BattleEngine = (() => {
 
         if (enemies.length === 0) break;
 
-        actor.sp += 1;
+        // ② SPD-SP関係: SPD150以上は+2 SP/行動、それ未満は+1
+        actor.sp += 1 + Math.floor(actor.stats.spd / 150);
 
-        // スキル判定（SPが足りれば最初に使えるスキルを発動）
+        // ① スキル判定: SP足りる かつ 発動条件を満たす最初のスキルを実行
         let acted = false;
         if (actor.skills && actor.skills.length > 0) {
           for (const sk of actor.skills) {
-            if (actor.sp >= sk.sp) {
+            if (actor.sp >= sk.sp && shouldUseSkill(actor, sk, allies)) {
               actor.sp -= sk.sp;
               const skLog = useSkill(actor, sk, enemies, allies);
               log.push(...skLog);
@@ -306,13 +348,18 @@ const BattleEngine = (() => {
         }
       }
 
-      // ターン終了: ヒーラー役割ボーナス — 生存チーム全員を3%回復（3ターンごと）
+      // ターン終了: ヒーラー役割ボーナス — HP70%未満の時だけ3%回復（3ターンごと）
       if (hasHealer && turn % 3 === 0) {
         const liveTeam = fighters.filter(f => !f.isEnemy && f.currentHp > 0);
-        liveTeam.forEach(f => {
-          const heal = Math.floor(f.stats.hp * 0.03);
-          f.currentHp = Math.min(f.stats.hp, f.currentHp + heal);
-        });
+        const minHpRatio = liveTeam.length > 0
+          ? Math.min(...liveTeam.map(f => f.currentHp / f.stats.hp))
+          : 1;
+        if (minHpRatio < 0.70) {
+          liveTeam.forEach(f => {
+            const heal = Math.floor(f.stats.hp * 0.03);
+            f.currentHp = Math.min(f.stats.hp, f.currentHp + heal);
+          });
+        }
       }
     }
 
