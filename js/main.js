@@ -1461,32 +1461,96 @@ const UI = (() => {
              <small>欠片 ${blInfo.shards}/${blInfo.cost} → Lv.${blInfo.maxLevel+20}まで</small>
            </button>`;
 
+      // Hero ビュー用ヘルパー
+      const charImgWebp = `assets/characters/${def.id}.webp`;
+      const charImgPng  = `assets/characters/${def.id}.png`;
+      const heroImgErr  = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${charImgPng}';}else{this.style.opacity='0';}`;
+      const skillIconFor = (sk) => {
+        const t = sk.type || '';
+        const n = sk.name || '';
+        if (n.includes('炎') || n.includes('火') || n.includes('焔') || n.includes('焼')) return '🔥';
+        if (n.includes('氷') || n.includes('凍') || n.includes('霜')) return '❄️';
+        if (n.includes('雷') || n.includes('電')) return '⚡';
+        if (n.includes('闇') || n.includes('影') || n.includes('黒')) return '🌑';
+        if (n.includes('光') || n.includes('聖')) return '🌟';
+        if (n.includes('風')) return '🌪️';
+        if (n.includes('水')) return '💧';
+        if (t.startsWith('heal')) return '✨';
+        if (t.startsWith('buff')) return '🌀';
+        if (t.startsWith('debuff')) return '🔮';
+        if (t.endsWith('_all')) return '💥';
+        if (t === 'taunt') return '🛡️';
+        return '⚔️';
+      };
+      const equipSlotIcon = { weapon: '⚔️', armor: '🛡️', accessory: '💍' };
+      const heroEquipSlotsHtml = ['weapon','armor','accessory'].map(slot => {
+        const iid  = equips[slot];
+        const inst = iid ? Game.getState().inventory.equipment.find(e=>e.instanceId===iid) : null;
+        const ed   = inst ? EQUIPMENT_DATA[inst.defId] : null;
+        if (!ed) {
+          return `<button class="hero-slot hero-slot-empty" data-general="${gid}" data-slot="${slot}" aria-label="${slot}空き">
+            <span class="hero-slot-icon">${equipSlotIcon[slot]}</span>
+            <span class="hero-slot-empty-mark">＋</span>
+          </button>`;
+        }
+        const enhTxt = inst.enhanceLevel > 0 ? `+${inst.enhanceLevel}` : '';
+        return `<button class="hero-slot rarity-${ed.rarity}" data-general="${gid}" data-slot="${slot}" aria-label="${ed.name}">
+          <span class="hero-slot-rarity-tag">${ed.rarity}</span>
+          <span class="hero-slot-icon">${ed.emoji}</span>
+          ${enhTxt ? `<span class="hero-slot-enh">${enhTxt}</span>` : ''}
+        </button>`;
+      }).join('');
+      const heroSkillSlotsHtml = def.skills.map((sk, idx) => {
+        const skLv = (gs.skillLevels?.[idx] ?? 1);
+        return `<button class="hero-slot hero-skill-slot" data-skill-idx="${idx}" aria-label="${sk.name}">
+          <span class="hero-slot-rarity-tag hero-slot-sp">SP${sk.sp}</span>
+          <span class="hero-slot-icon">${skillIconFor(sk)}</span>
+          <span class="hero-slot-enh">Lv.${skLv}</span>
+        </button>`;
+      }).join('');
+
       $('detail-body').innerHTML = `
-        <div class="detail-top">
-          <div class="detail-portrait-wrap" data-char-id="${def.id}" data-char-name="${escapeAttr(def.name)}" title="タップで全画面表示">
-            ${makePortrait(def,'lg')}
-            <span class="detail-portrait-zoom-hint">🔍 タップで拡大</span>
+        <!-- ━━━ Hero Zone ━━━ -->
+        <div class="hero-zone rarity-${def.rarity}" data-char-id="${def.id}" data-char-name="${escapeAttr(def.name)}">
+          <img class="hero-bg-blur" src="${charImgWebp}" onerror="${heroImgErr}" alt="" aria-hidden="true" loading="eager">
+          <img class="hero-bg-main" src="${charImgWebp}" onerror="${heroImgErr}" alt="${escapeAttr(def.name)}" loading="eager">
+          <div class="hero-vignette"></div>
+          <div class="hero-top-overlay">
+            <span class="rarity-badge badge-${def.rarity}">${def.rarity}</span>
+            <h2 class="hero-name">${def.name}</h2>
+            <span class="hero-stars" title="覚醒">${starsHtml}</span>
           </div>
-          <div class="detail-meta">
-            <h2 class="detail-name">${def.name}</h2>
-            <p class="detail-title">${def.title}</p>
-            <div class="detail-tags">
+          <div class="hero-side hero-side-left">${heroEquipSlotsHtml}</div>
+          <div class="hero-side hero-side-right">${heroSkillSlotsHtml}</div>
+          <div class="hero-bottom-overlay">
+            <div class="hero-title-tag">『${def.title}』</div>
+            <div class="hero-tags">
               <span class="tag tag-elem">${def.element}</span>
               <span class="tag tag-type">${def.typeName}</span>
+              ${def.faction ? `<span class="tag tag-faction">🏰 ${def.faction}</span>` : ''}
             </div>
-            <p class="detail-desc">${def.description}</p>
-            <div class="detail-stars">${starsHtml}</div>
-            <p class="detail-shards">欠片: ${shards}個</p>
+          </div>
+          <span class="hero-zoom-hint" aria-hidden="true">🔍 タップで拡大</span>
+        </div>
+
+        <!-- ━━━ Quick Stats ━━━ -->
+        <div class="hero-stats-bar">
+          <div class="hero-lv-row">
+            <span class="hero-lv">Lv. <strong>${gs.level}</strong></span>
+            <div class="hero-exp-bar"><div class="hero-exp-fill" style="width:${expPct}%"></div></div>
+            <span class="hero-exp-txt">${gs.exp}/${expMax}</span>
+          </div>
+          <div class="hero-quick-stats">
+            <div class="quick-stat"><span class="qs-icon">❤️</span><span class="qs-val">${stats.hp.toLocaleString()}</span></div>
+            <div class="quick-stat"><span class="qs-icon">⚔️</span><span class="qs-val">${stats.atk.toLocaleString()}</span></div>
+            <div class="quick-stat"><span class="qs-icon">🛡️</span><span class="qs-val">${stats.def.toLocaleString()}</span></div>
+            <div class="quick-stat"><span class="qs-icon">💨</span><span class="qs-val">${stats.spd}</span></div>
           </div>
         </div>
 
-        <div class="detail-level-block">
-          <div class="level-row">
-            <span class="level-num">Lv. <strong>${gs.level}</strong></span>
-            <span class="exp-text">${gs.exp} / ${expMax} EXP</span>
-          </div>
-          <div class="exp-bar-wrap"><div class="exp-bar" style="width:${expPct}%"></div></div>
-        </div>
+        <!-- 説明文 -->
+        <p class="hero-desc">${def.description}</p>
+        <p class="detail-shards-line">💎 欠片: <strong>${shards}</strong>個</p>
 
         ${(() => {
           const STAT_MAX = { hp: 30000, atk: 3500, def: 1500, spd: 200 };
@@ -1627,9 +1691,26 @@ const UI = (() => {
         requestAnimationFrame(() => { panel.scrollTop = 0; });
       }
 
-      // 装備スロットをタップ → EquipPicker を開く
-      $('detail-body').querySelectorAll('.equip-slot-row[data-slot]').forEach(row => {
-        row.addEventListener('click', () => EquipPicker.open(row.dataset.general, row.dataset.slot));
+      // 装備スロットをタップ → EquipPicker を開く（旧リスト + Hero Zone 両方）
+      $('detail-body').querySelectorAll('[data-slot]').forEach(row => {
+        row.addEventListener('click', e => {
+          e.stopPropagation();
+          EquipPicker.open(row.dataset.general, row.dataset.slot);
+        });
+      });
+
+      // Hero Zone のスキルスロット → 該当スキル詳細にスクロール
+      $('detail-body').querySelectorAll('.hero-skill-slot').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const idx = Number(btn.dataset.skillIdx);
+          const skillRows = $('detail-body').querySelectorAll('.skill-row');
+          if (skillRows[idx]) {
+            skillRows[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            skillRows[idx].classList.add('skill-row-flash');
+            setTimeout(() => skillRows[idx].classList.remove('skill-row-flash'), 1200);
+          }
+        });
       });
 
       $('dlv-btn').addEventListener('click', () => {
@@ -2311,8 +2392,11 @@ const UI = (() => {
     });
 
     // キャライラストのタップで全画面 lightbox 表示 (event delegation)
+    // 旧 detail-portrait-wrap + 新 hero-zone の両方に対応
     document.body.addEventListener('click', e => {
-      const wrap = e.target.closest('.detail-portrait-wrap');
+      // ボタン・スロットのクリックは除外（バブリングを止めていない場合の保険）
+      if (e.target.closest('.hero-slot, .hero-top-overlay, .hero-bottom-overlay')) return;
+      const wrap = e.target.closest('.detail-portrait-wrap, .hero-zone');
       if (!wrap) return;
       const id = wrap.dataset.charId;
       const name = wrap.dataset.charName || '';

@@ -2049,3 +2049,369 @@ textarea {
   60%     { transform: translate(-3px, 1px); }
   80%     { transform: translate(2px, -1px); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Hero Zone（副将詳細・市販ガチャゲー風レイアウト）
+   - キャライラストを全画面背景化
+   - 装備3スロット（左）/ スキル3スロット（右）を浮かせる
+   - 低解像度画像対策：背景にぼかしコピーを敷いてフルブリード化
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hero-zone {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 70vh;
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #0a0612;
+  cursor: pointer;
+  isolation: isolate;
+}
+
+/* 背景：ぼかし版（低解像度の余白を埋める） */
+.hero-bg-blur {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(24px) brightness(.55) saturate(1.2);
+  z-index: 0;
+}
+/* メイン画像：くっきり */
+.hero-bg-main {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  z-index: 1;
+}
+
+/* ヴィネット：上下グラデーションで読みやすく */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom,
+      rgba(0,0,0,.55) 0%,
+      rgba(0,0,0,.10) 18%,
+      rgba(0,0,0,0)   45%,
+      rgba(0,0,0,.10) 65%,
+      rgba(0,0,0,.85) 100%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 35%, rgba(0,0,0,.45) 100%);
+}
+
+/* 上部オーバーレイ（名前・★） */
+.hero-top-overlay {
+  position: absolute;
+  top: 10px; left: 10px; right: 50px; /* close ボタン分余白 */
+  z-index: 3;
+  display: flex; align-items: center; gap: 8px;
+  pointer-events: none;
+}
+.hero-top-overlay > * { pointer-events: auto; }
+.hero-top-overlay .rarity-badge {
+  position: static;
+  font-size: 12px;
+  padding: 3px 7px;
+}
+.hero-name {
+  flex: 1; min-width: 0;
+  font-size: 20px; font-weight: bold;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,.95), 0 0 14px rgba(0,0,0,.7);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin: 0;
+  letter-spacing: .02em;
+}
+.hero-stars {
+  font-size: 12px;
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255,215,0,.8), 0 1px 3px rgba(0,0,0,.9);
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+
+/* 左右サイドのスロット帯 */
+.hero-side {
+  position: absolute;
+  top: 56px; bottom: 84px;
+  width: 56px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  z-index: 3;
+  gap: 6px;
+}
+.hero-side-left  { left: 8px; }
+.hero-side-right { right: 8px; }
+
+/* スロット個別 */
+.hero-slot {
+  position: relative;
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, rgba(20,12,30,.88), rgba(10,5,20,.92));
+  border: 2px solid rgba(255,255,255,.18);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: transform .15s, border-color .15s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 3px 10px rgba(0,0,0,.5);
+}
+.hero-slot:hover { transform: scale(1.06); border-color: rgba(255,255,255,.45); }
+.hero-slot:active { transform: scale(.97); }
+
+.hero-slot-icon {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.7));
+}
+.hero-slot-rarity-tag {
+  position: absolute;
+  top: -4px; left: -4px;
+  font-size: 9px; font-weight: 900;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  color: #1a0a00;
+  text-shadow: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,.6);
+  letter-spacing: .5px;
+}
+.hero-slot.rarity-LR  .hero-slot-rarity-tag { background: linear-gradient(135deg,#ff00cc,#ffd700,#00ccff); animation: lrBadgeShine 2s linear infinite; background-size: 200% auto; color: #000; }
+.hero-slot.rarity-MR  .hero-slot-rarity-tag { background: linear-gradient(135deg,#6600cc,#cc00ff,#9900bb); color: #fff; }
+.hero-slot.rarity-UR  .hero-slot-rarity-tag { background: linear-gradient(135deg,#cc2200,#ff6600,#ff8800); color: #fff; }
+.hero-slot.rarity-SSR .hero-slot-rarity-tag { background: linear-gradient(135deg,#ffd700,#ff8c00); color: #1a0a00; }
+.hero-slot.rarity-SR  .hero-slot-rarity-tag { background: linear-gradient(135deg,#60a5fa,#2563eb); color: #fff; }
+.hero-slot.rarity-R   .hero-slot-rarity-tag { background: #4b5563; color: #d1d5db; }
+.hero-slot-sp { background: linear-gradient(135deg, #6366f1, #4338ca) !important; color: #fff !important; }
+
+.hero-slot-enh {
+  position: absolute;
+  bottom: -3px; right: -3px;
+  font-size: 11px; font-weight: 900;
+  color: #ffd700;
+  background: rgba(0,0,0,.85);
+  padding: 1px 4px;
+  border-radius: 4px;
+  text-shadow: 0 0 4px rgba(255,215,0,.8);
+  border: 1px solid rgba(255,215,0,.6);
+}
+
+/* 空スロット */
+.hero-slot-empty {
+  background: rgba(20,15,30,.55);
+  border: 2px dashed rgba(255,255,255,.25);
+}
+.hero-slot-empty .hero-slot-icon { opacity: .35; }
+.hero-slot-empty-mark {
+  position: absolute;
+  bottom: 2px; right: 4px;
+  font-size: 14px; font-weight: bold;
+  color: rgba(255,255,255,.6);
+}
+
+/* レアリティ枠アニメーション継承（既存5種を流用） */
+.hero-slot.rarity-LR  { border-color: transparent; animation: lrRainbow 2s linear infinite; }
+.hero-slot.rarity-MR  { border-color: transparent; animation: mrPulse   2s ease-in-out infinite; }
+.hero-slot.rarity-UR  { border-color: transparent; animation: urFlame   2.5s ease-in-out infinite; }
+.hero-slot.rarity-SSR { border-color: transparent; animation: ssrGold   2.5s ease-in-out infinite; }
+.hero-slot.rarity-SR  { border-color: transparent; animation: srBlue    3s ease-in-out infinite; }
+/* スキルスロットは紫グロー */
+.hero-skill-slot { border-color: rgba(99,102,241,.55); box-shadow: 0 0 0 1px rgba(99,102,241,.3), 0 3px 10px rgba(0,0,0,.5); }
+.hero-skill-slot:hover { border-color: rgba(168,85,247,.85); box-shadow: 0 0 0 2px rgba(168,85,247,.5), 0 0 16px rgba(168,85,247,.4); }
+
+/* 下部オーバーレイ（タイトル・タグ） */
+.hero-bottom-overlay {
+  position: absolute;
+  bottom: 12px; left: 70px; right: 70px;
+  z-index: 3;
+  text-align: center;
+  pointer-events: none;
+}
+.hero-title-tag {
+  font-size: 13px; font-style: italic;
+  color: #ffd700;
+  text-shadow: 0 1px 4px rgba(0,0,0,.95), 0 0 8px rgba(255,215,0,.4);
+  margin-bottom: 4px;
+  letter-spacing: .04em;
+}
+.hero-tags {
+  display: inline-flex; gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+  pointer-events: auto;
+}
+.hero-tags .tag { backdrop-filter: blur(6px); }
+.hero-tags .tag-faction {
+  background: rgba(140,90,40,.55);
+  color: #ffeec0;
+  border: 1px solid rgba(255,200,100,.5);
+}
+
+/* 拡大ヒント */
+.hero-zoom-hint {
+  position: absolute;
+  bottom: 78px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; color: rgba(255,255,255,.55);
+  text-shadow: 0 1px 3px rgba(0,0,0,.9);
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.hero-zone:hover .hero-zoom-hint { opacity: 1; }
+
+/* ═══ Quick Stats Bar ════════════════════════════════════════════════════ */
+.hero-stats-bar {
+  background: linear-gradient(135deg, rgba(40,30,60,.85), rgba(20,15,30,.95));
+  border: 1px solid rgba(255,215,0,.25);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.hero-lv-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.hero-lv { font-size: 13px; color: var(--text-mid); white-space: nowrap; }
+.hero-lv strong { color: var(--gold); font-size: 18px; margin-left: 2px; }
+.hero-exp-bar {
+  flex: 1; min-width: 0;
+  height: 7px;
+  background: rgba(0,0,0,.55);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+}
+.hero-exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff6b6b 0%, #ffa500 50%, #ffd700 100%);
+  box-shadow: 0 0 8px rgba(255,165,0,.6);
+  transition: width .4s ease;
+}
+.hero-exp-txt { font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+.hero-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.quick-stat {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px;
+  padding: 6px 4px;
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 6px;
+  font-size: 12px; font-weight: bold;
+  min-width: 0;
+}
+.qs-icon { font-size: 13px; flex-shrink: 0; }
+.qs-val {
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* 説明文・欠片 */
+.hero-desc {
+  font-size: 13px; line-height: 1.55;
+  color: var(--text);
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  background: rgba(40,30,60,.4);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 6px 6px 0;
+}
+.detail-shards-line {
+  font-size: 13px; color: var(--text-mid);
+  margin-bottom: 12px;
+  text-align: right;
+}
+.detail-shards-line strong { color: var(--gold); font-size: 15px; }
+
+/* スキル詳細：Hero スロットからジャンプした時のフラッシュ */
+.skill-row-flash {
+  animation: skillFlash 1.2s ease;
+}
+@keyframes skillFlash {
+  0%   { background: rgba(168,85,247,.4); box-shadow: 0 0 20px rgba(168,85,247,.7); }
+  100% { background: transparent; box-shadow: none; }
+}
+
+/* ─── 詳細パネル全体のクローズ・バックボタンを Hero に重ねて読みやすく ─── */
+.detail-close {
+  background: rgba(20,12,30,.85) !important;
+  border: 1px solid rgba(255,255,255,.3) !important;
+  color: #fff !important;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.6);
+}
+.detail-back-home {
+  position: absolute;
+  top: 14px; left: 14px;
+  z-index: 10;
+  background: rgba(20,12,30,.85);
+  border: 1px solid rgba(255,255,255,.3);
+  color: #fff;
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-size: 12px; font-weight: bold;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.6);
+  display: flex; align-items: center; gap: 4px;
+}
+.detail-back-home:hover { background: rgba(40,30,60,.95); }
+
+/* detail-panel: hero zone がはみ出さないよう padding 調整 */
+.detail-panel { padding-top: 56px; }
+
+/* ═══ レスポンシブ対応 ═══════════════════════════════════════════════════ */
+/* タブレット〜PC：オーバーレイ中央寄せ・最大幅 */
+@media (min-width: 600px) {
+  .hero-zone { max-height: 60vh; aspect-ratio: 4 / 5; }
+  .hero-name { font-size: 22px; }
+  .hero-side { width: 64px; }
+  .hero-slot { width: 64px; height: 64px; }
+  .hero-slot-icon { font-size: 30px; }
+}
+/* スマホ横画面：縦レイアウトを保ちつつ調整 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .hero-zone { aspect-ratio: 16 / 9; max-height: 50vh; }
+  .hero-side { top: 48px; bottom: 60px; }
+  .hero-bottom-overlay { bottom: 6px; }
+  .hero-quick-stats { grid-template-columns: repeat(4, 1fr); }
+}
+/* 極狭スマホ（iPhone SE等）：スロット縮小 */
+@media (max-width: 360px) {
+  .hero-side { width: 50px; }
+  .hero-slot { width: 50px; height: 50px; }
+  .hero-slot-icon { font-size: 22px; }
+  .hero-bottom-overlay { left: 60px; right: 60px; }
+  .hero-name { font-size: 17px; }
+  .hero-quick-stats { gap: 4px; }
+  .quick-stat { font-size: 11px; padding: 5px 2px; }
+}
+/* iPhone ノッチ・ホームバー対応 */
+.detail-overlay { padding-top: env(safe-area-inset-top); }
+@supports (padding: max(0px)) {
+  .detail-back-home { top: max(14px, env(safe-area-inset-top)); }
+  .detail-close     { top: max(14px, env(safe-area-inset-top)); }
+}
+
+/* reduced-motion 配慮 */
+@media (prefers-reduced-motion: reduce) {
+  .hero-slot, .hero-exp-fill, .skill-row-flash { animation: none !important; transition: none !important; }
+}
