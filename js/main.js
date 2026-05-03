@@ -1461,6 +1461,28 @@ const UI = (() => {
              <small>欠片 ${blInfo.shards}/${blInfo.cost} → Lv.${blInfo.maxLevel+20}まで</small>
            </button>`;
 
+      // ─── 前後キャラ計算（左右スワイプ・ナビボタン用） ───
+      const allState = Game.getState();
+      const ownedGids = Object.keys(allState.generals).filter(g => GENERALS_DATA[g]);
+      const rOrder = { LR:0, MR:1, UR:2, SSR:3, SR:4, R:5 };
+      const sortedGids = ownedGids.slice().sort((a, b) => {
+        const da = GENERALS_DATA[a], db = GENERALS_DATA[b];
+        const ra = rOrder[da.rarity] ?? 9, rb = rOrder[db.rarity] ?? 9;
+        if (ra !== rb) return ra - rb;
+        return (allState.generals[b].level || 1) - (allState.generals[a].level || 1);
+      });
+      const curIdx  = Math.max(0, sortedGids.indexOf(gid));
+      const prevGid = sortedGids[(curIdx - 1 + sortedGids.length) % sortedGids.length];
+      const nextGid = sortedGids[(curIdx + 1) % sortedGids.length];
+      const hasMultiple = sortedGids.length > 1;
+
+      // ─── 戦力値（放置少女スタイルの最重要指標） ───
+      const power = Math.floor(stats.hp * 0.1 + stats.atk * 2 + stats.def * 1.5 + stats.spd);
+      const fmtPower = power >= 10000 ? (power / 10000).toFixed(2) + '万' : power.toLocaleString();
+
+      // ─── お気に入り状態 ───
+      const isFav = !!gs.favorite;
+
       // Hero ビュー用ヘルパー
       const charImgWebp = `assets/characters/${def.id}.webp`;
       const charImgPng  = `assets/characters/${def.id}.png`;
@@ -1515,13 +1537,25 @@ const UI = (() => {
           <img class="hero-bg-blur" src="${charImgWebp}" onerror="${heroImgErr}" alt="" aria-hidden="true" loading="eager">
           <img class="hero-bg-main" src="${charImgWebp}" onerror="${heroImgErr}" alt="${escapeAttr(def.name)}" loading="eager">
           <div class="hero-vignette"></div>
+          <div class="hero-corner hero-corner-tl"></div>
+          <div class="hero-corner hero-corner-tr"></div>
+          <div class="hero-corner hero-corner-bl"></div>
+          <div class="hero-corner hero-corner-br"></div>
           <div class="hero-top-overlay">
             <span class="rarity-badge badge-${def.rarity}">${def.rarity}</span>
             <h2 class="hero-name">${def.name}</h2>
             <span class="hero-stars" title="覚醒">${starsHtml}</span>
+            <button class="hero-fav-btn ${isFav?'is-fav':''}" aria-label="お気に入り" title="お気に入り">
+              ${isFav ? '❤️' : '🤍'}
+            </button>
           </div>
           <div class="hero-side hero-side-left">${heroEquipSlotsHtml}</div>
           <div class="hero-side hero-side-right">${heroSkillSlotsHtml}</div>
+          ${hasMultiple ? `
+            <button class="hero-nav hero-nav-prev" aria-label="前のキャラ" title="前のキャラ">‹</button>
+            <button class="hero-nav hero-nav-next" aria-label="次のキャラ" title="次のキャラ">›</button>
+            <div class="hero-page-indicator">${curIdx + 1} / ${sortedGids.length}</div>
+          ` : ''}
           <div class="hero-bottom-overlay">
             <div class="hero-title-tag">『${def.title}』</div>
             <div class="hero-tags">
@@ -1531,6 +1565,13 @@ const UI = (() => {
             </div>
           </div>
           <span class="hero-zoom-hint" aria-hidden="true">🔍 タップで拡大</span>
+        </div>
+
+        <!-- ━━━ Power Banner（戦力値メイン表示） ━━━ -->
+        <div class="hero-power-banner">
+          <span class="hpb-label">⚔️ 戦力</span>
+          <span class="hpb-value">${fmtPower}</span>
+          <span class="hpb-rank">#${curIdx + 1}</span>
         </div>
 
         <!-- ━━━ Quick Stats ━━━ -->
@@ -1546,6 +1587,30 @@ const UI = (() => {
             <div class="quick-stat"><span class="qs-icon">🛡️</span><span class="qs-val">${stats.def.toLocaleString()}</span></div>
             <div class="quick-stat"><span class="qs-icon">💨</span><span class="qs-val">${stats.spd}</span></div>
           </div>
+        </div>
+
+        <!-- ━━━ アクションアイコン群（市販ゲー風6個並列） ━━━ -->
+        <div class="hero-action-grid">
+          <button class="hero-act-btn ${hasCoins?'':'disabled'}" id="dlv-btn-icon" ${isAtMaxLv?'disabled':''}>
+            <span class="hab-icon">📈</span>
+            <span class="hab-label">育成</span>
+            <span class="hab-sub">${isAtMaxLv ? 'MAX' : `${lvCost.toLocaleString()}🪙`}</span>
+          </button>
+          <button class="hero-act-btn ${stars<6 && shards>=awakenCost?'':'disabled'}" id="daw-btn-icon" ${stars>=6?'disabled':''}>
+            <span class="hab-icon">⭐</span>
+            <span class="hab-label">覚醒</span>
+            <span class="hab-sub">${stars>=6 ? 'MAX' : `${shards}/${awakenCost}`}</span>
+          </button>
+          <button class="hero-act-btn ${blInfo.canBreak?'':'disabled'}" id="dbl-btn-icon" ${blInfo.isMaxBreak?'disabled':''}>
+            <span class="hab-icon">💎</span>
+            <span class="hab-label">限界突破</span>
+            <span class="hab-sub">${blInfo.isMaxBreak ? '完了' : `+${blInfo.breakCount+1}回目`}</span>
+          </button>
+          <button class="hero-act-btn ${inFm?'is-active':''}" id="dfm-btn-icon">
+            <span class="hab-icon">${inFm ? '✅' : '⚔️'}</span>
+            <span class="hab-label">${inFm ? '編成中' : '編成'}</span>
+            <span class="hab-sub">${inFm ? '外す' : '入れる'}</span>
+          </button>
         </div>
 
         <!-- 説明文 -->
@@ -1667,20 +1732,8 @@ const UI = (() => {
           ${equipsHtml}
         </div>
 
-        <div class="detail-actions">
-          <button class="btn btn-levelup" id="dlv-btn" ${hasCoins?'':'disabled'}>
-            ${isAtMaxLv ? `Lv.MAX (${blInfo0.maxLevel})` : `レベルアップ <small>(${lvCost.toLocaleString()}🪙)</small>`}
-          </button>
-          <button class="btn ${inFm?'btn-remove':'btn-add'}" id="dfm-btn">
-            ${inFm ? '編成から外す' : '編成に入れる'}
-          </button>
-        </div>
-        <div class="detail-actions" style="margin-top:8px;">
-          ${awakenHtml}
-        </div>
-        <div class="detail-actions" style="margin-top:8px;">
-          ${breakHtml}
-        </div>`;
+        `;
+      // 旧テキストボタンは削除（hero-action-grid に集約）
 
       show('general-detail');
       // スクロール位置を先頭にリセット
@@ -1713,26 +1766,99 @@ const UI = (() => {
         });
       });
 
-      $('dlv-btn').addEventListener('click', () => {
+      // お気に入りトグル
+      $('detail-body').querySelector('.hero-fav-btn')?.addEventListener('click', e => {
+        e.stopPropagation();
+        const nowFav = Game.toggleFavorite(gid);
+        showToast(nowFav ? '❤️ お気に入りに追加' : '🤍 お気に入りを解除', 'success');
+        this.showDetail(gid);
+        this.renderGrid();
+      });
+
+      // 前/次キャラナビゲーション
+      const goToChar = (targetGid) => {
+        if (!targetGid || targetGid === gid) return;
+        const heroZone = $('detail-body').querySelector('.hero-zone');
+        if (heroZone) {
+          heroZone.classList.add('hero-zone-fade-out');
+          setTimeout(() => this.showDetail(targetGid), 120);
+        } else {
+          this.showDetail(targetGid);
+        }
+      };
+      $('detail-body').querySelector('.hero-nav-prev')?.addEventListener('click', e => {
+        e.stopPropagation();
+        goToChar(prevGid);
+      });
+      $('detail-body').querySelector('.hero-nav-next')?.addEventListener('click', e => {
+        e.stopPropagation();
+        goToChar(nextGid);
+      });
+
+      // 左右スワイプでキャラ切替（hero-zone 上のみ）
+      if (hasMultiple) {
+        const heroZone = $('detail-body').querySelector('.hero-zone');
+        if (heroZone) {
+          let tStartX = 0, tStartY = 0, tStartT = 0, tracking = false;
+          heroZone.addEventListener('touchstart', e => {
+            // スロット・ボタン上のスワイプは無視
+            if (e.target.closest('.hero-slot, .hero-nav, .hero-fav-btn, .hero-top-overlay, .hero-bottom-overlay')) {
+              tracking = false;
+              return;
+            }
+            tStartX = e.touches[0].clientX;
+            tStartY = e.touches[0].clientY;
+            tStartT = Date.now();
+            tracking = true;
+          }, { passive: true });
+          heroZone.addEventListener('touchend', e => {
+            if (!tracking) return;
+            tracking = false;
+            const dx = e.changedTouches[0].clientX - tStartX;
+            const dy = e.changedTouches[0].clientY - tStartY;
+            const dt = Date.now() - tStartT;
+            // 横方向 50px 以上 + 縦より明らかに横が大きい + 800ms以内
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4 && dt < 800) {
+              if (dx > 0) goToChar(prevGid);
+              else         goToChar(nextGid);
+            }
+          }, { passive: true });
+        }
+      }
+
+      // アクションアイコンボタン（新6個並列版）
+      $('dlv-btn-icon')?.addEventListener('click', () => {
         const r = Game.levelUpGeneral(gid);
         if (r.success) { updateResourceBar(); this.showDetail(gid); this.renderGrid(); }
       });
-      $('dfm-btn').addEventListener('click', () => {
+      $('daw-btn-icon')?.addEventListener('click', () => {
+        const r = Game.awakenGeneral(gid);
+        if (r.success) { this.showDetail(gid); this.renderGrid(); }
+      });
+      $('dbl-btn-icon')?.addEventListener('click', () => {
+        const r = Game.breakLimit(gid);
+        if (r.success) { this.showDetail(gid); this.renderGrid(); }
+        else if (r.reason === 'no_shards') showToast(`欠片不足！ 必要: ${r.needed}個`, 'warn');
+      });
+      $('dfm-btn-icon')?.addEventListener('click', () => {
         inFm ? Game.removeFromFormation(gid) : Game.addToFormation(gid);
         this.showDetail(gid);
         this.renderGrid();
         this.renderFormationEditor();
         HomeTab.renderFormation();
       });
-      $('daw-btn')?.addEventListener('click', () => {
-        const r = Game.awakenGeneral(gid);
-        if (r.success) { this.showDetail(gid); this.renderGrid(); }
-      });
-      $('dbl-btn')?.addEventListener('click', () => {
-        const r = Game.breakLimit(gid);
-        if (r.success) { this.showDetail(gid); this.renderGrid(); }
-        else if (r.reason === 'no_shards') showToast(`欠片不足！ 必要: ${r.needed}個`, 'warn');
-      });
+
+      // キーボード ←/→ でも切替
+      const keyHandler = (e) => {
+        if ($('general-detail').classList.contains('hidden')) return;
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); goToChar(prevGid); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); goToChar(nextGid); }
+      };
+      document.removeEventListener('keydown', this._heroNavKeyHandler);
+      document.addEventListener('keydown', keyHandler);
+      this._heroNavKeyHandler = keyHandler;
+
+      // 旧 dlv-btn/dfm-btn/daw-btn/dbl-btn は hero-action-grid のアイコン版（-icon 付き）に統合済み
 
       $('detail-body').querySelectorAll('.btn-skill-up[data-idx]').forEach(btn => {
         btn.addEventListener('click', () => {

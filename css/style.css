@@ -2415,3 +2415,263 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
   .hero-slot, .hero-exp-fill, .skill-row-flash { animation: none !important; transition: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Hero Zone v2 拡張（放置少女との差を埋める）
+   - 中華風金縁四隅装飾
+   - キャラ立ち絵呼吸アニメ
+   - 左右ナビボタン + ページ表示
+   - お気に入りハート
+   - 戦力値巨大バナー
+   - アクション6アイコン並列
+   - キャラ切替フェード
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 中華風金縁装飾（四隅） */
+.hero-corner {
+  position: absolute;
+  width: 26px; height: 26px;
+  z-index: 4;
+  pointer-events: none;
+}
+.hero-corner-tl { top: 4px;    left: 4px;
+  border-top: 2px solid rgba(255,215,0,.85); border-left: 2px solid rgba(255,215,0,.85);
+  filter: drop-shadow(0 0 4px rgba(255,215,0,.5)); }
+.hero-corner-tr { top: 4px;    right: 4px;
+  border-top: 2px solid rgba(255,215,0,.85); border-right: 2px solid rgba(255,215,0,.85);
+  filter: drop-shadow(0 0 4px rgba(255,215,0,.5)); }
+.hero-corner-bl { bottom: 4px; left: 4px;
+  border-bottom: 2px solid rgba(255,215,0,.85); border-left: 2px solid rgba(255,215,0,.85);
+  filter: drop-shadow(0 0 4px rgba(255,215,0,.5)); }
+.hero-corner-br { bottom: 4px; right: 4px;
+  border-bottom: 2px solid rgba(255,215,0,.85); border-right: 2px solid rgba(255,215,0,.85);
+  filter: drop-shadow(0 0 4px rgba(255,215,0,.5)); }
+
+/* キャラ立ち絵の呼吸アニメ */
+.hero-bg-main {
+  animation: heroBreathe 6s ease-in-out infinite;
+  transform-origin: center 20%;
+}
+@keyframes heroBreathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%      { transform: scale(1.018) translateY(-3px); }
+}
+
+/* お気に入りボタン */
+.hero-fav-btn {
+  background: rgba(20,12,30,.7);
+  border: 1.5px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  width: 32px; height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform .15s, border-color .15s;
+  padding: 0;
+}
+.hero-fav-btn:hover  { transform: scale(1.12); border-color: #ff5577; }
+.hero-fav-btn:active { transform: scale(.92); }
+.hero-fav-btn.is-fav {
+  border-color: #ff3366;
+  background: rgba(60,15,30,.75);
+  box-shadow: 0 0 12px rgba(255,51,102,.5);
+  animation: favPulse 1.6s ease-in-out infinite;
+}
+@keyframes favPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(255,51,102,.5); }
+  50%      { box-shadow: 0 0 22px rgba(255,51,102,.85); }
+}
+
+/* 左右ナビボタン */
+.hero-nav {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 36px; height: 64px;
+  background: linear-gradient(135deg, rgba(20,12,30,.85), rgba(40,20,60,.85));
+  border: 1.5px solid rgba(255,215,0,.55);
+  color: #ffd700;
+  font-size: 28px; font-weight: bold;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform .15s, background .15s;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  box-shadow: 0 4px 12px rgba(0,0,0,.6);
+  padding: 0;
+}
+.hero-nav:hover  { transform: translateY(-50%) scale(1.08); background: linear-gradient(135deg, rgba(40,20,60,.95), rgba(80,40,100,.95)); }
+.hero-nav:active { transform: translateY(-50%) scale(.94); }
+.hero-nav-prev { left: 70px; }
+.hero-nav-next { right: 70px; }
+
+/* ページ表示（現在位置） */
+.hero-page-indicator {
+  position: absolute;
+  top: 8px; left: 50%; transform: translateX(-50%);
+  z-index: 4;
+  background: rgba(20,12,30,.85);
+  color: rgba(255,215,0,.95);
+  font-size: 11px; font-weight: bold;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1px solid rgba(255,215,0,.5);
+  backdrop-filter: blur(6px);
+  letter-spacing: .5px;
+  pointer-events: none;
+}
+
+/* キャラ切替フェードアウト */
+.hero-zone-fade-out {
+  opacity: 0;
+  transform: scale(.96);
+  transition: opacity .12s, transform .12s;
+}
+
+/* 戦力値メインバナー（最重要指標） */
+.hero-power-banner {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(80,40,10,.75) 0%, rgba(40,20,5,.85) 50%, rgba(80,40,10,.75) 100%);
+  border: 1.5px solid rgba(255,215,0,.55);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  box-shadow:
+    0 0 18px rgba(255,140,0,.25),
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.3);
+  position: relative;
+  overflow: hidden;
+}
+.hero-power-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 30%, rgba(255,215,0,.15) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: powerShine 3s linear infinite;
+  pointer-events: none;
+}
+@keyframes powerShine {
+  0%   { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+.hpb-label {
+  font-size: 13px; font-weight: bold;
+  color: #ffe5a0;
+  text-shadow: 0 1px 2px rgba(0,0,0,.8);
+  letter-spacing: .05em;
+  z-index: 1;
+}
+.hpb-value {
+  font-size: 32px; font-weight: 900;
+  background: linear-gradient(180deg, #fff7c0 0%, #ffd700 50%, #ff8c00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.7)) drop-shadow(0 0 8px rgba(255,140,0,.4));
+  letter-spacing: .02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+}
+.hpb-rank {
+  font-size: 12px; font-weight: bold;
+  color: #ffd700;
+  background: rgba(0,0,0,.55);
+  padding: 3px 8px;
+  border-radius: 99px;
+  border: 1px solid rgba(255,215,0,.4);
+  z-index: 1;
+}
+
+/* アクション4アイコン並列（市販ゲー風） */
+.hero-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.hero-act-btn {
+  background: linear-gradient(180deg, rgba(60,40,90,.9), rgba(30,20,50,.95));
+  border: 1.5px solid rgba(255,215,0,.4);
+  border-radius: 10px;
+  padding: 9px 4px;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px;
+  font-family: inherit;
+  color: #fff;
+  transition: transform .12s, border-color .15s, background .15s;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+.hero-act-btn:hover  { transform: translateY(-2px); border-color: #ffd700; background: linear-gradient(180deg, rgba(80,55,120,.95), rgba(40,25,65,.98)); }
+.hero-act-btn:active { transform: translateY(0) scale(.96); }
+.hero-act-btn.disabled,
+.hero-act-btn:disabled {
+  opacity: .42;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(.4);
+}
+.hero-act-btn.is-active {
+  background: linear-gradient(180deg, rgba(80,140,80,.9), rgba(40,80,40,.95));
+  border-color: #4ade80;
+  box-shadow: 0 0 12px rgba(74,222,128,.4);
+}
+.hab-icon {
+  font-size: 22px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+.hab-label {
+  font-size: 12px; font-weight: bold;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.hab-sub {
+  font-size: 10px;
+  color: rgba(255,215,0,.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* レスポンシブ：極狭画面 */
+@media (max-width: 360px) {
+  .hero-nav-prev { left: 56px; }
+  .hero-nav-next { right: 56px; }
+  .hero-nav { width: 30px; height: 54px; font-size: 22px; }
+  .hpb-value { font-size: 26px; }
+  .hero-power-banner { padding: 9px 10px; gap: 8px; }
+  .hero-action-grid { gap: 4px; }
+  .hero-act-btn { padding: 7px 2px; }
+  .hab-icon  { font-size: 18px; }
+  .hab-label { font-size: 11px; }
+  .hab-sub   { font-size: 9px; }
+  .hero-corner { width: 20px; height: 20px; }
+}
+
+/* タブレット〜PC：ボタンを少し大きく */
+@media (min-width: 600px) {
+  .hpb-value { font-size: 38px; }
+  .hero-nav { width: 42px; height: 72px; font-size: 32px; }
+  .hero-act-btn { padding: 12px 6px; }
+  .hab-icon { font-size: 26px; }
+  .hab-label { font-size: 13px; }
+  .hab-sub  { font-size: 11px; }
+}
+
+/* reduced-motion: 呼吸・shimmer も停止 */
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg-main, .hero-power-banner::before, .hero-fav-btn.is-fav { animation: none !important; }
+}

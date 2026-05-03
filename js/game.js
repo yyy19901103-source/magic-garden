@@ -729,6 +729,15 @@ const Game = (() => {
     return AWAKEN_COST[stars - 1];
   }
 
+  // ─── お気に入り ──────────────────────────────────────────────────────────
+  function toggleFavorite(generalId) {
+    const gs = state.generals[generalId];
+    if (!gs) return false;
+    gs.favorite = !gs.favorite;
+    save();
+    return !!gs.favorite;
+  }
+
   // ─── 一括覚醒 ────────────────────────────────────────────────────────────
   function bulkAwaken() {
     const results = []; // { name, oldStars, newStars }
@@ -1136,7 +1145,7 @@ const Game = (() => {
     battle,
     levelUpGeneral, addToFormation, removeFromFormation,
     equipItem, unequipItem,
-    awakenGeneral, getAwakenCost, bulkAwaken,
+    awakenGeneral, getAwakenCost, bulkAwaken, toggleFavorite,
     enhanceEquip, getEnhanceCost,
     battleBoss, getDailyBossState,
     draw,
