@@ -6,6 +6,9 @@ const UI = (() => {
 
   // ─── ユーティリティ ─────────────────────────────────────────────────────
 
+  // キャラ画像キャッシュバスター（v73: 2026-05-04 G フォルダ画像反映）
+  const IMG_V = '73';
+
   const $ = id => document.getElementById(id);
   const show = id => { const e=$(id); if(e) e.classList.remove('hidden'); };
   const hide = id => { const e=$(id); if(e) e.classList.add('hidden'); };
@@ -174,10 +177,10 @@ const UI = (() => {
     const lazyAttrs = isLg ? '' : 'loading="lazy" decoding="async"';
     // 詳細用は標準WebP / 一覧はサムネWebP
     // DPR>=2 (Retina/高DPI画面) では1段上の解像度を使う
-    const stdSrc   = `assets/characters/${def.id}.webp`;
-    const thumbSrc = `assets/characters/thumbs/${def.id}.webp`;
-    const hiresSrc = `assets/characters/hires/${def.id}.webp`;
-    const pngSrc   = `assets/characters/${def.id}.png`;
+    const stdSrc   = `assets/characters/${def.id}.webp?v=${IMG_V}`;
+    const thumbSrc = `assets/characters/thumbs/${def.id}.webp?v=${IMG_V}`;
+    const hiresSrc = `assets/characters/hires/${def.id}.webp?v=${IMG_V}`;
+    const pngSrc   = `assets/characters/${def.id}.png?v=${IMG_V}`;
     const primarySrc  = isLg ? stdSrc   : thumbSrc;
     const retinaSrc   = isLg ? hiresSrc : stdSrc;   // 2x で1段アップグレード
     const errHandler = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${pngSrc}';}else{this.remove();}`;
@@ -940,8 +943,8 @@ const UI = (() => {
       // 味方ポートレート (WebP優先・PNG fallback・alt付き)
       left.innerHTML = (team || []).filter(t => t && t.def).map((g, i) => {
         const d = g.def || {};
-        const webp = `assets/characters/${d.id}.webp`;
-        const png  = `assets/characters/${d.id}.png`;
+        const webp = `assets/characters/${d.id}.webp?v=${IMG_V}`;
+        const png  = `assets/characters/${d.id}.png?v=${IMG_V}`;
         const err  = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${png}';}else{this.style.display='none';}`;
         return `
         <div class="intro-fighter intro-ally" style="animation-delay:${i * 0.08}s">
@@ -1486,9 +1489,9 @@ const UI = (() => {
       const isFav = !!gs.favorite;
 
       // Hero ビュー用ヘルパー（hires画像優先・標準WebP→PNG fallback）
-      const charImgHires = `assets/characters/hires/${def.id}.webp`;
-      const charImgWebp  = `assets/characters/${def.id}.webp`;
-      const charImgPng   = `assets/characters/${def.id}.png`;
+      const charImgHires = `assets/characters/hires/${def.id}.webp?v=${IMG_V}`;
+      const charImgWebp  = `assets/characters/${def.id}.webp?v=${IMG_V}`;
+      const charImgPng   = `assets/characters/${def.id}.png?v=${IMG_V}`;
       // 多段フォールバック: hires WebP → 標準 WebP → PNG → 透明
       const heroImgErr   = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${charImgWebp}';}` +
                            `else if(this.dataset.fb==='1'){this.dataset.fb='2';this.src='${charImgPng}';}` +
@@ -2536,13 +2539,14 @@ const UI = (() => {
       lbImg.onerror = function() {
         if (!this.dataset.fb) {
           this.dataset.fb = '1';
-          this.src = `assets/characters/${id}.png`;
+          this.src = `assets/characters/${id}.png?v=${IMG_V}`;
         } else {
           this.alt = '(画像なし)';
         }
       };
       lbImg.dataset.fb = '';
-      lbImg.src = `assets/characters/${id}.webp`;  // 変換済み新画像を最優先
+      // hires (1024x1536) を最優先 → 失敗時は PNG にフォールバック
+      lbImg.src = `assets/characters/hires/${id}.webp?v=${IMG_V}`;
       lbImg.alt = name;
       if (lbName) lbName.textContent = name;
       show('char-lightbox');
