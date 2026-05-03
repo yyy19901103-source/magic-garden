@@ -1567,6 +1567,37 @@ const UI = (() => {
           }).join('')}
         </div>
 
+        ${(() => {
+          const hasLore = def.faction || def.quote || def.lore || (def.relations?.length > 0);
+          if (!hasLore) return '';
+          const factionHtml = def.faction
+            ? `<div class="lore-faction">🏰 <strong>${def.faction}</strong></div>` : '';
+          const quoteHtml = def.quote
+            ? `<div class="lore-quote">${def.quote}</div>` : '';
+          const loreHtml = def.lore
+            ? `<p class="lore-text">${def.lore}</p>` : '';
+          const relHtml = (def.relations?.length > 0)
+            ? `<div class="lore-relations">
+                <h5 class="relations-label">⚔️ 人間関係</h5>
+                ${def.relations.map(rel => {
+                  const rDef = GENERALS_DATA[rel.id];
+                  const relTypeLabel = {
+                    ally: '味方', enemy: '敵', rival: 'ライバル', mentor: '師弟',
+                    sworn_brother: '義兄弟', best_friend: '親友', enemy_turned_ally: '因縁の絆'
+                  }[rel.type] || rel.type;
+                  return `<div class="relation-row">
+                    <span class="relation-char">${rDef ? rDef.emoji + ' ' + rDef.name : rel.id}</span>
+                    <span class="relation-tag">${relTypeLabel}</span>
+                    <span class="relation-desc">${rel.desc}</span>
+                  </div>`;
+                }).join('')}
+              </div>` : '';
+          return `<div class="detail-section detail-section--lore">
+            <h4 class="section-label">📖 世界観・人間関係</h4>
+            ${factionHtml}${quoteHtml}${loreHtml}${relHtml}
+          </div>`;
+        })()}
+
         <div class="detail-section">
           <h4 class="section-label">装備</h4>
           ${equipsHtml}
@@ -1852,7 +1883,7 @@ const UI = (() => {
       }
 
       // ソート
-      const rarityOrder = { SSR: 0, SR: 1, R: 2 };
+      const rarityOrder = { LR: 0, UR: 1, SSR: 2, SR: 3, R: 4 };
       if (this._equipSort === 'rarity') {
         equips = equips.slice().sort((a, b) => {
           const ra = rarityOrder[EQUIPMENT_DATA[a.defId]?.rarity] ?? 9;

@@ -167,7 +167,8 @@ const GENERALS_DATA = {
     quote: '「氷は固く、冷たく——しかしどこまでも澄んでいる」',
     relations: [
       { id: 'fafnir',  type: 'enemy_turned_ally', desc: '王国を焼いた竜王との因縁。怒りを超えて和解への道を歩んでいる' },
-      { id: 'aquaria', type: 'rival',             desc: '水の扱い方を巡る永遠のライバル。氷と流水、どちらが水の本質か' }
+      { id: 'aquaria', type: 'rival',             desc: '水の扱い方を巡る永遠のライバル。氷と流水、どちらが水の本質か' },
+      { id: 'frost',   type: 'ally',              desc: '時代を超えて仕え続ける忠実な衛士。その無言の忠誠が最も信頼できる盾となる' }
     ],
     baseStats: { hp: 7200, atk: 900, def: 350, spd: 140 },
     statGrowth: { hp: 180, atk: 28, def: 10, spd: 0.7 },
@@ -311,7 +312,7 @@ const GENERALS_DATA = {
     baseStats: { hp: 7000, atk: 700, def: 320, spd: 110 },
     statGrowth: { hp: 178, atk: 22, def: 10, spd: 0.45 },
     skills: [
-      { name: '火攻の策',  sp: 4, type: 'atk_buff',    power: 0.5, description: '炎の陣形で全体の攻撃力を大幅強化' },
+      { name: '火攻の策',  sp: 4, type: 'atk_buff',    power: 0.5, description: '炎の兵法書を開き、自身の攻撃力を大幅強化して敵将を翻弄する' },
       { name: '赤壁の炎',  sp: 9, type: 'damage_all',  power: 1.4, description: '伝説の赤壁の戦術を再現する全体炎攻撃' }
     ]
   },
@@ -339,7 +340,7 @@ const GENERALS_DATA = {
     statGrowth: { hp: 220, atk: 14, def: 14, spd: 0.4 },
     skills: [
       { name: '聖なる癒し',  sp: 3, type: 'heal_all',  power: 1.1, description: '神の奇跡で全体のHPを大きく回復' },
-      { name: '聖光の守護',  sp: 8, type: 'heal_all',  power: 0.8, description: '光の膜で全体を包み、回復+被ダメ軽減' }
+      { name: '聖光の守護',  sp: 8, type: 'heal_all',  power: 0.8, description: '神聖な光が仲間全体を包み込み、大きくHPを回復する' }
     ]
   },
 

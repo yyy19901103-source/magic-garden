@@ -731,7 +731,7 @@ const Game = (() => {
 
   // ─── 装備強化 ────────────────────────────────────────────────────────────
 
-  const ENHANCE_BASE_COST = { R: 100, SR: 300, SSR: 800 };
+  const ENHANCE_BASE_COST = { R: 100, SR: 300, SSR: 800, UR: 2000, LR: 5000 };
   const ENHANCE_MAX = 10;
 
   function enhanceEquip(instanceId) {
@@ -835,7 +835,7 @@ const Game = (() => {
 
   // ─── 装備売却 ────────────────────────────────────────────────────────────
 
-  const SELL_PRICE = { R: 100, SR: 500, SSR: 2000 };
+  const SELL_PRICE = { R: 100, SR: 500, SSR: 2000, UR: 8000, LR: 20000 };
 
   function sellEquip(instanceId) {
     const idx = state.inventory.equipment.findIndex(e => e.instanceId === instanceId);
@@ -887,25 +887,22 @@ const Game = (() => {
 
   // ─── ショップ ────────────────────────────────────────────────────────────
 
-  const SHOP_POOL = [
-    // R items (price: 800)
-    { defId: 'sword_r',    price: 800 },
-    { defId: 'armor_r',    price: 800 },
-    { defId: 'ring_r',     price: 800 },
-    // SR items (price: 2500)
-    { defId: 'sword_sr',   price: 2500 },
-    { defId: 'armor_sr',   price: 2500 },
-    { defId: 'ring_sr',    price: 2500 },
-  ];
+  // ショップ価格テーブル（レアリティ別）
+  const SHOP_RARITY_PRICE = { R: 800, SR: 2500, SSR: 8000, UR: 20000 };
+
+  // EQUIPMENT_DATA から動的に生成（UR以下のみ対象、LRは入手困難なので除外）
+  const SHOP_POOL = Object.values(EQUIPMENT_DATA)
+    .filter(ed => SHOP_RARITY_PRICE[ed.rarity] !== undefined)
+    .map(ed => ({ defId: ed.id, price: SHOP_RARITY_PRICE[ed.rarity] }));
 
   function _buildShopItems() {
-    // 3 R + 1 SR をランダムに選ぶ（重複なし）
-    const rItems  = SHOP_POOL.filter(i => EQUIPMENT_DATA[i.defId]?.rarity === 'R');
-    const srItems = SHOP_POOL.filter(i => EQUIPMENT_DATA[i.defId]?.rarity === 'SR');
-    const shuffle = arr => arr.slice().sort(() => Math.random() - 0.5);
+    // R×3 + SR×2 + SSR×1 をランダムに選ぶ（重複なし）
+    const byRarity = r => SHOP_POOL.filter(i => EQUIPMENT_DATA[i.defId]?.rarity === r);
+    const shuffle  = arr => arr.slice().sort(() => Math.random() - 0.5);
     return [
-      ...shuffle(rItems).slice(0, 3),
-      ...shuffle(srItems).slice(0, 1)
+      ...shuffle(byRarity('R')).slice(0, 3),
+      ...shuffle(byRarity('SR')).slice(0, 2),
+      ...shuffle(byRarity('SSR')).slice(0, 1)
     ].map((item, idx) => ({ ...item, idx, sold: false }));
   }
 

@@ -487,9 +487,9 @@ const STAGES_DATA = [
       {
         id: '7-1', name: '大陸の関所', isBoss: false,
         enemies: [
-          { name: '帝国衛兵',   emoji: '🛡️', hp: 70000,  atk: 2200, def: 1400, spd: 120, element: '炎' },
-          { name: '帝国衛兵',   emoji: '🛡️', hp: 70000,  atk: 2200, def: 1400, spd: 120, element: '炎' },
-          { name: '帝国衛兵長', emoji: '⚔️', hp: 90000,  atk: 2500, def: 1600, spd: 110, element: '土' }
+          { name: '帝国衛兵',   emoji: '🛡️', hp: 70000,  atk: 1940, def: 1400, spd: 120, element: '炎' },
+          { name: '帝国衛兵',   emoji: '🛡️', hp: 70000,  atk: 1940, def: 1400, spd: 120, element: '炎' },
+          { name: '帝国衛兵長', emoji: '⚔️', hp: 90000,  atk: 2200, def: 1600, spd: 110, element: '土' }
         ],
         rewards: { coins: [5000, 7500], exp: [2000, 3000],
           material: { id: 'imperialstone', chance: 0.5 },
@@ -500,9 +500,9 @@ const STAGES_DATA = [
       {
         id: '7-2', name: '帝国の首都', isBoss: false,
         enemies: [
-          { name: '帝国精鋭騎士', emoji: '⚔️', hp: 85000,  atk: 2400, def: 1500, spd: 130, element: '炎' },
-          { name: '帝国精鋭騎士', emoji: '⚔️', hp: 85000,  atk: 2400, def: 1500, spd: 130, element: '炎' },
-          { name: '炎の将軍',     emoji: '🔥', hp: 120000, atk: 2800, def: 1700, spd: 105 }
+          { name: '帝国精鋭騎士', emoji: '⚔️', hp: 85000,  atk: 2110, def: 1500, spd: 130, element: '炎' },
+          { name: '帝国精鋭騎士', emoji: '⚔️', hp: 85000,  atk: 2110, def: 1500, spd: 130, element: '炎' },
+          { name: '炎の将軍',     emoji: '🔥', hp: 120000, atk: 2460, def: 1700, spd: 105 }
         ],
         rewards: { coins: [6000, 9000], exp: [2400, 3600],
           material: { id: 'imperialstone', chance: 0.55 },
@@ -513,9 +513,9 @@ const STAGES_DATA = [
       {
         id: '7-3', name: '赤壁の古戦場', isBoss: false,
         enemies: [
-          { name: '赤壁の亡霊', emoji: '👻', hp: 80000, atk: 2600, def: 1300, spd: 140, element: '炎' },
-          { name: '赤壁の亡霊', emoji: '👻', hp: 80000, atk: 2600, def: 1300, spd: 140, element: '炎' },
-          { name: '赤壁の亡霊', emoji: '👻', hp: 80000, atk: 2600, def: 1300, spd: 140, element: '炎' }
+          { name: '赤壁の亡霊', emoji: '👻', hp: 80000, atk: 2290, def: 1300, spd: 140, element: '炎' },
+          { name: '赤壁の亡霊', emoji: '👻', hp: 80000, atk: 2290, def: 1300, spd: 140, element: '炎' },
+          { name: '赤壁の亡霊', emoji: '👻', hp: 80000, atk: 2290, def: 1300, spd: 140, element: '炎' }
         ],
         rewards: { coins: [7000, 10500], exp: [2800, 4200],
           material: { id: 'imperialstone', chance: 0.6 },
@@ -526,9 +526,9 @@ const STAGES_DATA = [
       {
         id: '7-4', name: '天帝神殿の遺跡', isBoss: false,
         enemies: [
-          { name: '遺跡の守護像', emoji: '🗿', hp: 100000, atk: 2700, def: 2000, spd: 80,  element: '土' },
-          { name: '遺跡の守護像', emoji: '🗿', hp: 100000, atk: 2700, def: 2000, spd: 80,  element: '土' },
-          { name: '古代ゴーレム', emoji: '🪨', hp: 150000, atk: 3000, def: 2200, spd: 60,  element: '土' }
+          { name: '遺跡の守護像', emoji: '🗿', hp: 100000, atk: 2380, def: 2000, spd: 80,  element: '土' },
+          { name: '遺跡の守護像', emoji: '🗿', hp: 100000, atk: 2380, def: 2000, spd: 80,  element: '土' },
+          { name: '古代ゴーレム', emoji: '🪨', hp: 150000, atk: 2640, def: 2200, spd: 60,  element: '土' }
         ],
         rewards: { coins: [8000, 12000], exp: [3200, 4800],
           material: { id: 'imperialstone', chance: 0.65 },
@@ -539,9 +539,9 @@ const STAGES_DATA = [
       {
         id: '7-5', name: '操られし皇帝の玉座', isBoss: false,
         enemies: [
-          { name: '帝国近衛騎士', emoji: '⚔️', hp: 110000, atk: 2900, def: 1900, spd: 135, element: '炎' },
-          { name: '帝国近衛騎士', emoji: '⚔️', hp: 110000, atk: 2900, def: 1900, spd: 135, element: '炎' },
-          { name: '堕ちた将軍',   emoji: '😈', hp: 160000, atk: 3200, def: 1800, spd: 120, element: '闇' }
+          { name: '帝国近衛騎士', emoji: '⚔️', hp: 110000, atk: 2550, def: 1900, spd: 135, element: '炎' },
+          { name: '帝国近衛騎士', emoji: '⚔️', hp: 110000, atk: 2550, def: 1900, spd: 135, element: '炎' },
+          { name: '堕ちた将軍',   emoji: '😈', hp: 160000, atk: 2820, def: 1800, spd: 120, element: '闇' }
         ],
         rewards: { coins: [9000, 13500], exp: [3600, 5400],
           material: { id: 'imperialstone', chance: 0.7 },
@@ -552,7 +552,7 @@ const STAGES_DATA = [
       {
         id: '7-6', name: '【BOSS】虚無に堕ちし紅炎皇帝', isBoss: true,
         enemies: [
-          { name: '虚無に堕ちし紅炎皇帝', emoji: '👑', hp: 750000, atk: 5800, def: 2500, spd: 200, element: '闇',
+          { name: '虚無に堕ちし紅炎皇帝', emoji: '👑', hp: 690000, atk: 5100, def: 2500, spd: 200, element: '闇',
             skills: [
               { name: '虚無の炎',    sp: 3,  type: 'damage_single', power: 4.2, description: '虚無の力で強化された炎が単体を焼く' },
               { name: '覇道の咆哮',  sp: 5,  type: 'damage_all',    power: 1.8, description: '皇帝の怒りが全体を揺さぶる' },
@@ -580,9 +580,9 @@ const STAGES_DATA = [
       {
         id: '8-1', name: '嵐の海峡', isBoss: false,
         enemies: [
-          { name: '海賊ゴースト', emoji: '👻', hp: 80000,  atk: 2300, def: 1400, spd: 160, element: '風' },
-          { name: '海賊ゴースト', emoji: '👻', hp: 80000,  atk: 2300, def: 1400, spd: 160, element: '風' },
-          { name: '嵐の精霊',     emoji: '🌪️', hp: 70000,  atk: 2600, def: 1200, spd: 200, element: '風' }
+          { name: '海賊ゴースト', emoji: '👻', hp: 70400,  atk: 2300, def: 1230, spd: 160, element: '風' },
+          { name: '海賊ゴースト', emoji: '👻', hp: 70400,  atk: 2300, def: 1230, spd: 160, element: '風' },
+          { name: '嵐の精霊',     emoji: '🌪️', hp: 61600,  atk: 2600, def: 1060, spd: 200, element: '風' }
         ],
         rewards: { coins: [6000, 9000], exp: [2400, 3600],
           material: { id: 'seagem', chance: 0.5 },
@@ -593,9 +593,9 @@ const STAGES_DATA = [
       {
         id: '8-2', name: '沈没船の墓場', isBoss: false,
         enemies: [
-          { name: '骸骨海賊', emoji: '☠️', hp: 75000, atk: 2500, def: 1300, spd: 145, element: '闇' },
-          { name: '骸骨海賊', emoji: '☠️', hp: 75000, atk: 2500, def: 1300, spd: 145, element: '闇' },
-          { name: '骸骨海賊', emoji: '☠️', hp: 75000, atk: 2500, def: 1300, spd: 145, element: '闇' }
+          { name: '骸骨海賊', emoji: '☠️', hp: 66000, atk: 2500, def: 1140, spd: 145, element: '闇' },
+          { name: '骸骨海賊', emoji: '☠️', hp: 66000, atk: 2500, def: 1140, spd: 145, element: '闇' },
+          { name: '骸骨海賊', emoji: '☠️', hp: 66000, atk: 2500, def: 1140, spd: 145, element: '闇' }
         ],
         rewards: { coins: [7000, 10500], exp: [2800, 4200],
           material: { id: 'seagem', chance: 0.55 },
@@ -606,9 +606,9 @@ const STAGES_DATA = [
       {
         id: '8-3', name: '海賊の楽園', isBoss: false,
         enemies: [
-          { name: '凶悪海賊',   emoji: '🏴‍☠️', hp: 90000,  atk: 2700, def: 1500, spd: 155, element: '風' },
-          { name: '凶悪海賊',   emoji: '🏴‍☠️', hp: 90000,  atk: 2700, def: 1500, spd: 155, element: '風' },
-          { name: '海賊船長',   emoji: '⚓',   hp: 130000, atk: 3000, def: 1600, spd: 140, element: '水' }
+          { name: '凶悪海賊',   emoji: '🏴‍☠️', hp: 79200,  atk: 2700, def: 1320, spd: 155, element: '風' },
+          { name: '凶悪海賊',   emoji: '🏴‍☠️', hp: 79200,  atk: 2700, def: 1320, spd: 155, element: '風' },
+          { name: '海賊船長',   emoji: '⚓',   hp: 114400, atk: 3000, def: 1410, spd: 140, element: '水' }
         ],
         rewards: { coins: [8000, 12000], exp: [3200, 4800],
           material: { id: 'seagem', chance: 0.6 },
@@ -619,9 +619,9 @@ const STAGES_DATA = [
       {
         id: '8-4', name: '深海の古代都市', isBoss: false,
         enemies: [
-          { name: '深海の番人',   emoji: '🦑', hp: 110000, atk: 2900, def: 2000, spd: 100, element: '水' },
-          { name: '深海の番人',   emoji: '🦑', hp: 110000, atk: 2900, def: 2000, spd: 100, element: '水' },
-          { name: '古代機械兵',   emoji: '🤖', hp: 160000, atk: 3200, def: 2300, spd: 75,  element: '土' }
+          { name: '深海の番人',   emoji: '🦑', hp: 96800,  atk: 2900, def: 1760, spd: 100, element: '水' },
+          { name: '深海の番人',   emoji: '🦑', hp: 96800,  atk: 2900, def: 1760, spd: 100, element: '水' },
+          { name: '古代機械兵',   emoji: '🤖', hp: 140800, atk: 3200, def: 2020, spd: 75,  element: '土' }
         ],
         rewards: { coins: [9000, 13500], exp: [3600, 5400],
           material: { id: 'seagem', chance: 0.65 },
@@ -632,9 +632,9 @@ const STAGES_DATA = [
       {
         id: '8-5', name: '海王類の縄張り', isBoss: false,
         enemies: [
-          { name: '巨大海王類', emoji: '🐋', hp: 200000, atk: 3500, def: 2100, spd: 120, element: '水' },
-          { name: '海王類の子', emoji: '🐬', hp: 90000,  atk: 2800, def: 1600, spd: 145, element: '水' },
-          { name: '海王類の子', emoji: '🐬', hp: 90000,  atk: 2800, def: 1600, spd: 145, element: '水' }
+          { name: '巨大海王類', emoji: '🐋', hp: 176000, atk: 3500, def: 1850, spd: 120, element: '水' },
+          { name: '海王類の子', emoji: '🐬', hp: 79200,  atk: 2800, def: 1410, spd: 145, element: '水' },
+          { name: '海王類の子', emoji: '🐬', hp: 79200,  atk: 2800, def: 1410, spd: 145, element: '水' }
         ],
         rewards: { coins: [10000, 15000], exp: [4000, 6000],
           material: { id: 'seagem', chance: 0.7 },
@@ -645,14 +645,14 @@ const STAGES_DATA = [
       {
         id: '8-6', name: '【BOSS】海神リヴァイアサン', isBoss: true,
         enemies: [
-          { name: '海神リヴァイアサン', emoji: '🌊', hp: 900000, atk: 6500, def: 3000, spd: 180, element: '水',
+          { name: '海神リヴァイアサン', emoji: '🌊', hp: 780000, atk: 6500, def: 2500, spd: 180, element: '水',
             skills: [
               { name: '深海の咆哮',  sp: 2,  type: 'damage_all',    power: 1.6, description: '海底から響く咆哮が全体を揺さぶる' },
               { name: '大波の一撃',  sp: 4,  type: 'damage_single', power: 5.0, description: '巨大な波と共に単体を叩き潰す' },
-              { name: '海神回生',    sp: 7,  type: 'heal_single',   power: 4.5, description: '深海の力で大回復' },
+              { name: '海神回生',    sp: 7,  type: 'heal_single',   power: 3.4, description: '深海の力で大回復' },
               { name: '海嵐乱舞',    sp: 8,  type: 'damage_all',    power: 2.5, description: '嵐と波が入り乱れる全体攻撃' },
               { name: '潮流の支配',  sp: 5,  type: 'atk_down',      power: 0.45, description: '潮の流れを変え全体の動きを鈍らせる' },
-              { name: '深淵の波動',  sp: 12, type: 'damage_all',    power: 3.5, description: '深海の全エネルギーを解放する究極技' }
+              { name: '深淵の波動',  sp: 12, type: 'damage_all',    power: 2.9, description: '深海の全エネルギーを解放する究極技' }
             ]
           }
         ],
