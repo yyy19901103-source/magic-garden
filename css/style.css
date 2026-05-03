@@ -2828,3 +2828,152 @@ textarea {
   .hab-label       { font-size: 12px; }
   .qs-val          { font-size: 12px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   画像品質向上（Phase 3）
+   - image-rendering で拡大時の補間最適化
+   - 高解像度版利用時のシャープ感
+   - .character-art / .hero-card / .premium-card / .rarity-frame
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 全キャラ画像の補間品質改善 */
+.hero-bg-main,
+.hero-bg-blur,
+.character-art img,
+.character-art picture,
+.portrait img,
+.intro-portrait img {
+  image-rendering: -webkit-optimize-contrast;  /* Chrome系：シャープ */
+  image-rendering: crisp-edges;                 /* Firefox系：シャープ */
+  -ms-interpolation-mode: bicubic;              /* IE系：補間 */
+}
+
+/* picture 要素の基本スタイル（ImageLoader.picture 出力先） */
+picture.character-art {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+picture.character-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  display: block;
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+picture.character-art img.loaded { opacity: 1; }
+
+/* Hero 専用：呼吸 + シャープ補間 */
+.hero-bg-main {
+  will-change: transform;
+}
+
+/* プレミアムカード（SSR以上で使用可能な高級感クラス） */
+.premium-card {
+  position: relative;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(40,28,72,.92), rgba(20,12,30,.95));
+  box-shadow:
+    0 4px 14px rgba(0,0,0,.6),
+    0 0 24px rgba(255,215,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.08),
+    inset 0 -1px 0 rgba(0,0,0,.4);
+  overflow: hidden;
+  isolation: isolate;
+}
+.premium-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,215,0,.16) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(180,80,255,.1) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+}
+.premium-card > * { position: relative; z-index: 2; }
+
+/* レアリティ枠（既存 .rarity-* と組み合わせて高級感を強化） */
+.rarity-frame {
+  position: relative;
+  padding: 2px;
+  border-radius: var(--radius);
+}
+.rarity-frame.rarity-LR  { background: linear-gradient(135deg, #ff00cc 0%, #ffd700 25%, #00ccff 50%, #ff69b4 75%, #ff00cc 100%); background-size: 300% 300%; animation: lrFrameFlow 3s linear infinite; }
+.rarity-frame.rarity-MR  { background: linear-gradient(135deg, #6600cc, #cc00ff, #9900bb, #6600cc); background-size: 200% 200%; animation: lrFrameFlow 4s linear infinite; }
+.rarity-frame.rarity-UR  { background: linear-gradient(135deg, #cc2200, #ff6600, #ff8800, #cc2200); background-size: 200% 200%; animation: lrFrameFlow 4s linear infinite; }
+.rarity-frame.rarity-SSR { background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700); background-size: 200% 200%; animation: lrFrameFlow 5s linear infinite; }
+.rarity-frame.rarity-SR  { background: linear-gradient(135deg, #60a5fa, #2563eb, #60a5fa); background-size: 200% 200%; animation: lrFrameFlow 6s linear infinite; }
+.rarity-frame.rarity-R   { background: #6b7280; }
+@keyframes lrFrameFlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.rarity-frame > * {
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--card);
+  display: block;
+}
+
+/* バトル画面用の大表示ポートレート */
+.battle-portrait {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,.5);
+}
+.battle-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  display: block;
+}
+
+/* hero-card（ホーム画面の編成キャラ拡大表示で活用予定） */
+.hero-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(40,28,72,.85), rgba(15,10,25,.95));
+  box-shadow:
+    0 6px 20px rgba(0,0,0,.55),
+    0 0 30px rgba(255,215,0,.12),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+.hero-card img,
+.hero-card picture {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+/* 一覧グリッドの描画最適化（スクロール時のジャンク低減） */
+.generals-grid,
+.zukan-generals,
+.gacha-result-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
+}
+
+/* 高解像度ディスプレイ最適化 */
+@media (min-resolution: 2dppx) {
+  .hero-bg-main {
+    image-rendering: auto; /* Retinaでは標準補間（hires画像が十分な解像度を持つため） */
+  }
+}
+
+/* 低速回線/データセーバ対応 */
+@media (prefers-reduced-data: reduce) {
+  .hero-bg-blur { display: none; }  /* ぼかし背景を省略 */
+}

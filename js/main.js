@@ -171,19 +171,21 @@ const UI = (() => {
   function makePortrait(def, size='md') {
     const sizeClass = size === 'lg' ? 'portrait-lg' : 'portrait-md';
     const isLg = size === 'lg';
-    // 一覧用 (md) は lazy + async decoding で副将タブの読み込み爆発を抑制
     const lazyAttrs = isLg ? '' : 'loading="lazy" decoding="async"';
-    // 詳細用は本体WebP / 一覧はサムネWebP / 失敗時PNGフォールバック
-    const primarySrc = isLg
-      ? `assets/characters/${def.id}.webp`
-      : `assets/characters/thumbs/${def.id}.webp`;
-    const fallbackSrc = `assets/characters/${def.id}.png`;
-    // onerror で WebP→PNG→消去 の段階フォールバック
-    const errHandler = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${fallbackSrc}';}else{this.remove();}`;
+    // 詳細用は標準WebP / 一覧はサムネWebP
+    // DPR>=2 (Retina/高DPI画面) では1段上の解像度を使う
+    const stdSrc   = `assets/characters/${def.id}.webp`;
+    const thumbSrc = `assets/characters/thumbs/${def.id}.webp`;
+    const hiresSrc = `assets/characters/hires/${def.id}.webp`;
+    const pngSrc   = `assets/characters/${def.id}.png`;
+    const primarySrc  = isLg ? stdSrc   : thumbSrc;
+    const retinaSrc   = isLg ? hiresSrc : stdSrc;   // 2x で1段アップグレード
+    const errHandler = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${pngSrc}';}else{this.remove();}`;
     return `
       <div class="portrait ${sizeClass} rarity-${def.rarity}" style="background:${def.gradient}">
         <span class="portrait-emoji" aria-hidden="true">${def.emoji}</span>
-        <img ${lazyAttrs} src="${primarySrc}" alt="${def.name}のポートレート"
+        <img ${lazyAttrs} src="${primarySrc}" srcset="${primarySrc} 1x, ${retinaSrc} 2x"
+             alt="${def.name}のポートレート"
              onload="this.classList.add('loaded')" onerror="${errHandler}">
         <span class="rarity-badge badge-${def.rarity}" aria-label="レアリティ ${def.rarity}">${def.rarity}</span>
       </div>`;
@@ -1483,10 +1485,15 @@ const UI = (() => {
       // ─── お気に入り状態 ───
       const isFav = !!gs.favorite;
 
-      // Hero ビュー用ヘルパー
-      const charImgWebp = `assets/characters/${def.id}.webp`;
-      const charImgPng  = `assets/characters/${def.id}.png`;
-      const heroImgErr  = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${charImgPng}';}else{this.style.opacity='0';}`;
+      // Hero ビュー用ヘルパー（hires画像優先・標準WebP→PNG fallback）
+      const charImgHires = `assets/characters/hires/${def.id}.webp`;
+      const charImgWebp  = `assets/characters/${def.id}.webp`;
+      const charImgPng   = `assets/characters/${def.id}.png`;
+      // 多段フォールバック: hires WebP → 標準 WebP → PNG → 透明
+      const heroImgErr   = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${charImgWebp}';}` +
+                           `else if(this.dataset.fb==='1'){this.dataset.fb='2';this.src='${charImgPng}';}` +
+                           `else{this.style.opacity='0';}`;
+      const heroBlurErr  = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${charImgPng}';}else{this.style.opacity='0';}`;
       const skillIconFor = (sk) => {
         const t = sk.type || '';
         const n = sk.name || '';
@@ -1534,8 +1541,8 @@ const UI = (() => {
       $('detail-body').innerHTML = `
         <!-- ━━━ Hero Zone ━━━ -->
         <div class="hero-zone rarity-${def.rarity}" data-char-id="${def.id}" data-char-name="${escapeAttr(def.name)}">
-          <img class="hero-bg-blur" src="${charImgWebp}" onerror="${heroImgErr}" alt="" aria-hidden="true" loading="eager">
-          <img class="hero-bg-main" src="${charImgWebp}" onerror="${heroImgErr}" alt="${escapeAttr(def.name)}" loading="eager">
+          <img class="hero-bg-blur" src="${charImgWebp}" onerror="${heroBlurErr}" alt="" aria-hidden="true" loading="eager" decoding="async">
+          <img class="hero-bg-main" src="${charImgHires}" onerror="${heroImgErr}" alt="${escapeAttr(def.name)}" loading="eager" decoding="async">
           <div class="hero-vignette"></div>
           <div class="hero-corner hero-corner-tl"></div>
           <div class="hero-corner hero-corner-tr"></div>
