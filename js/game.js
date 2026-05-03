@@ -731,7 +731,7 @@ const Game = (() => {
 
   // ─── 装備強化 ────────────────────────────────────────────────────────────
 
-  const ENHANCE_BASE_COST = { R: 100, SR: 300, SSR: 800, UR: 2000, LR: 5000 };
+  const ENHANCE_BASE_COST = { R: 100, SR: 300, SSR: 800, UR: 2000, MR: 3500, LR: 5000 };
   const ENHANCE_MAX = 10;
 
   function enhanceEquip(instanceId) {
@@ -835,7 +835,7 @@ const Game = (() => {
 
   // ─── 装備売却 ────────────────────────────────────────────────────────────
 
-  const SELL_PRICE = { R: 100, SR: 500, SSR: 2000, UR: 8000, LR: 20000 };
+  const SELL_PRICE = { R: 100, SR: 500, SSR: 2000, UR: 8000, MR: 15000, LR: 20000 };
 
   function sellEquip(instanceId) {
     const idx = state.inventory.equipment.findIndex(e => e.instanceId === instanceId);

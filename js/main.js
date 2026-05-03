@@ -1883,7 +1883,7 @@ const UI = (() => {
       }
 
       // ソート
-      const rarityOrder = { LR: 0, UR: 1, SSR: 2, SR: 3, R: 4 };
+      const rarityOrder = { LR: 0, MR: 1, UR: 2, SSR: 3, SR: 4, R: 5 };
       if (this._equipSort === 'rarity') {
         equips = equips.slice().sort((a, b) => {
           const ra = rarityOrder[EQUIPMENT_DATA[a.defId]?.rarity] ?? 9;
