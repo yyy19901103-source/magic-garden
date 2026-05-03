@@ -151,7 +151,7 @@ body {
 }
 .stamina-low .st-bar-fill { background: linear-gradient(90deg, #ef4444, #f87171); }
 
-/* タブナビ */
+/* タブナビ（PNG アイコン版・木目テクスチャ背景） */
 .tab-nav {
   display: flex; gap: 2px; padding: 6px 8px;
   background: var(--surface); border-bottom: 1px solid var(--border);
@@ -168,6 +168,96 @@ body {
   background: var(--primary-lt); color: var(--primary); font-weight: bold;
 }
 .tab-btn:not(.active):hover { background: rgba(167,139,250,.1); }
+
+/* ═══ PNG アイコンタブ（参考ゲーム風・木目+金縁+アクティブ拡大） ═══════════ */
+.tab-nav-png {
+  position: relative;
+  background-image: url('../assets/nav-icons/wood_texture.webp?v=75');
+  background-size: cover;
+  background-position: center;
+  padding: 8px 6px 10px;
+  gap: 4px;
+  border-bottom: 2px solid rgba(255,215,0,.45);
+  box-shadow: 0 2px 12px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);
+  isolation: isolate;
+}
+.tab-nav-png::before {
+  /* 全体に半透明黒オーバーレイで読みやすく */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,.55) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.tab-nav-png .tab-btn {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  padding: 4px 2px 6px;
+  background: transparent;
+  border-radius: 10px;
+  transition: transform .2s cubic-bezier(.4, 0, .2, 1), filter .2s;
+}
+.tab-nav-png .tab-icon {
+  width: 38px; height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)) brightness(.85) saturate(.85);
+  transition: all .25s cubic-bezier(.4, 0, .2, 1);
+}
+.tab-nav-png .tab-label {
+  font-size: 11px; font-weight: bold;
+  color: rgba(255,255,255,.6);
+  text-shadow: 0 1px 2px rgba(0,0,0,.9);
+  letter-spacing: .04em;
+  transition: color .2s;
+}
+.tab-nav-png .tab-btn.active {
+  background: transparent;
+  transform: translateY(-4px) scale(1.12);
+}
+.tab-nav-png .tab-btn.active .tab-icon {
+  filter: drop-shadow(0 0 12px rgba(255,215,0,.85))
+          drop-shadow(0 2px 4px rgba(0,0,0,.7))
+          brightness(1.1) saturate(1.15);
+  width: 44px; height: 44px;
+}
+.tab-nav-png .tab-btn.active .tab-label {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255,215,0,.6), 0 1px 2px rgba(0,0,0,.95);
+  font-weight: 900;
+}
+.tab-nav-png .tab-btn:not(.active):hover {
+  background: rgba(255,255,255,.08);
+}
+.tab-nav-png .tab-btn:not(.active):hover .tab-icon {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)) brightness(1) saturate(1);
+}
+
+@media (max-width: 360px) {
+  .tab-nav-png .tab-icon { width: 32px; height: 32px; }
+  .tab-nav-png .tab-btn.active .tab-icon { width: 38px; height: 38px; }
+  .tab-nav-png .tab-label { font-size: 10px; }
+}
+
+/* ═══ UI アイコン共通クラス（material/achievement/task/equip/stat 兼用） ═══ */
+.ui-icon {
+  display: inline-block;
+  vertical-align: middle;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));
+}
+.ui-icon-sm { width: 18px; height: 18px; }
+.ui-icon-md { width: 28px; height: 28px; }
+.ui-icon-lg { width: 44px; height: 44px; }
+.ui-icon-xl { width: 64px; height: 64px; }
+
+/* レアリティ別の発光（オプション） */
+.ui-icon.rarity-LR  { filter: drop-shadow(0 0 6px rgba(255,0,200,.7)) drop-shadow(0 0 10px rgba(255,215,0,.4)); }
+.ui-icon.rarity-MR  { filter: drop-shadow(0 0 6px rgba(204,0,255,.6)); }
+.ui-icon.rarity-UR  { filter: drop-shadow(0 0 6px rgba(255,102,0,.6)); }
+.ui-icon.rarity-SSR { filter: drop-shadow(0 0 5px rgba(255,215,0,.55)); }
+.ui-icon.rarity-SR  { filter: drop-shadow(0 0 4px rgba(96,165,250,.45)); }
 
 /* タブコンテンツ */
 .tab-content { flex: 1; overflow-y: auto; overflow-x: hidden; }

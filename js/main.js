@@ -6,8 +6,16 @@ const UI = (() => {
 
   // ─── ユーティリティ ─────────────────────────────────────────────────────
 
-  // キャラ画像キャッシュバスター（v73: 2026-05-04 G フォルダ画像反映）
-  const IMG_V = '73';
+  // 画像キャッシュバスター（v75: 2026-05-04 UI アイコン全置換）
+  const IMG_V = '75';
+
+  // UI アイコン helper（PNG優先 + 絵文字フォールバック）
+  // 用法: uiIcon('mat_herb', '🌿') → 配置済なら img、なければ絵文字
+  function uiIcon(name, fallback = '', size = 'md') {
+    const sizeClass = `ui-icon-${size}`;  // sm/md/lg
+    const path = `assets/ui-icons/${name}.webp?v=${IMG_V}`;
+    return `<img class="ui-icon ${sizeClass}" src="${path}" alt="" onerror="this.outerHTML='${(fallback||'').replace(/'/g, "\\'")}';" loading="lazy" decoding="async">`;
+  }
 
   const $ = id => document.getElementById(id);
   const show = id => { const e=$(id); if(e) e.classList.remove('hidden'); };
@@ -394,11 +402,16 @@ const UI = (() => {
           <span class="ach-progress">${unlockedCount}/${total} <span class="ach-pct">(${pct}%)</span></span>
         </div>
         <div class="ach-grid">
-          ${achs.map(a => `
+          ${achs.map(a => {
+            const iconHtml = a.unlocked
+              ? uiIcon(`ach_${a.id}`, `<span class="ach-emoji">${a.emoji}</span>`, 'lg')
+              : uiIcon('ach_locked', `<span class="ach-emoji">🔒</span>`, 'lg');
+            return `
             <div class="ach-badge ${a.unlocked ? 'ach-unlocked' : 'ach-locked'}" title="${a.desc}">
-              <span class="ach-emoji">${a.unlocked ? a.emoji : '🔒'}</span>
+              ${iconHtml}
               <span class="ach-name">${a.unlocked ? a.name : '???'}</span>
-            </div>`).join('')}
+            </div>`;
+          }).join('')}
         </div>`;
     },
 
@@ -500,8 +513,9 @@ const UI = (() => {
           rightHtml = `<span class="task-reward">${rewardText}</span>`;
         }
 
+        const iconHtml = uiIcon(`task_${task.id}`, `<span class="task-icon">${task.icon}</span>`, 'md');
         div.innerHTML = `
-          <span class="task-icon">${task.icon}</span>
+          ${iconHtml}
           <div class="task-info">
             <span class="task-label">${task.label}</span>
             ${hasProgress ? `<span class="task-count">${task.progress}/${task.target}</span>` : ''}
@@ -551,8 +565,9 @@ const UI = (() => {
           rightHtml = `<span class="task-reward">${rewardText}</span>`;
         }
 
+        const iconHtml = uiIcon(`task_${task.id}`, `<span class="task-icon">${task.icon}</span>`, 'md');
         div.innerHTML = `
-          <span class="task-icon">${task.icon}</span>
+          ${iconHtml}
           <div class="task-info">
             <span class="task-label">${task.label}</span>
             <span class="task-count">${task.progress}/${task.target}</span>
@@ -2003,9 +2018,10 @@ const UI = (() => {
         }
         const row = document.createElement('div');
         row.className = 'material-row';
+        const iconHtml = uiIcon(`mat_${id}`, `<span class="mat-emoji">${md.emoji}</span>`, 'md');
         row.innerHTML = `
           <div class="material-chip-inner">
-            <span class="mat-emoji">${md.emoji}</span>
+            ${iconHtml}
             <span class="mat-name">${md.name}</span>
             <span class="mat-count">×${count}</span>
           </div>
