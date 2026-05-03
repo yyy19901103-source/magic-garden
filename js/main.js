@@ -1567,21 +1567,15 @@ const UI = (() => {
           <span class="hero-zoom-hint" aria-hidden="true">🔍 タップで拡大</span>
         </div>
 
-        <!-- ━━━ Power Banner（戦力値メイン表示） ━━━ -->
-        <div class="hero-power-banner">
-          <span class="hpb-label">⚔️ 戦力</span>
-          <span class="hpb-value">${fmtPower}</span>
-          <span class="hpb-rank">#${curIdx + 1}</span>
-        </div>
-
-        <!-- ━━━ Quick Stats ━━━ -->
+        <!-- ━━━ Quick Stats（戦力を1列目に統合） ━━━ -->
         <div class="hero-stats-bar">
           <div class="hero-lv-row">
-            <span class="hero-lv">Lv. <strong>${gs.level}</strong></span>
+            <span class="hero-lv">Lv.<strong>${gs.level}</strong></span>
             <div class="hero-exp-bar"><div class="hero-exp-fill" style="width:${expPct}%"></div></div>
             <span class="hero-exp-txt">${gs.exp}/${expMax}</span>
           </div>
           <div class="hero-quick-stats">
+            <div class="quick-stat quick-stat-power"><span class="qs-icon">⚔️</span><span class="qs-val">${fmtPower}</span></div>
             <div class="quick-stat"><span class="qs-icon">❤️</span><span class="qs-val">${stats.hp.toLocaleString()}</span></div>
             <div class="quick-stat"><span class="qs-icon">⚔️</span><span class="qs-val">${stats.atk.toLocaleString()}</span></div>
             <div class="quick-stat"><span class="qs-icon">🛡️</span><span class="qs-val">${stats.def.toLocaleString()}</span></div>

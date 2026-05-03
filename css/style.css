@@ -2675,3 +2675,137 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
   .hero-bg-main, .hero-power-banner::before, .hero-fav-btn.is-fav { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Hero View v3 — サイズ縮小オーバーライド（参考ゲーム基準・コンパクト化）
+   - スロット 56→44px、アイコン 26→20px
+   - 戦力バナー廃止 → quick-stats の1列目に統合
+   - アクションボタン群を超コンパクトピルに
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* スロット縮小 */
+.hero-slot           { width: 44px; height: 44px; border-radius: 7px; }
+.hero-slot-icon      { font-size: 20px; }
+.hero-slot-rarity-tag{ font-size: 8px; padding: 1px 3px; top: -3px; left: -3px; }
+.hero-slot-enh       { font-size: 10px; padding: 0 3px; bottom: -2px; right: -2px; }
+.hero-slot-empty-mark{ font-size: 12px; }
+
+.hero-side {
+  width: 44px;
+  top: 48px;
+  bottom: 64px;
+}
+.hero-side-left  { left: 6px; }
+.hero-side-right { right: 6px; }
+
+/* 四隅装飾を控えめに */
+.hero-corner    { width: 18px; height: 18px; }
+.hero-corner-tl { top: 3px;    left: 3px; }
+.hero-corner-tr { top: 3px;    right: 3px; }
+.hero-corner-bl { bottom: 3px; left: 3px; }
+.hero-corner-br { bottom: 3px; right: 3px; }
+
+/* 名前・上部オーバーレイ */
+.hero-top-overlay { top: 8px; left: 8px; right: 44px; gap: 6px; }
+.hero-name        { font-size: 17px; }
+.hero-stars       { font-size: 11px; }
+.hero-fav-btn     { width: 28px; height: 28px; font-size: 14px; }
+
+/* ナビボタンも小さく */
+.hero-nav         { width: 28px; height: 50px; font-size: 22px; }
+.hero-nav-prev    { left: 56px; }
+.hero-nav-next    { right: 56px; }
+
+/* 下部オーバーレイ：タグ・タイトルを左下にまとめる */
+.hero-bottom-overlay { left: 56px; right: 56px; bottom: 8px; }
+.hero-title-tag      { font-size: 11px; margin-bottom: 2px; }
+.hero-tags .tag      { font-size: 11px; padding: 2px 6px; }
+.hero-zoom-hint      { bottom: 60px; font-size: 10px; }
+.hero-page-indicator { font-size: 10px; padding: 2px 8px; top: 6px; }
+
+/* 戦力バナーは廃止（quick-statsに統合） */
+.hero-power-banner { display: none; }
+
+/* Quick Stats Bar：5列グリッド + 戦力ハイライト */
+.hero-stats-bar { padding: 8px 10px; margin-bottom: 8px; }
+.hero-lv-row    { gap: 8px; margin-bottom: 6px; }
+.hero-lv        { font-size: 12px; }
+.hero-lv strong { font-size: 16px; }
+.hero-exp-bar   { height: 5px; }
+.hero-exp-txt   { font-size: 10px; }
+.hero-quick-stats {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.quick-stat     { padding: 5px 3px; font-size: 11px; gap: 3px; border-radius: 5px; }
+.qs-icon        { font-size: 12px; }
+.qs-val         { font-size: 11px; }
+.quick-stat-power {
+  background: linear-gradient(180deg, rgba(120,80,30,.95), rgba(60,30,5,.95));
+  border-color: rgba(255,215,0,.65);
+  box-shadow: 0 0 8px rgba(255,140,0,.3), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.quick-stat-power .qs-val {
+  color: #ffd700;
+  font-weight: 900;
+  text-shadow: 0 0 5px rgba(255,140,0,.7);
+}
+
+/* アクション4ボタン：超コンパクト */
+.hero-action-grid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.hero-act-btn {
+  padding: 6px 3px;
+  gap: 1px;
+  border-radius: 7px;
+  border-width: 1px;
+}
+.hab-icon  { font-size: 17px; }
+.hab-label { font-size: 11px; letter-spacing: 0; }
+.hab-sub   { font-size: 9px; }
+
+/* hero-zone のアスペクト比を縦長に（キャラ立ち絵を活かす） */
+.hero-zone {
+  aspect-ratio: 4 / 5;
+  max-height: 64vh;
+}
+
+/* description は控えめに */
+.hero-desc {
+  font-size: 12px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-left-width: 2px;
+}
+.detail-shards-line { font-size: 12px; margin-bottom: 8px; }
+
+/* 360px 以下：さらに縮小 */
+@media (max-width: 360px) {
+  .hero-slot       { width: 38px; height: 38px; }
+  .hero-side       { width: 38px; }
+  .hero-slot-icon  { font-size: 17px; }
+  .hero-nav-prev   { left: 46px; }
+  .hero-nav-next   { right: 46px; }
+  .hero-bottom-overlay { left: 46px; right: 46px; }
+  .hero-name       { font-size: 15px; }
+  .hero-quick-stats{ gap: 3px; }
+  .quick-stat      { padding: 4px 2px; font-size: 10px; }
+  .qs-icon         { font-size: 11px; }
+  .qs-val          { font-size: 10px; }
+  .hab-icon        { font-size: 15px; }
+  .hab-label       { font-size: 10px; }
+}
+
+/* タブレット〜PC：適度に拡大 */
+@media (min-width: 600px) {
+  .hero-slot       { width: 50px; height: 50px; }
+  .hero-side       { width: 50px; }
+  .hero-slot-icon  { font-size: 22px; }
+  .hero-name       { font-size: 19px; }
+  .hab-icon        { font-size: 19px; }
+  .hab-label       { font-size: 12px; }
+  .qs-val          { font-size: 12px; }
+}
