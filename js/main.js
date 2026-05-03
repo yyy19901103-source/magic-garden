@@ -11,10 +11,21 @@ const UI = (() => {
 
   // UI アイコン helper（PNG優先 + 絵文字フォールバック）
   // 用法: uiIcon('mat_herb', '🌿') → 配置済なら img、なければ絵文字
+  // fallback には HTML 文字列も渡せる（data 属性経由で安全に保持）
+  function _htmlAttrEscape(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
   function uiIcon(name, fallback = '', size = 'md') {
-    const sizeClass = `ui-icon-${size}`;  // sm/md/lg
+    const sizeClass = `ui-icon-${size}`;  // sm/md/lg/xl
     const path = `assets/ui-icons/${name}.webp?v=${IMG_V}`;
-    return `<img class="ui-icon ${sizeClass}" src="${path}" alt="" onerror="this.outerHTML='${(fallback||'').replace(/'/g, "\\'")}';" loading="lazy" decoding="async">`;
+    const fbAttr = _htmlAttrEscape(fallback || '');
+    // data-fallback 経由で fallback HTML を安全に保持。onerror 時に outerHTML を置換
+    return `<img class="ui-icon ${sizeClass}" src="${path}" alt="" data-fallback="${fbAttr}" onerror="if(!this.dataset.fbDone){this.dataset.fbDone='1';this.outerHTML=this.dataset.fallback||'';}" loading="lazy" decoding="async">`;
   }
 
   const $ = id => document.getElementById(id);
@@ -274,7 +285,7 @@ const UI = (() => {
     if (stEl) {
       const pct = Math.min(100, Math.round(st.current / st.max * 100));
       stEl.innerHTML = `
-        <span class="st-label"><span class="picon picon-stam"></span> ${st.current}/${st.max}</span>
+        <span class="st-label">${uiIcon('res_stamina', '<span class="picon picon-stam"></span>', 'sm')} ${st.current}/${st.max}</span>
         <span class="st-bar-wrap"><span class="st-bar-fill" style="width:${pct}%"></span></span>`;
       stEl.title = st.current < st.max
         ? `次回+1まで${st.nextRegenMin}分`
