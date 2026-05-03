@@ -1540,7 +1540,12 @@ const UI = (() => {
         if (t === 'taunt') return '🛡️';
         return '⚔️';
       };
-      const equipSlotIcon = { weapon: '⚔️', armor: '🛡️', accessory: '💍' };
+      // PNG装備カテゴリアイコン（v75 で配置済）。fallback は絵文字
+      const equipSlotIcon = {
+        weapon: uiIcon('equip_weapon', '⚔️', 'md'),
+        armor:  uiIcon('equip_armor',  '🛡️', 'md'),
+        accessory: uiIcon('equip_accessory', '💍', 'md'),
+      };
       const heroEquipSlotsHtml = ['weapon','armor','accessory'].map(slot => {
         const iid  = equips[slot];
         const inst = iid ? Game.getState().inventory.equipment.find(e=>e.instanceId===iid) : null;
@@ -1611,33 +1616,33 @@ const UI = (() => {
             <span class="hero-exp-txt">${gs.exp}/${expMax}</span>
           </div>
           <div class="hero-quick-stats">
-            <div class="quick-stat quick-stat-power"><span class="qs-icon">⚔️</span><span class="qs-val">${fmtPower}</span></div>
-            <div class="quick-stat"><span class="qs-icon">❤️</span><span class="qs-val">${stats.hp.toLocaleString()}</span></div>
-            <div class="quick-stat"><span class="qs-icon">⚔️</span><span class="qs-val">${stats.atk.toLocaleString()}</span></div>
-            <div class="quick-stat"><span class="qs-icon">🛡️</span><span class="qs-val">${stats.def.toLocaleString()}</span></div>
-            <div class="quick-stat"><span class="qs-icon">💨</span><span class="qs-val">${stats.spd}</span></div>
+            <div class="quick-stat quick-stat-power">${uiIcon('stat_atk', '<span class="qs-icon">⚔️</span>', 'sm')}<span class="qs-val">${fmtPower}</span></div>
+            <div class="quick-stat">${uiIcon('stat_hp',  '<span class="qs-icon">❤️</span>', 'sm')}<span class="qs-val">${stats.hp.toLocaleString()}</span></div>
+            <div class="quick-stat">${uiIcon('stat_atk', '<span class="qs-icon">⚔️</span>', 'sm')}<span class="qs-val">${stats.atk.toLocaleString()}</span></div>
+            <div class="quick-stat">${uiIcon('stat_def', '<span class="qs-icon">🛡️</span>', 'sm')}<span class="qs-val">${stats.def.toLocaleString()}</span></div>
+            <div class="quick-stat">${uiIcon('stat_spd', '<span class="qs-icon">💨</span>', 'sm')}<span class="qs-val">${stats.spd}</span></div>
           </div>
         </div>
 
         <!-- ━━━ アクションアイコン群（市販ゲー風6個並列） ━━━ -->
         <div class="hero-action-grid">
           <button class="hero-act-btn ${hasCoins?'':'disabled'}" id="dlv-btn-icon" ${isAtMaxLv?'disabled':''}>
-            <span class="hab-icon">📈</span>
+            ${uiIcon('ach_lv10', '<span class="hab-icon">📈</span>', 'md')}
             <span class="hab-label">育成</span>
-            <span class="hab-sub">${isAtMaxLv ? 'MAX' : `${lvCost.toLocaleString()}🪙`}</span>
+            <span class="hab-sub">${isAtMaxLv ? 'MAX' : `${lvCost.toLocaleString()} ${uiIcon('res_coin', '🪙', 'sm')}`}</span>
           </button>
           <button class="hero-act-btn ${stars<6 && shards>=awakenCost?'':'disabled'}" id="daw-btn-icon" ${stars>=6?'disabled':''}>
-            <span class="hab-icon">⭐</span>
+            ${uiIcon('ach_streak_10', '<span class="hab-icon">⭐</span>', 'md')}
             <span class="hab-label">覚醒</span>
             <span class="hab-sub">${stars>=6 ? 'MAX' : `${shards}/${awakenCost}`}</span>
           </button>
           <button class="hero-act-btn ${blInfo.canBreak?'':'disabled'}" id="dbl-btn-icon" ${blInfo.isMaxBreak?'disabled':''}>
-            <span class="hab-icon">💎</span>
+            ${uiIcon('res_gem', '<span class="hab-icon">💎</span>', 'md')}
             <span class="hab-label">限界突破</span>
             <span class="hab-sub">${blInfo.isMaxBreak ? '完了' : `+${blInfo.breakCount+1}回目`}</span>
           </button>
           <button class="hero-act-btn ${inFm?'is-active':''}" id="dfm-btn-icon">
-            <span class="hab-icon">${inFm ? '✅' : '⚔️'}</span>
+            ${inFm ? '<span class="hab-icon">✅</span>' : uiIcon('equip_weapon', '<span class="hab-icon">⚔️</span>', 'md')}
             <span class="hab-label">${inFm ? '編成中' : '編成'}</span>
             <span class="hab-sub">${inFm ? '外す' : '入れる'}</span>
           </button>
@@ -1645,21 +1650,21 @@ const UI = (() => {
 
         <!-- 説明文 -->
         <p class="hero-desc">${def.description}</p>
-        <p class="detail-shards-line">💎 欠片: <strong>${shards}</strong>個</p>
+        <p class="detail-shards-line">${uiIcon('res_gem', '💎', 'sm')} 欠片: <strong>${shards}</strong>個</p>
 
         ${(() => {
           const STAT_MAX = { hp: 30000, atk: 3500, def: 1500, spd: 200 };
           const STAT_COLOR = { hp: '#ef4444', atk: '#f97316', def: '#3b82f6', spd: '#10b981' };
           const rows = [
-            { key: 'hp',  icon: '❤️', label: 'HP',   val: stats.hp,  fmt: stats.hp.toLocaleString() },
-            { key: 'atk', icon: '⚔️', label: '攻撃', val: stats.atk, fmt: stats.atk.toLocaleString() },
-            { key: 'def', icon: '🛡️', label: '防御', val: stats.def, fmt: stats.def.toLocaleString() },
-            { key: 'spd', icon: '💨', label: '速度', val: stats.spd, fmt: String(stats.spd) },
+            { key: 'hp',  iconName: 'stat_hp',  emoji: '❤️', label: 'HP',   val: stats.hp,  fmt: stats.hp.toLocaleString() },
+            { key: 'atk', iconName: 'stat_atk', emoji: '⚔️', label: '攻撃', val: stats.atk, fmt: stats.atk.toLocaleString() },
+            { key: 'def', iconName: 'stat_def', emoji: '🛡️', label: '防御', val: stats.def, fmt: stats.def.toLocaleString() },
+            { key: 'spd', iconName: 'stat_spd', emoji: '💨', label: '速度', val: stats.spd, fmt: String(stats.spd) },
           ];
           return `<div class="detail-stats-bars">${rows.map(r => {
             const pct = Math.min(100, Math.round(r.val / STAT_MAX[r.key] * 100));
             return `<div class="stat-bar-row">
-              <span class="stat-bar-label">${r.icon} ${r.label}</span>
+              <span class="stat-bar-label">${uiIcon(r.iconName, r.emoji, 'sm')} ${r.label}</span>
               <div class="stat-bar-track">
                 <div class="stat-bar-fill" style="width:${pct}%;background:${STAT_COLOR[r.key]}"></div>
               </div>
