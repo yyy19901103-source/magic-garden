@@ -2427,6 +2427,18 @@ const UI = (() => {
       GeneralsTab.renderGrid();
     });
 
+    // 一括覚醒ボタン
+    $('bulk-awaken-btn')?.addEventListener('click', () => {
+      const { count, results } = Game.bulkAwaken();
+      if (count === 0) {
+        showToast('覚醒できるキャラがいません（欠片不足または全員★6）', 'warn');
+        return;
+      }
+      const lines = results.map(r => `${r.name} ★${r.oldStars}→★${r.newStars}`).join('、');
+      showToast(`✨ ${count}体を覚醒！ ${lines}`, 'success');
+      GeneralsTab.renderGrid();
+    });
+
     // 装備フィルターバー
     document.querySelectorAll('.equip-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {

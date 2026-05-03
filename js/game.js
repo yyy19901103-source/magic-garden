@@ -729,6 +729,33 @@ const Game = (() => {
     return AWAKEN_COST[stars - 1];
   }
 
+  // ─── 一括覚醒 ────────────────────────────────────────────────────────────
+  function bulkAwaken() {
+    const results = []; // { name, oldStars, newStars }
+    Object.keys(state.generals).forEach(gid => {
+      const gs = state.generals[gid];
+      if (!gs) return;
+      const oldStars = gs.stars || 1;
+      // 欠片が足りる限り連続覚醒
+      let changed = false;
+      while (true) {
+        const stars = gs.stars || 1;
+        if (stars >= 6) break;
+        const cost = AWAKEN_COST[stars - 1];
+        if ((gs.shards || 0) < cost) break;
+        gs.shards -= cost;
+        gs.stars = stars + 1;
+        changed = true;
+      }
+      if (changed) {
+        const def = GENERALS_DATA[gid];
+        results.push({ name: def ? def.name : gid, oldStars, newStars: gs.stars });
+      }
+    });
+    if (results.length > 0) save();
+    return { count: results.length, results };
+  }
+
   // ─── 装備強化 ────────────────────────────────────────────────────────────
 
   const ENHANCE_BASE_COST = { R: 100, SR: 300, SSR: 800, UR: 2000, MR: 3500, LR: 5000 };
@@ -1109,7 +1136,7 @@ const Game = (() => {
     battle,
     levelUpGeneral, addToFormation, removeFromFormation,
     equipItem, unequipItem,
-    awakenGeneral, getAwakenCost,
+    awakenGeneral, getAwakenCost, bulkAwaken,
     enhanceEquip, getEnhanceCost,
     battleBoss, getDailyBossState,
     draw,
