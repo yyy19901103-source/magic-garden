@@ -190,22 +190,26 @@ const Storage = (() => {
 
   /**
    * GAS REST 保存
-   * ★ Fix: GETのURL長制限（約2000文字）を回避するため、
-   *        POSTボディに変更（CODEX指摘②: saveChunk不整合も解消）
-   *        no-corsのためレスポンスが読めないので、保存後loadで確認はできないが
-   *        GAS doPost() は正常に受け取れる（実証済み）
+   * ★ Fix v4.2: Content-Type を text/plain に変更して preflight を回避。
+   *   - application/json は CORS preflight (OPTIONS) を要求するが GAS は OPTIONS に 405 を返す
+   *   - text/plain は "simple request" 扱いで preflight なし → レスポンスが読める
+   *   - GAS 側の doPost は e.postData.contents を JSON.parse するので動作に変化なし
+   *   - no-cors を廃止してレスポンス検証を行う（サイレント失敗の根本解消）
    */
   async function _saveGasRest(endpoint, playerId, state) {
     try {
-      await fetch(endpoint, {
+      const res = await fetch(endpoint, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action: 'save', playerId, data: state }),
         signal: AbortSignal.timeout(15000)
       });
-      // no-cors はレスポンスが読めないので成功とみなす
-      return true;
+      if (!res.ok) {
+        console.warn('[Storage] GAS POST save HTTP error:', res.status);
+        return false;
+      }
+      const json = await res.json();
+      return json.ok === true;
     } catch(e) {
       console.warn('[Storage] GAS POST save failed:', e.message);
       return false;
@@ -298,7 +302,20 @@ const Storage = (() => {
 
   function load() { return loadLocal(); }
 
+  /**
+   * ★ Fix v4.2: クラウドから読み込む前に debounce/retry を必ずキャンセル
+   *   - 復元直後に古い pending 保存が発火してデータを上書きするバグを防ぐ
+   *   - pullFromCloud() は "信頼できるクラウドデータで現状を置き換える" 操作なので
+   *     保留中の送信はすべて破棄してよい
+   */
   async function pullFromCloud() {
+    // pending な debounce 保存をキャンセル
+    if (_debounceTimer) { clearTimeout(_debounceTimer); _debounceTimer = null; }
+    // retry キューもクリア（古い state を送らせない）
+    if (_retryTimer)  { clearTimeout(_retryTimer);  _retryTimer  = null; }
+    _retryQueue = null;
+    _retryCount = 0;
+
     const data = await loadCloud();
     if (data) { saveLocal(data); return data; }
     return null;

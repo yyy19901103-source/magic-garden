@@ -2230,6 +2230,9 @@ const UI = (() => {
     // 放置報酬受取
     $('collect-btn')?.addEventListener('click', () => {
       Game.collectIdleReward();
+      // ★ Fix: 受取直後に即クラウド同期（debounce 待ちにしない）
+      // タブ閉じ・バックグラウンド移行で報酬が消えるバグを防ぐ
+      Storage.flushSave(Game.getState());
       hide('idle-reward');
       updateResourceBar();
       HomeTab.update();
@@ -2580,11 +2583,16 @@ const UI = (() => {
       const code = $('cs-restore-input')?.value.trim();
       if (!code) { this.setStatus('引き継ぎコードを入力してください', 'err'); return; }
       this.setStatus('📥 読み込み中…', 'info');
-      // 既存の type（'gas' or 'firebase'）を保持してIDだけ上書き（CODEX指摘修正）
-      const existingType = Storage.getConfig().type || 'gas';
+
+      // ★ Fix: setConfig は成功後にだけ実行（失敗時に playerId を上書きしない）
+      // 1. 旧設定を退避
+      const prevConfig = Storage.getConfig();
+      // 2. 一時的に新IDをセットしてクラウド読込を試みる
+      const existingType = prevConfig.type || 'gas';
       Storage.setConfig(null, code, existingType);
       const data = await Storage.pullFromCloud();
       if (data) {
+        // 3. 成功 → 新IDを正式採用してゲームに反映
         Game.init(data);
         updateResourceBar();
         HomeTab.update();
@@ -2592,6 +2600,8 @@ const UI = (() => {
         this.setStatus('✅ データを読み込みました！', 'ok');
         switchTab('home');
       } else {
+        // 4. 失敗 → 旧設定を復元（元のplayerIdを失わない）
+        Storage.setConfig(prevConfig.endpoint, prevConfig.playerId, prevConfig.type);
         this.setStatus('コードが見つかりませんでした。確認してください。', 'err');
       }
     },
