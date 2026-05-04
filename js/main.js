@@ -360,10 +360,8 @@ const UI = (() => {
       const streak  = state.progress.winStreak || 0;
       const maxStreak = state.progress.maxWinStreak || 0;
 
-      // ステージクリア進捗バー付きチップ
-      const clearBar = `<div class="dash-progress-wrap">
-        <div class="dash-progress-bar" style="width:${pct}%"></div>
-      </div><span class="dash-pct">${pct}%</span>`;
+      // v100: クリア進捗バー / % 表示は削除（0/45 表記で十分）
+      const clearBar = '';
 
       // 連勝ストリーク表示（3以上のみ）
       const streakEmoji = streak >= 20 ? '🌈' : streak >= 10 ? '🔥' : streak >= 5 ? '⚡' : '🎯';

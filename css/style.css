@@ -1301,17 +1301,17 @@ body::after {
   50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
 }
 
-/* v98: 横一列レイアウト — チップ内は icon / value / label を縦積み・全て同色同サイズ */
-.dash-icon  { font-size: 22px; line-height: 1; }
+/* v100: 横一列レイアウト — フォント1サイズ縮小 (13→12) */
+.dash-icon  { font-size: 20px; line-height: 1; }
 .dash-chip .dash-icon img,
-.dash-chip .dash-icon .ui-icon { width: 24px; height: 24px; }
+.dash-chip .dash-icon .ui-icon { width: 22px; height: 22px; }
 .dash-val   {
-  font-size: 13px; color: #e8d8b0; line-height: 1.2;
+  font-size: 12px; color: #e8d8b0; line-height: 1.2;
   font-variant-numeric: tabular-nums; white-space: nowrap;
   background: none; -webkit-text-fill-color: currentColor;
 }
-.dash-total { font-size: 13px; color: #e8d8b0; }
-.dash-lbl   { font-size: 13px; color: #e8d8b0; line-height: 1.2; text-align: center; }
+.dash-total { font-size: 12px; color: #e8d8b0; }
+.dash-lbl   { font-size: 12px; color: #e8d8b0; line-height: 1.2; text-align: center; }
 
 /* クリア進捗バー */
 .dash-progress-wrap {
@@ -2054,13 +2054,13 @@ body::after {
   /* タブラベルを絵文字のみにして省スペース */
   .tab-btn { font-size: 12px; padding: 5px 2px; }
 
-  /* v98: モバイルでも横一列維持 */
+  /* v100: モバイル横5列・1サイズ小さく */
   .home-dashboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
   .dash-chip { padding: 6px 2px 5px; }
-  .dash-icon { font-size: 18px; }
+  .dash-icon { font-size: 16px; }
   .dash-chip .dash-icon img,
-  .dash-chip .dash-icon .ui-icon { width: 20px; height: 20px; }
-  .dash-val, .dash-lbl, .dash-total { font-size: 11px; }
+  .dash-chip .dash-icon .ui-icon { width: 18px; height: 18px; }
+  .dash-val, .dash-lbl, .dash-total { font-size: 10px; }
 }
 
 /* ─── 全スマホ共通：スクロール慣性・選択禁止 ────────────────────────────── */
@@ -2075,7 +2075,7 @@ body::after {
 
 @media (max-width: 340px) {
   .home-dashboard { grid-template-columns: repeat(5, 1fr); gap: 3px; }
-  .dash-val, .dash-lbl, .dash-total { font-size: 10px; }
+  .dash-val, .dash-lbl, .dash-total { font-size: 9px; }
 }
 
 /* ─── オーバーレイ（詳細画面）がはみ出さないよう ────────────────────────── */
