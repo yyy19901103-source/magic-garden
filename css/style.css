@@ -1301,10 +1301,14 @@ body::after {
   50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
 }
 
-/* v100: 横一列レイアウト — フォント1サイズ縮小 (13→12) */
-.dash-icon  { font-size: 20px; line-height: 1; }
+/* v102: アイコンと数字の横幅を視覚的に揃える */
+.dash-icon  {
+  font-size: 28px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px;
+}
 .dash-chip .dash-icon img,
-.dash-chip .dash-icon .ui-icon { width: 22px; height: 22px; }
+.dash-chip .dash-icon .ui-icon { width: 36px; height: 36px; }
 .dash-val   {
   font-size: 12px; color: #e8d8b0; line-height: 1.2;
   font-variant-numeric: tabular-nums; white-space: nowrap;
@@ -2054,12 +2058,12 @@ body::after {
   /* タブラベルを絵文字のみにして省スペース */
   .tab-btn { font-size: 12px; padding: 5px 2px; }
 
-  /* v100: モバイル横5列・1サイズ小さく */
+  /* v102: モバイル横5列・アイコン拡大 */
   .home-dashboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
   .dash-chip { padding: 6px 2px 5px; }
-  .dash-icon { font-size: 16px; }
+  .dash-icon { font-size: 22px; min-width: 36px; }
   .dash-chip .dash-icon img,
-  .dash-chip .dash-icon .ui-icon { width: 18px; height: 18px; }
+  .dash-chip .dash-icon .ui-icon { width: 30px; height: 30px; }
   .dash-val, .dash-lbl, .dash-total { font-size: 10px; }
 }
 
