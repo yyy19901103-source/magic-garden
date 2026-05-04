@@ -2447,64 +2447,76 @@ textarea {
   isolation: isolate;
 }
 
-/* ━━━ コーナースロット (v86): 装備=左上 / スキル=右上 ━━━ */
+/* ━━━ Hero コーナーレイアウト統一 (v87) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   片側 56px 幅の縦ストリップに統一:
+     左サイド: 装備3つ → ‹ ナビ → 育成2つ
+     右サイド: スキルNつ → › ナビ → 覚醒+限界突破
+   全要素を 52×52px の正方形タイルに揃え、視覚リズムを均一化
+   ──────────────────────────────────────────────────────────── */
+:root {
+  --hero-tile: 52px;
+  --hero-strip-pad: 6px;
+  --hero-strip-bottom: 78px; /* 称号 overlay の上端 */
+}
+
 .hero-corner-slots {
   position: absolute;
-  top: 48px;
+  top: 52px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   z-index: 5;
-  pointer-events: auto;
 }
-.hero-corner-slots-tl { left: 8px; }
-.hero-corner-slots-tr { right: 8px; }
+.hero-corner-slots-tl { left: var(--hero-strip-pad); }
+.hero-corner-slots-tr { right: var(--hero-strip-pad); }
 .hero-corner-slots .hero-slot {
   position: static;
-  width: 48px;
-  height: 48px;
-}
-@media (max-width: 374px) {
-  .hero-corner-slots .hero-slot { width: 40px; height: 40px; }
-  .hero-corner-slots-tl { left: 6px; }
-  .hero-corner-slots-tr { right: 6px; }
+  width: var(--hero-tile);
+  height: var(--hero-tile);
 }
 
-/* ━━━ アクションコーナー (v86): 育成=左下 / 覚醒=右下 / 編成=中央下 ━━━ */
 .hero-action-corner {
   position: absolute;
   z-index: 6;
   display: flex;
   gap: 6px;
 }
-.hero-action-corner-bl { left: 8px;  bottom: 70px; flex-direction: column; }
-.hero-action-corner-br { right: 8px; bottom: 70px; flex-direction: column; }
+.hero-action-corner-bl {
+  left: var(--hero-strip-pad);
+  bottom: var(--hero-strip-bottom);
+  flex-direction: column;
+}
+.hero-action-corner-br {
+  right: var(--hero-strip-pad);
+  bottom: var(--hero-strip-bottom);
+  flex-direction: column;
+}
 .hero-action-corner-bc {
   left: 50%;
   transform: translateX(-50%);
-  bottom: 76px; /* 称号(『xxx』) の少し上 */
+  bottom: calc(var(--hero-strip-bottom) - 4px); /* 称号の少し上 */
 }
 .hero-action-corner .hero-act-btn {
-  width: 64px;
-  min-height: 56px;
-  padding: 4px 2px;
+  width: var(--hero-tile);
+  height: var(--hero-tile);
+  padding: 3px 2px;
   background: linear-gradient(180deg, rgba(40,28,60,.85), rgba(15,8,28,.92));
   border: 1px solid rgba(255,215,0,.35);
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);
   backdrop-filter: blur(2px);
   color: #fff;
-  font-size: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
+  gap: 0;
+  line-height: 1.1;
 }
 .hero-action-corner .hero-act-btn .hab-icon { font-size: 16px; }
 .hero-action-corner .hero-act-btn .ui-icon { width: 18px; height: 18px; }
 .hero-action-corner .hero-act-btn .hab-label { font-size: 10px; font-weight: 700; }
-.hero-action-corner .hero-act-btn .hab-sub { font-size: 9px; opacity: .85; }
+.hero-action-corner .hero-act-btn .hab-sub { font-size: 8px; opacity: .8; }
 .hero-action-corner .hero-act-btn.disabled,
 .hero-action-corner .hero-act-btn[disabled] {
   opacity: .45;
@@ -2514,12 +2526,33 @@ textarea {
   background: linear-gradient(180deg, rgba(20,80,40,.92), rgba(8,40,20,.95));
   border-color: rgba(120,255,140,.55);
 }
+
+/* 左右ナビ（前後キャラ）をストリップ中央に揃えて重ね合わせ防止 */
+.hero-nav {
+  width: var(--hero-tile) !important;
+  height: 38px !important;
+  font-size: 22px !important;
+  border-radius: 8px !important;
+}
+.hero-nav-prev { left: var(--hero-strip-pad) !important; }
+.hero-nav-next { right: var(--hero-strip-pad) !important; }
+
+/* タグオーバーレイは中央ストリップに収める（左右 56+8=64px 確保） */
+.hero-bottom-overlay {
+  left: 64px !important;
+  right: 64px !important;
+  bottom: 10px !important;
+}
+
 @media (max-width: 374px) {
-  .hero-action-corner .hero-act-btn { width: 54px; min-height: 50px; }
-  .hero-action-corner .hero-act-btn .hab-icon { font-size: 14px; }
-  .hero-action-corner-bl,
-  .hero-action-corner-br { bottom: 64px; }
-  .hero-action-corner-bc { bottom: 70px; }
+  :root { --hero-tile: 44px; --hero-strip-pad: 4px; --hero-strip-bottom: 66px; }
+  .hero-action-corner .hero-act-btn .hab-icon { font-size: 13px; }
+  .hero-action-corner .hero-act-btn .hab-label { font-size: 9px; }
+  .hero-action-corner .hero-act-btn .hab-sub { font-size: 7px; }
+  .hero-bottom-overlay { left: 54px !important; right: 54px !important; }
+}
+@media (min-width: 600px) {
+  :root { --hero-tile: 60px; --hero-strip-pad: 8px; --hero-strip-bottom: 86px; }
 }
 
 /* 背景：ぼかし版（低解像度の余白を埋める） */
