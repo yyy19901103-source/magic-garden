@@ -1639,7 +1639,7 @@ const UI = (() => {
           <!-- 編成：中央下（称号の少し上） -->
           <div class="hero-action-corner hero-action-corner-bc">
             <button class="hero-act-btn hero-act-fm ${inFm?'is-active':''}" id="dfm-btn-icon">
-              ${inFm ? '<span class="hab-icon">✅</span>' : uiIcon('equip_weapon', '<span class="hab-icon">⚔️</span>', 'sm')}
+              ${inFm ? '' : uiIcon('equip_weapon', '<span class="hab-icon">⚔️</span>', 'sm')}
               <span class="hab-label">${inFm ? '編成中' : '編成'}</span>
               <span class="hab-sub">${inFm ? '外す' : '入れる'}</span>
             </button>
@@ -1658,7 +1658,6 @@ const UI = (() => {
               ${def.faction ? `<span class="tag tag-faction">🏰 ${def.faction}</span>` : ''}
             </div>
           </div>
-          <span class="hero-zoom-hint" aria-hidden="true">🔍 タップで拡大</span>
         </div>
 
         <!-- ━━━ Quick Stats（戦力を1列目に統合） ━━━ -->
