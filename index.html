@@ -16,9 +16,9 @@
 <!-- ═══════════════════════════════════ ローディング画面 ═══ -->
 <div id="screen-loading" class="screen active">
   <div class="loading-wrap">
-    <div class="loading-sprite">🌸</div>
+    <div class="loading-sprite"><img src="assets/ui-icons/idle_welcome.webp?v=80" alt="" style="width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:center 25%;box-shadow:0 0 18px rgba(255,215,0,.45);border:2px solid rgba(255,215,0,.55);" onerror="this.outerHTML='<span>🌸</span>';"></div>
     <h1 class="loading-title">まほうの庭</h1>
-    <p class="loading-sub">✿ Magic Garden ✿</p>
+    <p class="loading-sub">Magic Garden</p>
     <div class="loading-bar-wrap"><div class="loading-bar" id="loading-bar"></div></div>
     <p class="loading-text">読み込んでいます…</p>
   </div>
@@ -275,7 +275,11 @@
 
       <!-- バナー -->
       <div class="gacha-banner">
-        <div class="banner-title">🌟 副将召喚 🌟</div>
+        <div class="banner-title">
+          <img class="ui-icon ui-icon-md" src="assets/ui-icons/summon_banner_star.webp?v=80" alt="">
+          副将召喚
+          <img class="ui-icon ui-icon-md" src="assets/ui-icons/summon_banner_star.webp?v=80" alt="">
+        </div>
         <div class="banner-rates">
           <span class="rate-ssr" style="color:var(--lr)">LR 0.6%</span>
           <span class="rate-ssr" style="color:var(--mr)">MR 1.1%</span>
@@ -500,7 +504,7 @@
 <script src="js/idle.js?v=55"></script>
 <script src="js/image_loader.js?v=73"></script>
 <script src="js/game.js?v=72"></script>
-<script src="js/main.js?v=79"></script>
+<script src="js/main.js?v=80"></script>
 
 </body>
 </html>
