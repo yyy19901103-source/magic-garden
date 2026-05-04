@@ -163,23 +163,7 @@ button, .btn, .tab-label, .tab-btn {
   letter-spacing: .1em;
 }
 
-/* ダッシュボードチップの数値 */
-.dash-val {
-  font-size: 22px;
-  background: linear-gradient(180deg, #ffeec0 0%, #ffd700 60%, #c8941a 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,.7));
-  letter-spacing: 0;
-}
-.dash-lbl {
-  color: rgba(255,255,255,.75);
-  font-family: var(--font-ui);
-  font-size: 12px;
-  letter-spacing: .08em;
-  font-weight: 500;
-}
+/* v107: ダッシュボードチップの数値・ラベルはタブラベルと完全統一 — 旧22px金グラデは廃止 */
 
 /* リソース表示（コイン/ジェム/スタミナ）v101: 枠を撤去して数字を読みやすく */
 .hd-resources span {

@@ -222,9 +222,9 @@ button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.
   padding: 6px 10px !important;
   border-radius: 0 !important;
 }
-/* 数値部分だけピクセルフォント＋金色 */
+/* 数値部分だけピクセルフォント＋金色（v107: .dash-val はホームダッシュボードで個別管理するため除外） */
 .dash-chip strong, .loot-chip strong, .reward-chip strong, .boss-reward-chip strong,
-.dash-val, .reward-num, .resource-value-num,
+.reward-num, .resource-value-num,
 .dash-chip-num, .loot-num {
   font-family: var(--p-font-num) !important;
   color: var(--p-gold) !important;
