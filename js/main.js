@@ -6,8 +6,8 @@ const UI = (() => {
 
   // ─── ユーティリティ ─────────────────────────────────────────────────────
 
-  // 画像キャッシュバスター（v80: 2026-05-04 おかえり/ロード画面/召喚バナー修正）
-  const IMG_V = '80';
+  // 画像キャッシュバスター（v81: 2026-05-04 ダッシュボードチップ + 図鑑thumb + プレミアムフォント）
+  const IMG_V = '81';
 
   // UI アイコン helper（PNG優先 + 絵文字フォールバック）
   // 用法: uiIcon('mat_herb', '🌿') → 配置済なら img、なければ絵文字
@@ -362,36 +362,36 @@ const UI = (() => {
       const streakEmoji = streak >= 20 ? '🌈' : streak >= 10 ? '🔥' : streak >= 5 ? '⚡' : '🎯';
       const streakChip = streak >= 3 ? `
         <div class="dash-chip dash-chip--streak">
-          <span class="dash-icon"><span class="picon picon-fire"></span></span>
+          <span class="dash-icon">${uiIcon('ach_streak_10', '<span class="picon picon-fire"></span>', 'lg')}</span>
           <span class="dash-val">${streak}</span>
           <span class="dash-lbl">連勝中！</span>
         </div>` : `
         <div class="dash-chip dash-chip--streak">
-          <span class="dash-icon"><span class="picon picon-target"></span></span>
+          <span class="dash-icon">${uiIcon('ach_streak_3', '<span class="picon picon-target"></span>', 'lg')}</span>
           <span class="dash-val">${maxStreak || '-'}</span>
           <span class="dash-lbl">最大連勝</span>
         </div>`;
 
       el.innerHTML = `
         <div class="dash-chip dash-chip--clear">
-          <span class="dash-icon"><span class="picon picon-trophy"></span></span>
+          <span class="dash-icon">${uiIcon('ach_wins_10', '<span class="picon picon-trophy"></span>', 'lg')}</span>
           <span class="dash-val">${cleared}<span class="dash-total">/${total}</span></span>
           <span class="dash-lbl">クリア</span>
           ${clearBar}
         </div>
         <div class="dash-chip dash-chip--power">
-          <span class="dash-icon"><span class="picon picon-sword"></span></span>
+          <span class="dash-icon">${uiIcon('equip_weapon', '<span class="picon picon-sword"></span>', 'lg')}</span>
           <span class="dash-val">${power >= 10000 ? (power/1000).toFixed(1)+'K' : power.toLocaleString()}</span>
           <span class="dash-lbl">戦力</span>
         </div>
         ${streakChip}
         <div class="dash-chip dash-chip--idle">
-          <span class="dash-icon"><span class="picon picon-coin"></span></span>
+          <span class="dash-icon">${uiIcon('res_coin', '<span class="picon picon-coin"></span>', 'lg')}</span>
           <span class="dash-val">${rate}</span>
           <span class="dash-lbl">毎分収益</span>
         </div>
         <div class="dash-chip dash-chip--generals">
-          <span class="dash-icon"><span class="picon picon-people"></span></span>
+          <span class="dash-icon">${uiIcon('ach_own_15', '<span class="picon picon-people"></span>', 'lg')}</span>
           <span class="dash-val">${genCnt}<span class="dash-total">/${Object.keys(GENERALS_DATA).length}</span></span>
           <span class="dash-lbl">副将</span>
         </div>
@@ -2320,11 +2320,16 @@ const UI = (() => {
         const card    = document.createElement('div');
         card.className = `zukan-card rarity-${def.rarity} ${isOwned ? '' : 'zukan-unknown'}`;
         const starsHtml = isOwned && gs.stars > 1 ? `<div class="zukan-stars">${'⭐'.repeat(gs.stars)}</div>` : '';
+        // 既存のキャラthumb画像を採用（owned=フルカラー / locked=シルエット化）
+        const thumbWebp = `assets/characters/thumbs/${gid}.webp?v=${IMG_V}`;
+        const lockClass = isOwned ? '' : 'zukan-locked-img';
+        const lockOverlay = isOwned ? '' : '<div class="zukan-lock-overlay">？？？</div>';
         card.innerHTML = `
-          <div class="zukan-portrait" style="background:${isOwned ? def.gradient : 'var(--card)'}">
-            <span style="font-size:26px;${isOwned ? '' : 'filter:grayscale(1) opacity(.3)'}">
-              ${def.emoji}
-            </span>
+          <div class="zukan-portrait" style="background:${isOwned ? def.gradient : '#1a1a2e'}">
+            <img class="zukan-thumb ${lockClass}" src="${thumbWebp}" alt="${isOwned ? def.name : 'locked'}"
+                 onerror="this.outerHTML='<span style=&quot;font-size:26px;${isOwned ? '' : 'filter:grayscale(1) opacity(.3)'}&quot;>${def.emoji}</span>'"
+                 loading="lazy" decoding="async">
+            ${lockOverlay}
           </div>
           <div class="zukan-name">${isOwned ? def.name : '???'}</div>
           <span class="zukan-rarity badge-${def.rarity}">${def.rarity}</span>

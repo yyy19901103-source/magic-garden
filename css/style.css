@@ -52,8 +52,25 @@
 
 .hidden { display: none !important; }
 
+/* ━━━ プレミアムタイポグラフィ（v81） ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  /* 本文用：エレガント明朝（読みやすく高級感） */
+  --font-body: 'Shippori Mincho B1', 'Noto Serif JP', 'Hiragino Mincho ProN',
+               'Yu Mincho', '游明朝', serif;
+  /* タイトル用：装飾的な英語+日本語ミックス */
+  --font-title: 'Cinzel Decorative', 'Shippori Mincho B1', 'Noto Serif JP',
+                'Hiragino Mincho ProN', serif;
+  /* 数値用：表組み等幅・タビュラー */
+  --font-num: 'Cinzel', 'Shippori Mincho B1', 'Noto Serif JP', serif;
+  /* UI用：クリーンサンセリフ（メニュー・ボタン） */
+  --font-ui: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+  /* 手書き調（フレーバー・引用） */
+  --font-flavor: 'Klee One', 'Shippori Mincho B1', 'Noto Serif JP', serif;
+}
+
 body {
-  font-family: 'Noto Serif JP', 'Hiragino Mincho Pro', 'Yu Mincho', '游明朝', serif;
+  font-family: var(--font-body);
+  font-weight: 500;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -61,6 +78,188 @@ body {
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
+  letter-spacing: .02em;
+  font-feature-settings: "palt" 1;  /* プロポーショナル（日本語空き調整） */
+}
+
+/* タイトル類は装飾的フォント */
+h1, h2, .loading-title, .popup-title, .banner-title, .gacha-result-title,
+.section-label, .detail-name, .hero-name {
+  font-family: var(--font-title);
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+/* 数値（コイン・戦力・Lv等）は等幅で揃える */
+.dash-val, .res-coins, .res-crystals, .res-stamina, .qs-val, .hpb-value,
+.hero-lv strong, .stat-bar-val, .card-power, .card-lv, .equip-stats,
+.shop-price, .ach-progress {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* ボタン・タブはクリーンUI */
+button, .btn, .tab-label, .tab-btn {
+  font-family: var(--font-ui);
+  font-weight: 700;
+}
+
+/* キャラ説明・lore はフレーバー */
+.detail-desc, .hero-desc, .lore-text, .lore-quote, .hero-title-tag {
+  font-family: var(--font-flavor);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+/* ━━━ 10億ドルゲーム風 プレミアム表現 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* タイトルクラス：ゴールドグラデ + 強グロー + 大きめ */
+.loading-title {
+  font-size: 36px;
+  background: linear-gradient(180deg, #fff7c0 0%, #ffd700 50%, #d4a017 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.7))
+          drop-shadow(0 0 14px rgba(255,215,0,.5));
+  letter-spacing: .08em;
+  margin-bottom: 4px;
+}
+.loading-sub {
+  font-family: var(--font-title);
+  font-size: 14px;
+  color: rgba(255,215,0,.8);
+  letter-spacing: .25em;
+  text-transform: uppercase;
+}
+
+/* セクションラベル：金縁 + 装飾 */
+.section-label {
+  position: relative;
+  font-size: 17px;
+  color: #ffe5a0;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7), 0 0 6px rgba(255,215,0,.25);
+  padding: 6px 12px 6px 4px;
+  border-bottom: 1px solid rgba(255,215,0,.25);
+  letter-spacing: .05em;
+}
+
+/* バナータイトル */
+.banner-title {
+  font-size: 22px;
+  background: linear-gradient(180deg, #fff5b3 0%, #ffd700 50%, #b8860b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.8))
+          drop-shadow(0 0 10px rgba(255,215,0,.4));
+  letter-spacing: .1em;
+}
+
+/* ダッシュボードチップの数値 */
+.dash-val {
+  font-size: 22px;
+  background: linear-gradient(180deg, #ffeec0 0%, #ffd700 60%, #c8941a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.7));
+  letter-spacing: 0;
+}
+.dash-lbl {
+  color: rgba(255,255,255,.75);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: .08em;
+  font-weight: 500;
+}
+
+/* リソース表示（コイン/ジェム/スタミナ） */
+.hd-resources span {
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: linear-gradient(180deg, rgba(40,28,72,.6), rgba(20,12,30,.85));
+  border: 1px solid rgba(255,215,0,.3);
+  border-radius: 99px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 2px 4px rgba(0,0,0,.4);
+}
+.hd-resources span span {
+  font-family: var(--font-num);
+  font-weight: 700;
+  color: #ffd700;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+
+/* キャラ詳細の名前 */
+.hero-name, .detail-name {
+  background: linear-gradient(180deg, #fff7d0 0%, #ffd700 60%, #d4a017 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.85));
+}
+
+/* ボタンの仕上げ */
+.btn, button:not(.tab-btn):not(.elem-filter-btn):not(.rarity-filter-btn):not(.dash-chip):not(.equip-filter-btn) {
+  letter-spacing: .04em;
+}
+
+/* ════ 図鑑 thumb 装飾 ════ */
+.zukan-portrait {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.zukan-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  display: block;
+  transition: transform .25s;
+}
+.zukan-thumb.zukan-locked-img {
+  filter: grayscale(1) brightness(.35) contrast(.8);
+}
+.zukan-lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-title);
+  font-size: 22px; font-weight: 900;
+  color: rgba(255,215,0,.55);
+  text-shadow: 0 2px 6px rgba(0,0,0,.95);
+  pointer-events: none;
+  letter-spacing: .1em;
+}
+.zukan-card:hover .zukan-thumb { transform: scale(1.06); }
+
+/* ボディ全体に控えめなノイズテクスチャ風 */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,215,0,.012) 1px, transparent 1px);
+  background-size: 4px 4px;
+  pointer-events: none;
+  z-index: 999;
+  mix-blend-mode: overlay;
+}
+
+/* スクロールバーを金色化 */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,.3); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ffd700, #b8860b);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ffe55c, #ffd700);
 }
 
 /* ─── 画面共通 ──────────────────────────────────────────────────────────── */
