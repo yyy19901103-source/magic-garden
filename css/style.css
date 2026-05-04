@@ -163,7 +163,23 @@ button, .btn, .tab-label, .tab-btn {
   letter-spacing: .1em;
 }
 
-/* v107: ダッシュボードチップの数値・ラベルはタブラベルと完全統一 — 旧22px金グラデは廃止 */
+/* v109: ダッシュボードチップの数値は金色を維持してサイズだけ縮小 */
+.dash-val {
+  font-size: 11px;
+  background: linear-gradient(180deg, #ffeec0 0%, #ffd700 60%, #c8941a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.7));
+  letter-spacing: 0;
+}
+.dash-lbl {
+  color: rgba(255,255,255,.75);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: .04em;
+  font-weight: bold;
+}
 
 /* リソース表示（コイン/ジェム/スタミナ）v101: 枠を撤去して数字を読みやすく */
 .hd-resources span {
@@ -1300,7 +1316,7 @@ body::after {
   50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
 }
 
-/* v105: 文字サイズをタブラベル (11px / 10px) と統一 */
+/* v109: アイコンサイズと配置のみ（数値色は金色定義側で管理） */
 .dash-icon  {
   font-size: 28px; line-height: 1;
   display: inline-flex; align-items: center; justify-content: center;
@@ -1308,15 +1324,9 @@ body::after {
 }
 .dash-chip .dash-icon img,
 .dash-chip .dash-icon .ui-icon { width: 36px; height: 36px; }
-.dash-val, .dash-total, .dash-lbl {
-  font-size: 11px; font-weight: bold;
-  color: rgba(255,255,255,.6);
-  text-shadow: 0 1px 2px rgba(0,0,0,.9);
-  letter-spacing: .04em;
-  line-height: 1.2;
-}
-.dash-val   { font-variant-numeric: tabular-nums; white-space: nowrap; background: none; -webkit-text-fill-color: currentColor; }
-.dash-lbl   { text-align: center; }
+.dash-val   { font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.2; }
+.dash-total { font-size: 11px; line-height: 1.2; }
+.dash-lbl   { text-align: center; line-height: 1.2; }
 
 /* クリア進捗バー */
 .dash-progress-wrap {
