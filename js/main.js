@@ -1644,6 +1644,11 @@ const UI = (() => {
             <span class="hab-label">育成</span>
             <span class="hab-sub">${isAtMaxLv ? 'MAX' : `${lvCost.toLocaleString()} ${uiIcon('res_coin', '🪙', 'sm')}`}</span>
           </button>
+          <button class="hero-act-btn ${hasCoins?'':'disabled'}" id="dlv20-btn-icon" ${isAtMaxLv?'disabled':''} title="20回まとめて育成">
+            ${uiIcon('ach_lv50', '<span class="hab-icon">⚡</span>', 'md')}
+            <span class="hab-label">+20育成</span>
+            <span class="hab-sub">${isAtMaxLv ? 'MAX' : '一括'}</span>
+          </button>
           <button class="hero-act-btn ${stars<6 && shards>=awakenCost?'':'disabled'}" id="daw-btn-icon" ${stars>=6?'disabled':''}>
             ${uiIcon('ach_streak_10', '<span class="hab-icon">⭐</span>', 'md')}
             <span class="hab-label">覚醒</span>
@@ -1878,6 +1883,22 @@ const UI = (() => {
       $('dlv-btn-icon')?.addEventListener('click', () => {
         const r = Game.levelUpGeneral(gid);
         if (r.success) { updateResourceBar(); this.showDetail(gid); this.renderGrid(); }
+      });
+      $('dlv20-btn-icon')?.addEventListener('click', () => {
+        const r = Game.bulkLevelUpGeneral(gid, 20);
+        if (r.success) {
+          updateResourceBar();
+          this.showDetail(gid);
+          this.renderGrid();
+          // 軽いトースト風通知
+          const msg = r.reachedMax
+            ? `Lv.MAX到達！(+${r.leveled} / ${r.totalCost.toLocaleString()}🪙)`
+            : `+${r.leveled}Lv 一括育成！(${r.totalCost.toLocaleString()}🪙)`;
+          if (typeof showToast === 'function') showToast(msg);
+          else console.log(msg);
+        } else if (r.reason === 'no_coins') {
+          if (typeof showToast === 'function') showToast(`コイン不足 (必要: ${r.needed.toLocaleString()})`);
+        }
       });
       $('daw-btn-icon')?.addEventListener('click', () => {
         const r = Game.awakenGeneral(gid);

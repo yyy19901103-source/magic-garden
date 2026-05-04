@@ -626,6 +626,37 @@ const Game = (() => {
     return { success: true, newLevel: state.generals[generalId].level, cost };
   }
 
+  // 一括育成: 指定回数（既定 20）または所持コインが尽きるまで連続レベルアップ
+  function bulkLevelUpGeneral(generalId, times = 20) {
+    const gs = state.generals[generalId];
+    if (!gs) return { success: false, reason: 'not_found', leveled: 0, totalCost: 0 };
+    const startLevel = gs.level;
+    const maxLv = _maxLevel(gs);
+    if (startLevel >= maxLv) return { success: false, reason: 'max_level', leveled: 0, totalCost: 0 };
+
+    let leveled = 0;
+    let totalCost = 0;
+    for (let i = 0; i < times; i++) {
+      if (gs.level >= maxLv) break;
+      const cost = levelUpCost(gs.level);
+      if (state.resources.coins < cost) {
+        if (leveled === 0) return { success: false, reason: 'no_coins', needed: cost, leveled, totalCost };
+        break;
+      }
+      state.resources.coins -= cost;
+      totalCost += cost;
+      _applyExp(generalId, expToNext(gs.level));
+      leveled++;
+    }
+    return {
+      success: leveled > 0,
+      leveled,
+      totalCost,
+      newLevel: gs.level,
+      reachedMax: gs.level >= maxLv,
+    };
+  }
+
   function addToFormation(generalId) {
     if (state.formation.includes(generalId)) return false;
     const slot = state.formation.indexOf(null);
@@ -1143,7 +1174,7 @@ const Game = (() => {
   return {
     init, calculateIdleReward, collectIdleReward,
     battle,
-    levelUpGeneral, addToFormation, removeFromFormation,
+    levelUpGeneral, bulkLevelUpGeneral, addToFormation, removeFromFormation,
     equipItem, unequipItem,
     awakenGeneral, getAwakenCost, bulkAwaken, toggleFavorite,
     enhanceEquip, getEnhanceCost,
