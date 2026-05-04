@@ -1784,10 +1784,17 @@ const UI = (() => {
                   const rDef = GENERALS_DATA[rel.id];
                   const relTypeLabel = {
                     ally: '味方', enemy: '敵', rival: 'ライバル', mentor: '師弟',
-                    sworn_brother: '義兄弟', best_friend: '親友', enemy_turned_ally: '因縁の絆'
+                    sworn_brother: '義兄弟', best_friend: '親友', enemy_turned_ally: '因縁の絆',
+                    childhood_friend: '幼馴染', mysterious: '謎の縁', protege: '弟子',
+                    former_subordinate: '元部下', betrayer: '裏切り者', loyal_servant: '忠臣',
+                    forbidden_love: '禁断の恋', soul_bond: '魂の絆', master: '主君',
+                    apprentice: '弟子', teacher: '師', student: '門下生',
+                    blood_oath: '血の契約', friendly_rival: '好敵手', secret_admirer: '秘めた想い',
+                    one_sided_love: '片想い', sister: '姉妹', brother: '兄弟',
+                    family: '家族', parent: '親', child: '子'
                   }[rel.type] || rel.type;
                   return `<div class="relation-row">
-                    <span class="relation-char">${rDef ? rDef.emoji + ' ' + rDef.name : rel.id}</span>
+                    <span class="relation-char">${rDef ? rDef.name : rel.id}</span>
                     <span class="relation-tag">${relTypeLabel}</span>
                     <span class="relation-desc">${rel.desc}</span>
                   </div>`;
