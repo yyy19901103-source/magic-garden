@@ -2530,12 +2530,24 @@ textarea {
   border-color: rgba(120,255,140,.55);
 }
 
-/* 左右ナビ（前後キャラ）をストリップ中央に揃えて重ね合わせ防止 */
+/* 左右ナビ（前後キャラ）— 矢印のみ表示、枠/背景なし */
 .hero-nav {
   width: var(--hero-tile) !important;
   height: 38px !important;
-  font-size: 22px !important;
-  border-radius: 8px !important;
+  font-size: 28px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  color: rgba(255,255,255,.85) !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,.85), 0 0 6px rgba(0,0,0,.6);
+  opacity: .85 !important;
+}
+.hero-nav:hover {
+  background: transparent !important;
+  color: #ffd700 !important;
+  opacity: 1 !important;
 }
 .hero-nav-prev { left: var(--hero-strip-pad) !important; }
 .hero-nav-next { right: var(--hero-strip-pad) !important; }
