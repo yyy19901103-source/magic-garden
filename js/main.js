@@ -626,26 +626,41 @@ const UI = (() => {
     },
 
     _switchView(mode) {
-      // mode: 'chapter' | 'boss' | 'tower'
+      // mode: 'chapter' | 'boss' | 'tower' | 'quest' (v104)
       this.isBossTab  = mode === 'boss';
       this.isTowerTab = mode === 'tower';
-      const stageList   = $('stage-list');
-      const bossSection = $('daily-boss-section');
-      const towerSection= $('tower-section');
+      this.isQuestTab = mode === 'quest';
+      const stageList    = $('stage-list');
+      const bossSection  = $('daily-boss-section');
+      const towerSection = $('tower-section');
+      const questSection = $('quest-section');
       if (stageList)    stageList.classList.toggle('hidden', mode !== 'chapter');
       if (bossSection)  bossSection.classList.toggle('hidden', mode !== 'boss');
       if (towerSection) towerSection.classList.toggle('hidden', mode !== 'tower');
+      if (questSection) questSection.classList.toggle('hidden', mode !== 'quest');
 
       document.querySelectorAll('.chapter-tab').forEach(btn => {
         const isTowerBtn   = !!btn.dataset.tower;
         const isBossBtn    = !!btn.dataset.boss;
+        const isQuestBtn   = !!btn.dataset.quest;
         const isChapterBtn = btn.dataset.chapter !== undefined;
         let active = false;
         if (mode === 'tower'   && isTowerBtn)   active = true;
         if (mode === 'boss'    && isBossBtn)     active = true;
+        if (mode === 'quest'   && isQuestBtn)    active = true;
         if (mode === 'chapter' && isChapterBtn && parseInt(btn.dataset.chapter) === this.currentChapter) active = true;
         btn.classList.toggle('active', active);
       });
+    },
+
+    renderQuest() {
+      // v104: 実績/任務/週間ミッション をクエストタブで表示
+      this._switchView('quest');
+      if (typeof HomeTab !== 'undefined') {
+        HomeTab.renderAchievements?.();
+        HomeTab.renderDailyTasks?.();
+        HomeTab.renderWeeklyTasks?.();
+      }
     },
 
     renderChapter() {
@@ -2554,20 +2569,16 @@ const UI = (() => {
       if (tog) { tog.classList.add('hidden'); tog.classList.remove('open'); }
     });
 
-    // 章タブ（data-chapter / data-boss / data-tower で判定）
+    // 章タブ（data-chapter / data-boss / data-tower / data-quest で判定）
     document.querySelectorAll('.chapter-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         if (btn.dataset.tower) {
-          AdventureTab.isTowerTab = true;
-          AdventureTab.isBossTab  = false;
           AdventureTab.renderTower();
         } else if (btn.dataset.boss) {
-          AdventureTab.isBossTab  = true;
-          AdventureTab.isTowerTab = false;
           AdventureTab.renderBossSection();
+        } else if (btn.dataset.quest) {
+          AdventureTab.renderQuest();
         } else {
-          AdventureTab.isBossTab  = false;
-          AdventureTab.isTowerTab = false;
           AdventureTab.currentChapter = parseInt(btn.dataset.chapter);
           AdventureTab.renderChapter();
         }
