@@ -91,7 +91,7 @@ button, input, select, textarea,
 
 /* ─── ボタン (FF/オクトラ風 凹凸ピクセル) ─── */
 .btn,
-button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.btn-cloud-icon):not(.btn-edit-name):not(.icon-btn) {
+button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.btn-cloud-icon):not(.btn-edit-name):not(.icon-btn):not(.hero-nav):not(.hero-fav-btn):not(.hero-act-btn) {
   background: linear-gradient(180deg, var(--p-bg-hi) 0%, var(--p-bg-soft) 50%, var(--p-bg) 100%) !important;
   color: var(--p-text) !important;
   font-family: var(--p-font-main) !important;
@@ -108,11 +108,11 @@ button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.
   padding: 10px 16px;
   cursor: pointer;
 }
-.btn:hover, button:not(.tab-btn):not(.chapter-tab):not(.btn-icon):not(.btn-cloud-icon):not(.btn-edit-name):not(.icon-btn):hover {
+.btn:hover, button:not(.tab-btn):not(.chapter-tab):not(.btn-icon):not(.btn-cloud-icon):not(.btn-edit-name):not(.icon-btn):not(.hero-nav):not(.hero-fav-btn):not(.hero-act-btn):hover {
   filter: brightness(1.15);
   border-color: var(--p-border-hi) !important;
 }
-.btn:active, button:not(.tab-btn):not(.chapter-tab):not(.btn-icon):not(.btn-cloud-icon):not(.btn-edit-name):not(.icon-btn):active {
+.btn:active, button:not(.tab-btn):not(.chapter-tab):not(.btn-icon):not(.btn-cloud-icon):not(.btn-edit-name):not(.icon-btn):not(.hero-nav):not(.hero-fav-btn):not(.hero-act-btn):active {
   transform: translateY(var(--px));
   box-shadow:
     inset 0 var(--px) 0 rgba(0,0,0,.4),
