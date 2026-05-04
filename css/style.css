@@ -1306,7 +1306,7 @@ body::after {
   50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
 }
 
-/* v102: アイコンと数字の横幅を視覚的に揃える */
+/* v105: 文字サイズをタブラベル (11px / 10px) と統一 */
 .dash-icon  {
   font-size: 28px; line-height: 1;
   display: inline-flex; align-items: center; justify-content: center;
@@ -1314,13 +1314,15 @@ body::after {
 }
 .dash-chip .dash-icon img,
 .dash-chip .dash-icon .ui-icon { width: 36px; height: 36px; }
-.dash-val   {
-  font-size: 12px; color: #e8d8b0; line-height: 1.2;
-  font-variant-numeric: tabular-nums; white-space: nowrap;
-  background: none; -webkit-text-fill-color: currentColor;
+.dash-val, .dash-total, .dash-lbl {
+  font-size: 11px; font-weight: bold;
+  color: rgba(255,255,255,.6);
+  text-shadow: 0 1px 2px rgba(0,0,0,.9);
+  letter-spacing: .04em;
+  line-height: 1.2;
 }
-.dash-total { font-size: 12px; color: #e8d8b0; }
-.dash-lbl   { font-size: 12px; color: #e8d8b0; line-height: 1.2; text-align: center; }
+.dash-val   { font-variant-numeric: tabular-nums; white-space: nowrap; background: none; -webkit-text-fill-color: currentColor; }
+.dash-lbl   { text-align: center; }
 
 /* クリア進捗バー */
 .dash-progress-wrap {
@@ -2068,7 +2070,7 @@ body::after {
   /* タブラベルを絵文字のみにして省スペース */
   .tab-btn { font-size: 12px; padding: 5px 2px; }
 
-  /* v103: モバイル横5列・アイコンとフォント縮小 */
+  /* v105: モバイル — タブラベル 10px と統一 */
   .home-dashboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
   .dash-chip { padding: 5px 1px 4px; }
   .dash-icon { font-size: 18px; min-width: 28px; }
