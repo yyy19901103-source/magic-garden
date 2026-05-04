@@ -1583,9 +1583,10 @@ const UI = (() => {
           </button>`;
         }
         const enhTxt = inst.enhanceLevel > 0 ? `+${inst.enhanceLevel}` : '';
+        // v112: 装備中もスロット種別の PNG アイコンを表示（絵文字フォールバック）
         return `<button class="hero-slot rarity-${ed.rarity}" data-general="${gid}" data-slot="${slot}" aria-label="${ed.name}">
           <span class="hero-slot-rarity-tag">${ed.rarity}</span>
-          <span class="hero-slot-icon">${ed.emoji}</span>
+          <span class="hero-slot-icon">${equipSlotIcon[slot]}</span>
           ${enhTxt ? `<span class="hero-slot-enh">${enhTxt}</span>` : ''}
         </button>`;
       }).join('');
