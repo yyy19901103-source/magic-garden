@@ -1999,16 +1999,18 @@ body::after {
 /* ─── ヘッダー：小画面でさらにコンパクトに ─────────────────────────────── */
 
 @media (max-width: 480px) {
-  .game-header { padding: 8px 10px; }
-  .hd-resources { gap: 5px; }
+  .game-header { padding: 8px 8px; gap: 6px; }
+  .hd-resources { gap: 4px; flex: 1 1 0; min-width: 0; overflow: hidden; }
   .hd-resources span {
-    font-size: 11px;
-    padding: 2px 6px;
+    font-size: 10px;
+    padding: 2px 5px;
+    gap: 3px;
   }
-  .hd-resources span span { font-size: 11px; }
-  .hd-resources .ui-icon-sm { width: 14px; height: 14px; }
-  .hd-player { max-width: 30%; }
-  #player-name { max-width: 70px; font-size: 11px; }
+  .hd-resources span span { font-size: 10px; }
+  .hd-resources .ui-icon-sm { width: 13px; height: 13px; }
+  .st-bar-wrap { width: 28px; }
+  .hd-player { max-width: 28%; flex-shrink: 0; }
+  #player-name { max-width: 64px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
 }
 
 @media (max-width: 374px) {

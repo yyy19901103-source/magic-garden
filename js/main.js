@@ -7,7 +7,7 @@ const UI = (() => {
   // ─── ユーティリティ ─────────────────────────────────────────────────────
 
   // 画像キャッシュバスター（v81: 2026-05-04 ダッシュボードチップ + 図鑑thumb + プレミアムフォント）
-  const IMG_V = '81';
+  const IMG_V = '83';
 
   // UI アイコン helper（PNG優先 + 絵文字フォールバック）
   // 用法: uiIcon('mat_herb', '🌿') → 配置済なら img、なければ絵文字
@@ -1976,8 +1976,8 @@ const UI = (() => {
     showGachaResult(results) {
       const el = $('gacha-result-cards');
       el.innerHTML = '';
-      const hasSSR = results.some(r => r.def.rarity === 'SSR');
-      // SSR出現時は虹色バーストを overlay 内に1回だけ走らせる
+      const hasSSR = results.some(r => ['SSR','UR','MR','LR'].includes(r.def.rarity));
+      // SSR以上出現時はプレミアム金光バーストを overlay 内に1回だけ走らせる
       const overlay = document.getElementById('gacha-result');
       if (overlay) {
         overlay.classList.toggle('has-ssr', hasSSR);

@@ -445,25 +445,32 @@ body.opt-no-scanline::before { display: none !important; }
 .ssr-burst::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -10%;
   background:
     repeating-conic-gradient(from 0deg at 50% 50%,
-      #ff5577 0deg 18deg,
-      #ffaa44 18deg 36deg,
-      #ffeb47 36deg 54deg,
-      #99ff99 54deg 72deg,
-      #6cd3ff 72deg 90deg,
-      #c89aff 90deg 108deg);
-  filter: blur(3px);
-  opacity: .55;
-  animation: ssrBurstSpin 4s linear infinite;
+      rgba(255, 220, 130, 0)    0deg 6deg,
+      rgba(255, 230, 160, .55)  6deg 8deg,
+      rgba(255, 200,  90, 0)    8deg 14deg,
+      rgba(255, 240, 190, .35) 14deg 16deg,
+      rgba(255, 200,  90, 0)   16deg 24deg);
+  filter: blur(1.5px);
+  mix-blend-mode: screen;
+  opacity: .9;
+  animation: ssrBurstSpin 14s linear infinite;
+  mask-image: radial-gradient(circle at center, rgba(0,0,0,.0) 12%, #000 40%, #000 70%, transparent 92%);
+  -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,.0) 12%, #000 40%, #000 70%, transparent 92%);
 }
 .ssr-burst::after {
   content: '';
   position: absolute;
-  inset: 30%;
-  background: radial-gradient(circle at center, rgba(255,255,255,.95), rgba(255,230,120,.5) 40%, transparent 70%);
-  animation: ssrBurstFlash .8s ease-out;
+  inset: 0;
+  background:
+    radial-gradient(circle at center,
+      rgba(255, 248, 220, .85) 0%,
+      rgba(255, 215, 120, .55) 14%,
+      rgba(184, 134,  11, .25) 32%,
+      rgba(20,   10,   0, .0)  60%);
+  animation: ssrBurstFlash 1.2s ease-out;
 }
 @keyframes ssrBurstFade {
   0%   { opacity: 0; }
@@ -479,9 +486,13 @@ body.opt-no-scanline::before { display: none !important; }
   60%  { opacity: 1; transform: scale(1.5); }
   100% { opacity: 0; transform: scale(2.2); }
 }
-/* SSR時はガチャモーダル背景も金色寄りに */
+/* SSR以上出現時はガチャモーダル背景を漆黒×深金にして高級感を演出 */
 #gacha-result.has-ssr {
-  background: radial-gradient(ellipse at center, rgba(80,30,10,.8) 0%, rgba(0,0,0,.95) 80%) !important;
+  background:
+    radial-gradient(ellipse at center,
+      rgba(60, 38,  8, .92)  0%,
+      rgba(20, 12,  4, .96) 45%,
+      rgba(0,   0,  0, .98) 90%) !important;
 }
 
 /* ─── アクセシビリティ: 動きを抑える ─── */
