@@ -1271,12 +1271,15 @@ body::after {
 /* ─── ホームダッシュボード ──────────────────────────────────────────────── */
 
 .home-dashboard {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-  margin-bottom: 4px;
+  /* v95: 一列レイアウト — チップを縦並びにして数字を大きく可読化 */
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 8px;
 }
 .dash-chip {
-  border-radius: var(--radius-sm); padding: 8px 4px 7px;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border-radius: var(--radius-sm);
+  /* v95: 横並び（icon | label | value）— 値を右端に大きく表示 */
+  padding: 10px 14px;
+  display: flex; flex-direction: row; align-items: center; gap: 12px;
   text-align: center; border: 1px solid transparent;
   background: var(--card); position: relative; overflow: hidden;
   transition: transform .15s;
@@ -1298,10 +1301,24 @@ body::after {
   50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
 }
 
-.dash-icon  { font-size: 16px; line-height: 1; }
-.dash-val   { font-size: 13px; font-weight: bold; color: var(--text); line-height: 1.2; }
-.dash-total { font-size: 12px; font-weight: normal; color: var(--text-dim); }
-.dash-lbl   { font-size: 13px; color: var(--text-dim); }
+/* v95: 一列レイアウト用のサイズ・配置 */
+.dash-icon  { font-size: 26px; line-height: 1; flex: 0 0 auto; }
+.dash-chip .dash-icon img,
+.dash-chip .dash-icon .ui-icon { width: 28px; height: 28px; }
+.dash-lbl   { font-size: 14px; color: #e8d8b0; flex: 1 1 auto; min-width: 0; line-height: 1.2; }
+.dash-val   {
+  font-family: var(--font-num);
+  font-size: 22px; font-weight: 800;
+  background: linear-gradient(180deg, #ffeec0 0%, #ffd700 60%, #c8941a 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 1px 0 rgba(0,0,0,.4);
+  line-height: 1.1;
+  flex: 0 0 auto;
+  letter-spacing: .03em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.dash-total { font-size: 13px; font-weight: 500; color: rgba(255,215,0,.55); margin-left: 2px; }
 
 /* クリア進捗バー */
 .dash-progress-wrap {
@@ -2044,8 +2061,8 @@ body::after {
   /* タブラベルを絵文字のみにして省スペース */
   .tab-btn { font-size: 12px; padding: 5px 2px; }
 
-  /* ダッシュボードチップを2列に */
-  .home-dashboard { grid-template-columns: 1fr 1fr; }
+  /* v95: モバイルでも一列維持 */
+  .home-dashboard { display: flex; flex-direction: column; gap: 6px; }
 }
 
 /* ─── 全スマホ共通：スクロール慣性・選択禁止 ────────────────────────────── */
@@ -2059,7 +2076,8 @@ body::after {
 .dash-chip { min-width: 0; }
 
 @media (max-width: 340px) {
-  .home-dashboard { grid-template-columns: repeat(2, 1fr); }
+  .home-dashboard { display: flex; flex-direction: column; }
+  .dash-val { font-size: 20px; }
 }
 
 /* ─── オーバーレイ（詳細画面）がはみ出さないよう ────────────────────────── */
