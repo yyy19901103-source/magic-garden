@@ -2436,14 +2436,90 @@ textarea {
 .hero-zone {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
-  max-height: 70vh;
-  margin-bottom: 14px;
+  /* v86: キャラ立ち絵を主役に。アクション/スロットは画像内コーナーに集約 */
+  aspect-ratio: 3 / 5;
+  max-height: 82vh;
+  margin-bottom: 12px;
   border-radius: var(--radius);
   overflow: hidden;
   background: #0a0612;
   cursor: pointer;
   isolation: isolate;
+}
+
+/* ━━━ コーナースロット (v86): 装備=左上 / スキル=右上 ━━━ */
+.hero-corner-slots {
+  position: absolute;
+  top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 5;
+  pointer-events: auto;
+}
+.hero-corner-slots-tl { left: 8px; }
+.hero-corner-slots-tr { right: 8px; }
+.hero-corner-slots .hero-slot {
+  position: static;
+  width: 48px;
+  height: 48px;
+}
+@media (max-width: 374px) {
+  .hero-corner-slots .hero-slot { width: 40px; height: 40px; }
+  .hero-corner-slots-tl { left: 6px; }
+  .hero-corner-slots-tr { right: 6px; }
+}
+
+/* ━━━ アクションコーナー (v86): 育成=左下 / 覚醒=右下 / 編成=中央下 ━━━ */
+.hero-action-corner {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  gap: 6px;
+}
+.hero-action-corner-bl { left: 8px;  bottom: 70px; flex-direction: column; }
+.hero-action-corner-br { right: 8px; bottom: 70px; flex-direction: column; }
+.hero-action-corner-bc {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 76px; /* 称号(『xxx』) の少し上 */
+}
+.hero-action-corner .hero-act-btn {
+  width: 64px;
+  min-height: 56px;
+  padding: 4px 2px;
+  background: linear-gradient(180deg, rgba(40,28,60,.85), rgba(15,8,28,.92));
+  border: 1px solid rgba(255,215,0,.35);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);
+  backdrop-filter: blur(2px);
+  color: #fff;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+.hero-action-corner .hero-act-btn .hab-icon { font-size: 16px; }
+.hero-action-corner .hero-act-btn .ui-icon { width: 18px; height: 18px; }
+.hero-action-corner .hero-act-btn .hab-label { font-size: 10px; font-weight: 700; }
+.hero-action-corner .hero-act-btn .hab-sub { font-size: 9px; opacity: .85; }
+.hero-action-corner .hero-act-btn.disabled,
+.hero-action-corner .hero-act-btn[disabled] {
+  opacity: .45;
+  filter: saturate(.4);
+}
+.hero-action-corner .hero-act-fm.is-active {
+  background: linear-gradient(180deg, rgba(20,80,40,.92), rgba(8,40,20,.95));
+  border-color: rgba(120,255,140,.55);
+}
+@media (max-width: 374px) {
+  .hero-action-corner .hero-act-btn { width: 54px; min-height: 50px; }
+  .hero-action-corner .hero-act-btn .hab-icon { font-size: 14px; }
+  .hero-action-corner-bl,
+  .hero-action-corner-br { bottom: 64px; }
+  .hero-action-corner-bc { bottom: 70px; }
 }
 
 /* 背景：ぼかし版（低解像度の余白を埋める） */
@@ -2757,7 +2833,7 @@ textarea {
 /* ═══ レスポンシブ対応 ═══════════════════════════════════════════════════ */
 /* タブレット〜PC：オーバーレイ中央寄せ・最大幅 */
 @media (min-width: 600px) {
-  .hero-zone { max-height: 60vh; aspect-ratio: 4 / 5; }
+  .hero-zone { max-height: 78vh; aspect-ratio: 3 / 5; }
   .hero-name { font-size: 22px; }
   .hero-side { width: 64px; }
   .hero-slot { width: 64px; height: 64px; }
@@ -3161,10 +3237,10 @@ textarea {
 .hab-label { font-size: 11px; letter-spacing: 0; }
 .hab-sub   { font-size: 9px; }
 
-/* hero-zone のアスペクト比を縦長に（キャラ立ち絵を活かす） */
+/* hero-zone のアスペクト比を縦長に（キャラ立ち絵を活かす） v86: 3/5 で大画面化 */
 .hero-zone {
-  aspect-ratio: 4 / 5;
-  max-height: 64vh;
+  aspect-ratio: 3 / 5;
+  max-height: 82vh;
 }
 
 /* description は控えめに */

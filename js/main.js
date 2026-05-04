@@ -1603,8 +1603,48 @@ const UI = (() => {
               ${isFav ? '❤️' : '🤍'}
             </button>
           </div>
-          <div class="hero-side hero-side-left">${heroEquipSlotsHtml}</div>
-          <div class="hero-side hero-side-right">${heroSkillSlotsHtml}</div>
+          <!-- 装備：左上コーナー -->
+          <div class="hero-corner-slots hero-corner-slots-tl">${heroEquipSlotsHtml}</div>
+          <!-- スキル：右上コーナー -->
+          <div class="hero-corner-slots hero-corner-slots-tr">${heroSkillSlotsHtml}</div>
+
+          <!-- 育成・一括育成：左下コーナー -->
+          <div class="hero-action-corner hero-action-corner-bl">
+            <button class="hero-act-btn ${hasCoins?'':'disabled'}" id="dlv-btn-icon" ${isAtMaxLv?'disabled':''}>
+              ${uiIcon('ach_lv10', '<span class="hab-icon">📈</span>', 'sm')}
+              <span class="hab-label">育成</span>
+              <span class="hab-sub">${isAtMaxLv ? 'MAX' : `${lvCost.toLocaleString()}🪙`}</span>
+            </button>
+            <button class="hero-act-btn ${hasCoins?'':'disabled'}" id="dlv20-btn-icon" ${isAtMaxLv?'disabled':''} title="20回まとめて育成">
+              ${uiIcon('ach_lv50', '<span class="hab-icon">⚡</span>', 'sm')}
+              <span class="hab-label">+20育成</span>
+              <span class="hab-sub">${isAtMaxLv ? 'MAX' : '一括'}</span>
+            </button>
+          </div>
+
+          <!-- 覚醒・限界突破：右下コーナー -->
+          <div class="hero-action-corner hero-action-corner-br">
+            <button class="hero-act-btn ${stars<6 && shards>=awakenCost?'':'disabled'}" id="daw-btn-icon" ${stars>=6?'disabled':''}>
+              ${uiIcon('ach_streak_10', '<span class="hab-icon">⭐</span>', 'sm')}
+              <span class="hab-label">覚醒</span>
+              <span class="hab-sub">${stars>=6 ? 'MAX' : `${shards}/${awakenCost}`}</span>
+            </button>
+            <button class="hero-act-btn ${blInfo.canBreak?'':'disabled'}" id="dbl-btn-icon" ${blInfo.isMaxBreak?'disabled':''}>
+              ${uiIcon('res_gem', '<span class="hab-icon">💎</span>', 'sm')}
+              <span class="hab-label">限界突破</span>
+              <span class="hab-sub">${blInfo.isMaxBreak ? '完了' : `+${blInfo.breakCount+1}回目`}</span>
+            </button>
+          </div>
+
+          <!-- 編成：中央下（称号の少し上） -->
+          <div class="hero-action-corner hero-action-corner-bc">
+            <button class="hero-act-btn hero-act-fm ${inFm?'is-active':''}" id="dfm-btn-icon">
+              ${inFm ? '<span class="hab-icon">✅</span>' : uiIcon('equip_weapon', '<span class="hab-icon">⚔️</span>', 'sm')}
+              <span class="hab-label">${inFm ? '編成中' : '編成'}</span>
+              <span class="hab-sub">${inFm ? '外す' : '入れる'}</span>
+            </button>
+          </div>
+
           ${hasMultiple ? `
             <button class="hero-nav hero-nav-prev" aria-label="前のキャラ" title="前のキャラ">‹</button>
             <button class="hero-nav hero-nav-next" aria-label="次のキャラ" title="次のキャラ">›</button>
@@ -1637,34 +1677,7 @@ const UI = (() => {
           </div>
         </div>
 
-        <!-- ━━━ アクションアイコン群（市販ゲー風6個並列） ━━━ -->
-        <div class="hero-action-grid">
-          <button class="hero-act-btn ${hasCoins?'':'disabled'}" id="dlv-btn-icon" ${isAtMaxLv?'disabled':''}>
-            ${uiIcon('ach_lv10', '<span class="hab-icon">📈</span>', 'md')}
-            <span class="hab-label">育成</span>
-            <span class="hab-sub">${isAtMaxLv ? 'MAX' : `${lvCost.toLocaleString()} ${uiIcon('res_coin', '🪙', 'sm')}`}</span>
-          </button>
-          <button class="hero-act-btn ${hasCoins?'':'disabled'}" id="dlv20-btn-icon" ${isAtMaxLv?'disabled':''} title="20回まとめて育成">
-            ${uiIcon('ach_lv50', '<span class="hab-icon">⚡</span>', 'md')}
-            <span class="hab-label">+20育成</span>
-            <span class="hab-sub">${isAtMaxLv ? 'MAX' : '一括'}</span>
-          </button>
-          <button class="hero-act-btn ${stars<6 && shards>=awakenCost?'':'disabled'}" id="daw-btn-icon" ${stars>=6?'disabled':''}>
-            ${uiIcon('ach_streak_10', '<span class="hab-icon">⭐</span>', 'md')}
-            <span class="hab-label">覚醒</span>
-            <span class="hab-sub">${stars>=6 ? 'MAX' : `${shards}/${awakenCost}`}</span>
-          </button>
-          <button class="hero-act-btn ${blInfo.canBreak?'':'disabled'}" id="dbl-btn-icon" ${blInfo.isMaxBreak?'disabled':''}>
-            ${uiIcon('res_gem', '<span class="hab-icon">💎</span>', 'md')}
-            <span class="hab-label">限界突破</span>
-            <span class="hab-sub">${blInfo.isMaxBreak ? '完了' : `+${blInfo.breakCount+1}回目`}</span>
-          </button>
-          <button class="hero-act-btn ${inFm?'is-active':''}" id="dfm-btn-icon">
-            ${inFm ? '<span class="hab-icon">✅</span>' : uiIcon('equip_weapon', '<span class="hab-icon">⚔️</span>', 'md')}
-            <span class="hab-label">${inFm ? '編成中' : '編成'}</span>
-            <span class="hab-sub">${inFm ? '外す' : '入れる'}</span>
-          </button>
-        </div>
+        <!-- アクションボタンは hero-zone 内コーナーに移動済み (v86) -->
 
         <!-- 説明文 -->
         <p class="hero-desc">${def.description}</p>
