@@ -2176,8 +2176,10 @@ textarea {
   opacity: 1;
   transition: opacity .35s ease;
 }
-.battle-intro.hidden { display: none; }
-.battle-intro.intro-fadeout { opacity: 0; }
+.battle-intro.hidden { display: none !important; }
+.battle-intro.intro-fadeout { opacity: 0; pointer-events: none; }
+/* v92: 念のため intro-playing が外れた状態は完全非表示 */
+.battle-intro:not(.intro-playing):not(.intro-fadeout) { opacity: 0; pointer-events: none; }
 .battle-intro.intro-boss { background: radial-gradient(ellipse at center, rgba(80,10,20,.85) 0%, rgba(10,0,0,.98) 85%); }
 .battle-intro .intro-flash {
   position: absolute; inset: 0;
