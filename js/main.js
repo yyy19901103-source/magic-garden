@@ -1683,24 +1683,17 @@ const UI = (() => {
         <p class="detail-shards-line">${uiIcon('res_gem', '💎', 'sm')} 欠片: <strong>${shards}</strong>個</p>
 
         ${(() => {
-          const STAT_MAX = { hp: 30000, atk: 3500, def: 1500, spd: 200 };
-          const STAT_COLOR = { hp: '#ef4444', atk: '#f97316', def: '#3b82f6', spd: '#10b981' };
           const rows = [
-            { key: 'hp',  iconName: 'stat_hp',  emoji: '❤️', label: 'HP',   val: stats.hp,  fmt: stats.hp.toLocaleString() },
-            { key: 'atk', iconName: 'stat_atk', emoji: '⚔️', label: '攻撃', val: stats.atk, fmt: stats.atk.toLocaleString() },
-            { key: 'def', iconName: 'stat_def', emoji: '🛡️', label: '防御', val: stats.def, fmt: stats.def.toLocaleString() },
-            { key: 'spd', iconName: 'stat_spd', emoji: '💨', label: '速度', val: stats.spd, fmt: String(stats.spd) },
+            { iconName: 'stat_hp',  emoji: '❤️', label: 'HP',   fmt: stats.hp.toLocaleString() },
+            { iconName: 'stat_atk', emoji: '⚔️', label: '攻撃', fmt: stats.atk.toLocaleString() },
+            { iconName: 'stat_def', emoji: '🛡️', label: '防御', fmt: stats.def.toLocaleString() },
+            { iconName: 'stat_spd', emoji: '💨', label: '速度', fmt: String(stats.spd) },
           ];
-          return `<div class="detail-stats-bars">${rows.map(r => {
-            const pct = Math.min(100, Math.round(r.val / STAT_MAX[r.key] * 100));
-            return `<div class="stat-bar-row">
-              <span class="stat-bar-label">${uiIcon(r.iconName, r.emoji, 'sm')} ${r.label}</span>
-              <div class="stat-bar-track">
-                <div class="stat-bar-fill" style="width:${pct}%;background:${STAT_COLOR[r.key]}"></div>
-              </div>
-              <span class="stat-bar-val">${r.fmt}</span>
-            </div>`;
-          }).join('')}</div>`;
+          return `<div class="detail-stats-list">${rows.map(r =>
+            `<div class="stat-row">
+              <span class="stat-row-label">${uiIcon(r.iconName, r.emoji, 'sm')} ${r.label}</span>
+              <span class="stat-row-val">${r.fmt}</span>
+            </div>`).join('')}</div>`;
         })()}
 
         ${(() => {
@@ -2659,17 +2652,17 @@ const UI = (() => {
       if (e.target === $('equip-picker')) hide('equip-picker');
     });
 
-    // BGM — 初回クリックで起動して 🔇 表示、以降はトグル
+    // BGM — v94: 設定モーダル内のトグルボタン（settings-toggle 形式: ON/OFF テキスト）
     $('btn-bgm')?.addEventListener('click', () => {
       const btn = $('btn-bgm');
       if (!BGM.isRunning()) {
         BGM.start();
-        btn.textContent = '🔇';
-        btn.classList.remove('muted');
+        btn.dataset.on = 'true';
+        btn.textContent = 'ON';
       } else {
         const muted = BGM.toggle();
-        btn.textContent = muted ? '🔊' : '🔇';
-        btn.classList.toggle('muted', muted);
+        btn.dataset.on = muted ? 'false' : 'true';
+        btn.textContent = muted ? 'OFF' : 'ON';
       }
     });
 
