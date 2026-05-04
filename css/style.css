@@ -2013,19 +2013,21 @@ body::after {
   .hd-resources span span { font-size: 10px; }
   .hd-resources .ui-icon-sm { width: 13px; height: 13px; }
   .st-bar-wrap { width: 28px; }
-  .hd-player { max-width: 28%; flex-shrink: 0; }
-  #player-name { max-width: 64px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
+  .hd-player { max-width: 36%; flex-shrink: 0; min-width: 0; }
+  #player-name { max-width: 96px; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hd-icons { gap: 1px; }
+  .btn-icon, .btn-cloud-icon { font-size: 14px; padding: 2px 4px; }
 }
 
 @media (max-width: 374px) {
   .res-coins    { font-size: 11px; }
   .res-crystals { font-size: 11px; }
-  .hd-resources { gap: 4px; }
-  .hd-resources span { padding: 2px 5px; }
-  .st-bar-wrap  { width: 30px; }
+  .hd-resources { gap: 3px; }
+  .hd-resources span { padding: 2px 4px; }
+  .st-bar-wrap  { width: 26px; }
   .st-label     { font-size: 11px; }
-  .hd-player { max-width: 25%; }
-  #player-name { max-width: 50px; font-size: 10px; }
+  .hd-player { max-width: 32%; }
+  #player-name { max-width: 76px; font-size: 10px; }
 
   /* タブラベルを絵文字のみにして省スペース */
   .tab-btn { font-size: 12px; padding: 5px 2px; }
