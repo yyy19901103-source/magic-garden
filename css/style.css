@@ -2511,9 +2511,11 @@ textarea {
 .hero-corner-slots-tl { left: var(--hero-strip-pad); }
 .hero-corner-slots-tr { right: var(--hero-strip-pad); }
 .hero-corner-slots .hero-slot {
-  position: static;
+  /* v110: position は relative を維持（absolute 子要素 = レアリティバッジ・強化値の基準） */
+  position: relative;
   width: var(--hero-tile);
   height: var(--hero-tile);
+  flex: 0 0 auto;
 }
 
 .hero-action-corner {
@@ -2995,27 +2997,24 @@ textarea {
   50%      { transform: scale(1.018) translateY(-3px); }
 }
 
-/* お気に入りボタン */
+/* お気に入りボタン v110: 枠と背景を撤去、ハートのみ */
 .hero-fav-btn {
-  background: rgba(20,12,30,.7);
-  border: 1.5px solid rgba(255,255,255,.3);
-  border-radius: 50%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   width: 32px; height: 32px;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: transform .15s, border-color .15s;
+  transition: transform .15s, filter .15s;
   padding: 0;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.7));
 }
-.hero-fav-btn:hover  { transform: scale(1.12); border-color: #ff5577; }
+.hero-fav-btn:hover  { transform: scale(1.12); }
 .hero-fav-btn:active { transform: scale(.92); }
 .hero-fav-btn.is-fav {
-  border-color: #ff3366;
-  background: rgba(60,15,30,.75);
-  box-shadow: 0 0 12px rgba(255,51,102,.5);
+  filter: drop-shadow(0 0 6px rgba(255,51,102,.7)) drop-shadow(0 1px 2px rgba(0,0,0,.7));
   animation: favPulse 1.6s ease-in-out infinite;
 }
 @keyframes favPulse {
