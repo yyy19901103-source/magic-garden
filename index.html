@@ -30,9 +30,9 @@
   <!-- ヘッダー -->
   <header class="game-header">
     <div class="hd-resources">
-      <span class="res-coins"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_coin.webp?v=75" alt="🪙"> <span id="coins">0</span></span>
-      <span class="res-crystals"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_gem.webp?v=75" alt="💎"> <span id="crystals">0</span></span>
-      <span class="res-stamina" id="stamina-display"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_stamina.webp?v=75" alt="⚡"> 30/30</span>
+      <span class="res-coins"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_coin.webp?v=79" alt="🪙"> <span id="coins">0</span></span>
+      <span class="res-crystals"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_gem.webp?v=79" alt="💎"> <span id="crystals">0</span></span>
+      <span class="res-stamina" id="stamina-display"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_stamina.webp?v=79" alt="⚡"> 30/30</span>
       <span id="stamina-timer" class="stamina-timer hidden"></span>
     </div>
     <div class="hd-player">
@@ -83,23 +83,23 @@
   <!-- タブナビ（PNG アイコン版・木目テクスチャ背景） -->
   <nav class="tab-nav tab-nav-png">
     <button class="tab-btn active" data-tab="home">
-      <img class="tab-icon" src="assets/nav-icons/home.webp?v=75" alt="ホーム">
+      <img class="tab-icon" src="assets/nav-icons/home.webp?v=79" alt="ホーム">
       <span class="tab-label">ホーム</span>
     </button>
     <button class="tab-btn" data-tab="adventure">
-      <img class="tab-icon" src="assets/nav-icons/adventure.webp?v=75" alt="冒険">
+      <img class="tab-icon" src="assets/nav-icons/adventure.webp?v=79" alt="冒険">
       <span class="tab-label">冒険</span>
     </button>
     <button class="tab-btn" data-tab="generals">
-      <img class="tab-icon" src="assets/nav-icons/generals.webp?v=75" alt="副将">
+      <img class="tab-icon" src="assets/nav-icons/generals.webp?v=79" alt="副将">
       <span class="tab-label">副将</span>
     </button>
     <button class="tab-btn" data-tab="gacha">
-      <img class="tab-icon" src="assets/nav-icons/gacha.webp?v=75" alt="召喚">
+      <img class="tab-icon" src="assets/nav-icons/gacha.webp?v=79" alt="召喚">
       <span class="tab-label">召喚</span>
     </button>
     <button class="tab-btn" data-tab="zukan">
-      <img class="tab-icon" src="assets/nav-icons/codex.webp?v=75" alt="図鑑">
+      <img class="tab-icon" src="assets/nav-icons/codex.webp?v=79" alt="図鑑">
       <span class="tab-label">図鑑</span>
     </button>
   </nav>
@@ -113,7 +113,7 @@
       <!-- 放置報酬ポップアップ -->
       <div id="idle-reward" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="idle-reward-heading">
         <div class="popup-card">
-          <span class="popup-icon">🌸</span>
+          <img class="popup-hero-img" src="assets/ui-icons/idle_welcome.webp?v=79" alt="おかえり" onerror="this.outerHTML='<span class=&quot;popup-icon&quot;>🌸</span>'">
           <h3 id="idle-reward-heading" class="popup-title">おかえり！</h3>
           <p id="idle-reward-text" class="popup-text">コインを集めておいたよ！</p>
           <button id="collect-btn" class="btn btn-primary">受け取る ✓</button>
@@ -133,7 +133,7 @@
 
       <!-- 現在の編成 -->
       <section class="home-section">
-        <h3 class="section-label"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=75" alt="⚔️"> 現在の編成</h3>
+        <h3 class="section-label"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=79" alt="⚔️"> 現在の編成</h3>
         <div id="formation-display" class="formation-display"></div>
       </section>
 
@@ -232,7 +232,7 @@
 
       <!-- 編成スロット -->
       <section class="home-section">
-        <h3 class="section-label"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=75" alt="⚔️"> 編成（最大3体）</h3>
+        <h3 class="section-label"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=79" alt="⚔️"> 編成（最大3体）</h3>
         <div id="formation-editor" class="formation-editor"></div>
       </section>
 
@@ -313,9 +313,9 @@
         <h3 class="section-label">🎒 装備倉庫</h3>
         <div class="equip-filter-bar" id="equip-filter-bar">
           <button class="equip-filter-btn active" data-type="all">全部</button>
-          <button class="equip-filter-btn" data-type="weapon"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=75" alt="⚔️">武器</button>
-          <button class="equip-filter-btn" data-type="armor"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_armor.webp?v=75" alt="🛡️">防具</button>
-          <button class="equip-filter-btn" data-type="accessory"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_accessory.webp?v=75" alt="💍">装飾</button>
+          <button class="equip-filter-btn" data-type="weapon"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=79" alt="⚔️">武器</button>
+          <button class="equip-filter-btn" data-type="armor"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_armor.webp?v=79" alt="🛡️">防具</button>
+          <button class="equip-filter-btn" data-type="accessory"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_accessory.webp?v=79" alt="💍">装飾</button>
           <select id="equip-sort-sel" class="equip-sort-sel">
             <option value="rarity">レア度順</option>
             <option value="enhance">強化順</option>
@@ -336,12 +336,12 @@
         <!-- スタミナポーション（特別販売） -->
         <div id="shop-special" class="shop-special">
           <div class="shop-special-item">
-            <span class="shop-special-icon"><img class="ui-icon ui-icon-md" src="assets/ui-icons/res_stamina.webp?v=75" alt="⚡"></span>
+            <span class="shop-special-icon"><img class="ui-icon ui-icon-md" src="assets/ui-icons/res_stamina.webp?v=79" alt="⚡"></span>
             <div class="shop-special-info">
               <div class="shop-special-name">スタミナポーション</div>
               <div class="shop-special-desc">スタミナ+10回復</div>
             </div>
-            <button id="buy-stamina-btn" class="btn-shop-buy-special"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_coin.webp?v=75" alt="🪙"> 1,000</button>
+            <button id="buy-stamina-btn" class="btn-shop-buy-special"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/res_coin.webp?v=79" alt="🪙"> 1,000</button>
           </div>
         </div>
         <div id="shop-list" class="shop-list"></div>
@@ -372,7 +372,7 @@
 
       <!-- 装備図鑑 -->
       <section class="home-section">
-        <h3 class="section-label"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=75" alt="⚔️"> 装備図鑑</h3>
+        <h3 class="section-label"><img class="ui-icon ui-icon-sm" src="assets/ui-icons/equip_weapon.webp?v=79" alt="⚔️"> 装備図鑑</h3>
         <div id="zukan-equips" class="zukan-equips"></div>
       </section>
 
@@ -500,7 +500,7 @@
 <script src="js/idle.js?v=55"></script>
 <script src="js/image_loader.js?v=73"></script>
 <script src="js/game.js?v=72"></script>
-<script src="js/main.js?v=77"></script>
+<script src="js/main.js?v=79"></script>
 
 </body>
 </html>

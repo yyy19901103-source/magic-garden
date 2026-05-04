@@ -6,8 +6,8 @@ const UI = (() => {
 
   // ─── ユーティリティ ─────────────────────────────────────────────────────
 
-  // 画像キャッシュバスター（v75: 2026-05-04 UI アイコン全置換）
-  const IMG_V = '75';
+  // 画像キャッシュバスター（v79: 2026-05-04 CraftPix 高品質アセット適用）
+  const IMG_V = '79';
 
   // UI アイコン helper（PNG優先 + 絵文字フォールバック）
   // 用法: uiIcon('mat_herb', '🌿') → 配置済なら img、なければ絵文字
@@ -46,7 +46,13 @@ const UI = (() => {
     const md = (typeof MATERIALS_DATA !== 'undefined') ? MATERIALS_DATA[matId] : null;
     if (!md) return '';
     const bg = MAT_BG[matId] || '#555';
-    return `<span class="mat-icon" style="background:${bg}" title="${md.name}">${md.emoji}</span>`;
+    // PNG優先 + 旧バブル絵文字をフォールバック
+    const fallback = `<span class="mat-icon" style="background:${bg}" title="${md.name}">${md.emoji}</span>`;
+    // uiIcon は IMG_V 定義後でないと動かないので関数内で参照（hoist 効くように function 宣言を使用）
+    if (typeof uiIcon === 'function') {
+      return uiIcon(`mat_${matId}`, fallback, 'sm');
+    }
+    return fallback;
   }
 
   // HTML属性エスケープ（XSS防止）
@@ -694,11 +700,11 @@ const UI = (() => {
           ? `<span class="reward-chip">${matIcon(r.material.id)} ${matInfo.name} ${Math.round(r.material.chance*100)}%</span>`
           : '';
         const fcHtml = stage.firstClear
-          ? `<span class="reward-chip reward-chip-fc"><span class="picon picon-gem"></span> 初回+${stage.firstClear.crystals}</span>`
+          ? `<span class="reward-chip reward-chip-fc">${uiIcon('res_gem', '<span class="picon picon-gem"></span>', 'sm')} 初回+${stage.firstClear.crystals}</span>`
           : '';
         const rewardBar = `<div class="stage-rewards-preview">
-          <span class="reward-chip"><span class="picon picon-coin"></span> ${r.coins[0]}~${r.coins[1]}</span>
-          <span class="reward-chip"><span class="picon picon-exp"></span> ${r.exp[0]}~${r.exp[1]}</span>
+          <span class="reward-chip">${uiIcon('res_coin', '<span class="picon picon-coin"></span>', 'sm')} ${r.coins[0]}~${r.coins[1]}</span>
+          <span class="reward-chip">${uiIcon('ach_lv10', '<span class="picon picon-exp"></span>', 'sm')} ${r.exp[0]}~${r.exp[1]}</span>
           ${matHtml}${fcHtml}
         </div>`;
 
@@ -2086,8 +2092,9 @@ const UI = (() => {
         const statsText = Object.entries(ed.stats)
           .map(([k, v]) => `${k.toUpperCase()}+${v}`).join(' ');
         const canBuy = !item.sold && coins >= item.price;
+        const shopCatIcon = uiIcon(`equip_${ed.type}`, `<span class="equip-emoji">${ed.emoji}</span>`, 'md');
         row.innerHTML = `
-          <span class="equip-emoji">${ed.emoji}</span>
+          ${shopCatIcon}
           <div class="equip-info">
             <div class="equip-name">${ed.name} <span class="equip-rarity">${ed.rarity}</span></div>
             <div class="equip-stats">${statsText}</div>
@@ -2169,8 +2176,9 @@ const UI = (() => {
         const sellLabel = isEquipped
           ? '<span class="sell-equipped">装備中</span>'
           : `<button class="btn-sell" data-iid="${inst.instanceId}">売 ${sellVal.toLocaleString()}🪙</button>`;
+        const equipCatIcon = uiIcon(`equip_${ed.type}`, `<span class="equip-emoji">${ed.emoji}</span>`, 'md');
         div.innerHTML = `
-          <span class="equip-emoji">${ed.emoji}</span>
+          ${equipCatIcon}
           <div class="equip-info">
             <div class="equip-name">
               ${ed.name}
@@ -2259,8 +2267,9 @@ const UI = (() => {
           .map(([k,v]) => `${k.toUpperCase()}+${Math.floor(v * bonus)}`).join(' ');
         const row = document.createElement('div');
         row.className = `picker-row rarity-${ed.rarity} ${isEquipped ? 'picker-active' : ''}`;
+        const pickerCatIcon = uiIcon(`equip_${ed.type}`, `<span class="picker-emoji">${ed.emoji}</span>`, 'md');
         row.innerHTML = `
-          <span class="picker-emoji">${ed.emoji}</span>
+          ${pickerCatIcon}
           <div class="picker-info">
             <div class="picker-name">
               ${ed.name}
