@@ -6,8 +6,8 @@ const UI = (() => {
 
   // ─── ユーティリティ ─────────────────────────────────────────────────────
 
-  // 画像キャッシュバスター（v81: 2026-05-04 ダッシュボードチップ + 図鑑thumb + プレミアムフォント）
-  const IMG_V = '83';
+  // 画像キャッシュバスター（v83: ASSET_V を index.html で集中管理 — JS/CSS/画像で版を同期）
+  const IMG_V = (typeof window !== 'undefined' && window.ASSET_V) ? window.ASSET_V : '83';
 
   // UI アイコン helper（PNG優先 + 絵文字フォールバック）
   // 用法: uiIcon('mat_herb', '🌿') → 配置済なら img、なければ絵文字
@@ -20,12 +20,16 @@ const UI = (() => {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
-  function uiIcon(name, fallback = '', size = 'md') {
+  function uiIcon(name, fallback = '', size = 'md', opts = {}) {
     const sizeClass = `ui-icon-${size}`;  // sm/md/lg/xl
-    const path = `assets/ui-icons/${name}.webp?v=${IMG_V}`;
+    const safeName = _htmlAttrEscape(name);
+    const path = `assets/ui-icons/${safeName}.webp?v=${IMG_V}`;
     const fbAttr = _htmlAttrEscape(fallback || '');
+    const altText = _htmlAttrEscape(opts.alt || '');
+    const ariaHidden = opts.alt ? '' : ' aria-hidden="true"';
     // data-fallback 経由で fallback HTML を安全に保持。onerror 時に outerHTML を置換
-    return `<img class="ui-icon ${sizeClass}" src="${path}" alt="" data-fallback="${fbAttr}" onerror="if(!this.dataset.fbDone){this.dataset.fbDone='1';this.outerHTML=this.dataset.fallback||'';}" loading="lazy" decoding="async">`;
+    // （fallback は呼び出し側で属性エスケープ済の安全な HTML 断片に限定すること）
+    return `<img class="ui-icon ${sizeClass}" src="${path}" alt="${altText}"${ariaHidden} data-fallback="${fbAttr}" onerror="if(!this.dataset.fbDone){this.dataset.fbDone='1';this.outerHTML=this.dataset.fallback||'';}" loading="lazy" decoding="async">`;
   }
 
   const $ = id => document.getElementById(id);
@@ -46,8 +50,11 @@ const UI = (() => {
     const md = (typeof MATERIALS_DATA !== 'undefined') ? MATERIALS_DATA[matId] : null;
     if (!md) return '';
     const bg = MAT_BG[matId] || '#555';
-    // PNG優先 + 旧バブル絵文字をフォールバック
-    const fallback = `<span class="mat-icon" style="background:${bg}" title="${md.name}">${md.emoji}</span>`;
+    // PNG優先 + 旧バブル絵文字をフォールバック（属性は全てエスケープ）
+    const safeBg    = _htmlAttrEscape(bg);
+    const safeName  = _htmlAttrEscape(md.name || '');
+    const safeEmoji = _htmlAttrEscape(md.emoji || '');
+    const fallback = `<span class="mat-icon" style="background:${safeBg}" title="${safeName}">${safeEmoji}</span>`;
     // uiIcon は IMG_V 定義後でないと動かないので関数内で参照（hoist 効くように function 宣言を使用）
     if (typeof uiIcon === 'function') {
       return uiIcon(`mat_${matId}`, fallback, 'sm');

@@ -17,6 +17,8 @@
  */
 (() => {
   const BASE = 'assets/characters';
+  const V = (typeof window !== 'undefined' && window.ASSET_V) ? window.ASSET_V : '83';
+  const vq = `?v=${V}`;
 
   /** size → 推奨画像情報 */
   const SIZE_MAP = {
@@ -39,10 +41,10 @@
     const decoding = 'async';
 
     // ソース候補
-    const hiresWebp = `${BASE}/hires/${charId}.webp`;
-    const stdWebp   = `${BASE}/${charId}.webp`;
-    const thumbWebp = `${BASE}/thumbs/${charId}.webp`;
-    const pngFallback = `${BASE}/${charId}.png`;
+    const hiresWebp = `${BASE}/hires/${charId}.webp${vq}`;
+    const stdWebp   = `${BASE}/${charId}.webp${vq}`;
+    const thumbWebp = `${BASE}/thumbs/${charId}.webp${vq}`;
+    const pngFallback = `${BASE}/${charId}.png${vq}`;
 
     let srcsetParts = [];
     if (size === 'hero') {
@@ -80,14 +82,14 @@
    * 単純な <img> URL を返す（背景画像 url() 用や img 単体表示）
    */
   function charImage(charId, size = 'card') {
-    if (size === 'hero')  return `${BASE}/hires/${charId}.webp`;
-    if (size === 'thumb') return `${BASE}/thumbs/${charId}.webp`;
-    return `${BASE}/${charId}.webp`;
+    if (size === 'hero')  return `${BASE}/hires/${charId}.webp${vq}`;
+    if (size === 'thumb') return `${BASE}/thumbs/${charId}.webp${vq}`;
+    return `${BASE}/${charId}.webp${vq}`;
   }
 
   /** PNG フォールバックURL */
   function charImagePng(charId) {
-    return `${BASE}/${charId}.png`;
+    return `${BASE}/${charId}.png${vq}`;
   }
 
   /** onerror チェーン（background-image 用は手動で書く必要あり） */

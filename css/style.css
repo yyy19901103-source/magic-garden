@@ -250,6 +250,10 @@ body::after {
   z-index: 999;
   mix-blend-mode: overlay;
 }
+/* 低スペック・モバイルでは合成コスト削減のため全画面オーバーレイを無効化 */
+@media (max-width: 480px), (prefers-reduced-motion: reduce) {
+  body::after { display: none; }
+}
 
 /* スクロールバーを金色化 */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
