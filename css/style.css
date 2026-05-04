@@ -892,17 +892,18 @@ body::after {
   border-radius: 20px 20px 0 0; border-top: 1px solid var(--border-lt);
   width: 100%; max-width: var(--max-w);
   /* dvh で iOS Safari の URL バー伸縮に追従 */
-  max-height: 92dvh;
+  max-height: 100dvh;
+  min-height: 100dvh;
   overflow-y: auto;
-  /* 下端は env(safe-area-inset-bottom) + iOS Safari URL バー分の余白を確保 */
-  padding: 20px 16px max(96px, calc(env(safe-area-inset-bottom) + 96px));
+  /* v88: 紫余白を可能な限り削減 — 上下左右 padding 最小 */
+  padding: 6px 4px max(16px, calc(env(safe-area-inset-bottom) + 8px));
   animation: slideUp .3s ease;
   position: relative;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 @supports not (height: 100dvh) {
-  .detail-panel { max-height: 88vh; }
+  .detail-panel { max-height: 100vh; min-height: 100vh; }
 }
 .detail-close {
   position: absolute; top: 14px; right: 14px;
@@ -2436,10 +2437,10 @@ textarea {
 .hero-zone {
   position: relative;
   width: 100%;
-  /* v86: キャラ立ち絵を主役に。アクション/スロットは画像内コーナーに集約 */
+  /* v88: 余白削除のため margin-bottom 縮小 */
   aspect-ratio: 3 / 5;
   max-height: 82vh;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   border-radius: var(--radius);
   overflow: hidden;
   background: #0a0612;
