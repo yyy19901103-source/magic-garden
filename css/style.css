@@ -1301,24 +1301,22 @@ body::after {
   50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
 }
 
-/* v95: 一列レイアウト用のサイズ・配置 */
+/* v97: 一列レイアウト — 値とラベルを同じサイズ・色で揃える */
 .dash-icon  { font-size: 26px; line-height: 1; flex: 0 0 auto; }
 .dash-chip .dash-icon img,
 .dash-chip .dash-icon .ui-icon { width: 28px; height: 28px; }
 .dash-lbl   { font-size: 14px; color: #e8d8b0; flex: 1 1 auto; min-width: 0; line-height: 1.2; }
 .dash-val   {
-  font-family: var(--font-num);
-  font-size: 22px; font-weight: 800;
-  background: linear-gradient(180deg, #ffeec0 0%, #ffd700 60%, #c8941a 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  text-shadow: 0 1px 0 rgba(0,0,0,.4);
-  line-height: 1.1;
+  font-size: 14px;
+  color: #e8d8b0;
+  line-height: 1.2;
   flex: 0 0 auto;
-  letter-spacing: .03em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  background: none;
+  -webkit-text-fill-color: currentColor;
 }
-.dash-total { font-size: 13px; font-weight: 500; color: rgba(255,215,0,.55); margin-left: 2px; }
+.dash-total { font-size: 14px; color: #e8d8b0; margin-left: 2px; }
 
 /* クリア進捗バー */
 .dash-progress-wrap {
@@ -2077,7 +2075,6 @@ body::after {
 
 @media (max-width: 340px) {
   .home-dashboard { display: flex; flex-direction: column; }
-  .dash-val { font-size: 20px; }
 }
 
 /* ─── オーバーレイ（詳細画面）がはみ出さないよう ────────────────────────── */
