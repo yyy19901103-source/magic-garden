@@ -1955,14 +1955,71 @@ body::after {
 /* ボス選択カードもタップしやすく */
 .boss-card  { padding: 14px 10px; }
 
-/* ─── ヘッダー：小画面でコンパクトに ────────────────────────────────────── */
+/* ━━━ モバイルヘッダー overflow 防止 (v82 緊急修正) ━━━━━━━━━━━━━━━━ */
+
+/* ヘッダー全体を flex-wrap 不可・横スクロール禁止 */
+.game-header {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.hd-resources {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.hd-player {
+  flex-shrink: 0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 35%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#player-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+  display: inline-block;
+}
+
+/* リソースバー pill を小さく（v81 で大きすぎた） */
+.hd-resources span {
+  font-size: 12px;
+  padding: 3px 8px;
+  gap: 3px;
+  white-space: nowrap;
+}
+.hd-resources span span {
+  font-size: 12px;
+}
+
+/* ─── ヘッダー：小画面でさらにコンパクトに ─────────────────────────────── */
+
+@media (max-width: 480px) {
+  .game-header { padding: 8px 10px; }
+  .hd-resources { gap: 5px; }
+  .hd-resources span {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+  .hd-resources span span { font-size: 11px; }
+  .hd-resources .ui-icon-sm { width: 14px; height: 14px; }
+  .hd-player { max-width: 30%; }
+  #player-name { max-width: 70px; font-size: 11px; }
+}
 
 @media (max-width: 374px) {
-  .res-coins    { font-size: 13px; }
-  .res-crystals { font-size: 13px; }
-  .hd-resources { gap: 7px; }
-  .st-bar-wrap  { width: 40px; }
-  .st-label     { font-size: 13px; }
+  .res-coins    { font-size: 11px; }
+  .res-crystals { font-size: 11px; }
+  .hd-resources { gap: 4px; }
+  .hd-resources span { padding: 2px 5px; }
+  .st-bar-wrap  { width: 30px; }
+  .st-label     { font-size: 11px; }
+  .hd-player { max-width: 25%; }
+  #player-name { max-width: 50px; font-size: 10px; }
 
   /* タブラベルを絵文字のみにして省スペース */
   .tab-btn { font-size: 12px; padding: 5px 2px; }
