@@ -403,9 +403,11 @@ body::after {
   transition: transform .2s cubic-bezier(.4, 0, .2, 1), filter .2s;
 }
 .tab-nav-png .tab-icon {
-  width: 38px; height: 38px;
+  /* v98: つぶれ対策 — サイズ拡大 + 補正フィルター解除 + シャープレンダリング */
+  width: 48px; height: 48px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)) brightness(.85) saturate(.85);
+  image-rendering: -webkit-optimize-contrast;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.6));
   transition: all .25s cubic-bezier(.4, 0, .2, 1);
 }
 .tab-nav-png .tab-label {
@@ -421,9 +423,8 @@ body::after {
 }
 .tab-nav-png .tab-btn.active .tab-icon {
   filter: drop-shadow(0 0 12px rgba(255,215,0,.85))
-          drop-shadow(0 2px 4px rgba(0,0,0,.7))
-          brightness(1.1) saturate(1.15);
-  width: 44px; height: 44px;
+          drop-shadow(0 2px 4px rgba(0,0,0,.7));
+  width: 54px; height: 54px;
 }
 .tab-nav-png .tab-btn.active .tab-label {
   color: #ffd700;
@@ -434,12 +435,12 @@ body::after {
   background: rgba(255,255,255,.08);
 }
 .tab-nav-png .tab-btn:not(.active):hover .tab-icon {
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)) brightness(1) saturate(1);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.6));
 }
 
 @media (max-width: 360px) {
-  .tab-nav-png .tab-icon { width: 32px; height: 32px; }
-  .tab-nav-png .tab-btn.active .tab-icon { width: 38px; height: 38px; }
+  .tab-nav-png .tab-icon { width: 40px; height: 40px; }
+  .tab-nav-png .tab-btn.active .tab-icon { width: 46px; height: 46px; }
   .tab-nav-png .tab-label { font-size: 10px; }
 }
 
@@ -1271,15 +1272,14 @@ body::after {
 /* ─── ホームダッシュボード ──────────────────────────────────────────────── */
 
 .home-dashboard {
-  /* v95: 一列レイアウト — チップを縦並びにして数字を大きく可読化 */
-  display: flex; flex-direction: column; gap: 6px;
+  /* v98: 横一列に戻す — 5チップを均等配置 */
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
   margin-bottom: 8px;
 }
 .dash-chip {
   border-radius: var(--radius-sm);
-  /* v95: 横並び（icon | label | value）— 値を右端に大きく表示 */
-  padding: 10px 14px;
-  display: flex; flex-direction: row; align-items: center; gap: 12px;
+  padding: 8px 4px 7px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
   text-align: center; border: 1px solid transparent;
   background: var(--card); position: relative; overflow: hidden;
   transition: transform .15s;
@@ -1301,22 +1301,17 @@ body::after {
   50%     { box-shadow: 0 0 12px 2px rgba(249,115,22,.35); }
 }
 
-/* v97: 一列レイアウト — 値とラベルを同じサイズ・色で揃える */
-.dash-icon  { font-size: 26px; line-height: 1; flex: 0 0 auto; }
+/* v98: 横一列レイアウト — チップ内は icon / value / label を縦積み・全て同色同サイズ */
+.dash-icon  { font-size: 22px; line-height: 1; }
 .dash-chip .dash-icon img,
-.dash-chip .dash-icon .ui-icon { width: 28px; height: 28px; }
-.dash-lbl   { font-size: 14px; color: #e8d8b0; flex: 1 1 auto; min-width: 0; line-height: 1.2; }
+.dash-chip .dash-icon .ui-icon { width: 24px; height: 24px; }
 .dash-val   {
-  font-size: 14px;
-  color: #e8d8b0;
-  line-height: 1.2;
-  flex: 0 0 auto;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  background: none;
-  -webkit-text-fill-color: currentColor;
+  font-size: 13px; color: #e8d8b0; line-height: 1.2;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+  background: none; -webkit-text-fill-color: currentColor;
 }
-.dash-total { font-size: 14px; color: #e8d8b0; margin-left: 2px; }
+.dash-total { font-size: 13px; color: #e8d8b0; }
+.dash-lbl   { font-size: 13px; color: #e8d8b0; line-height: 1.2; text-align: center; }
 
 /* クリア進捗バー */
 .dash-progress-wrap {
@@ -2059,8 +2054,13 @@ body::after {
   /* タブラベルを絵文字のみにして省スペース */
   .tab-btn { font-size: 12px; padding: 5px 2px; }
 
-  /* v95: モバイルでも一列維持 */
-  .home-dashboard { display: flex; flex-direction: column; gap: 6px; }
+  /* v98: モバイルでも横一列維持 */
+  .home-dashboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .dash-chip { padding: 6px 2px 5px; }
+  .dash-icon { font-size: 18px; }
+  .dash-chip .dash-icon img,
+  .dash-chip .dash-icon .ui-icon { width: 20px; height: 20px; }
+  .dash-val, .dash-lbl, .dash-total { font-size: 11px; }
 }
 
 /* ─── 全スマホ共通：スクロール慣性・選択禁止 ────────────────────────────── */
@@ -2074,7 +2074,8 @@ body::after {
 .dash-chip { min-width: 0; }
 
 @media (max-width: 340px) {
-  .home-dashboard { display: flex; flex-direction: column; }
+  .home-dashboard { grid-template-columns: repeat(5, 1fr); gap: 3px; }
+  .dash-val, .dash-lbl, .dash-total { font-size: 10px; }
 }
 
 /* ─── オーバーレイ（詳細画面）がはみ出さないよう ────────────────────────── */

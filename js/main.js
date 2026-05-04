@@ -2437,33 +2437,22 @@ const UI = (() => {
       btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
     // プレイヤー名編集
+    // プレイヤー名編集（v98: 設定モーダル内ボタン経由・最大8文字）
+    const PLAYER_NAME_MAX = 8;
+    function syncPlayerNameDisplay(name) {
+      const headerEl   = $('player-name');
+      const settingsEl = $('settings-player-name');
+      if (headerEl)   headerEl.textContent   = name;
+      if (settingsEl) settingsEl.textContent = name;
+    }
     $('btn-edit-name')?.addEventListener('click', () => {
-      const nameEl = $('player-name');
-      if (!nameEl || nameEl.tagName === 'INPUT') return;  // 二重クリック防止
-      const current = nameEl.textContent;
-      const input = document.createElement('input');
-      input.className = 'player-name-input';
-      input.value     = current;
-      input.maxLength = 12;
-      nameEl.replaceWith(input);
-      input.focus();
-      input.select();
-      let saved = false;
-      const commit = () => {
-        if (saved) return;
-        saved = true;
-        const newName = input.value.trim() || current;
-        Game.setPlayerName(newName);
-        const span = document.createElement('span');
-        span.id = 'player-name';
-        span.textContent = newName;
-        input.replaceWith(span);
-      };
-      input.addEventListener('blur', commit, { once: true });
-      input.addEventListener('keydown', e => {
-        if (e.key === 'Enter')  { e.preventDefault(); input.blur(); }
-        if (e.key === 'Escape') { input.value = current; input.blur(); }
-      });
+      const current = $('player-name')?.textContent || '';
+      const next = window.prompt(`プレイヤー名（最大${PLAYER_NAME_MAX}文字）`, current);
+      if (next === null) return;
+      const trimmed = next.trim().slice(0, PLAYER_NAME_MAX);
+      if (!trimmed || trimmed === current) return;
+      Game.setPlayerName(trimmed);
+      syncPlayerNameDisplay(trimmed);
     });
 
     // ─── 設定モーダル ───────────────────────────────────────────
