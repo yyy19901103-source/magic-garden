@@ -838,6 +838,16 @@ body::after {
 }
 .chapter-tab.active { background: var(--primary-lt); color: var(--primary); border-color: var(--primary); }
 
+/* v106: 特殊タブを色で識別（アイコン廃止） */
+.chapter-tab--final  { color: #ffd700; border-color: rgba(255,215,0,.45); background: linear-gradient(180deg, rgba(80,60,10,.5), rgba(40,30,5,.6)); }
+.chapter-tab--final.active  { background: linear-gradient(180deg, rgba(255,215,0,.32), rgba(180,140,20,.5)); color: #fff5c4; border-color: #ffd700; }
+.chapter-tab--daily  { color: #ff8a8a; border-color: rgba(255,80,80,.45); background: linear-gradient(180deg, rgba(80,20,20,.5), rgba(50,10,10,.6)); }
+.chapter-tab--daily.active  { background: linear-gradient(180deg, rgba(255,80,80,.35), rgba(160,30,30,.55)); color: #ffd0d0; border-color: #ff5050; }
+.chapter-tab--quest  { color: #80e8ff; border-color: rgba(80,180,255,.45); background: linear-gradient(180deg, rgba(20,40,80,.5), rgba(10,25,50,.6)); }
+.chapter-tab--quest.active  { background: linear-gradient(180deg, rgba(80,180,255,.35), rgba(30,80,160,.55)); color: #d0ecff; border-color: #5aaaff; }
+.chapter-tab--tower  { color: #d4a8ff; border-color: rgba(180,100,255,.45); background: linear-gradient(180deg, rgba(50,30,80,.5), rgba(30,15,50,.6)); }
+.chapter-tab--tower.active  { background: linear-gradient(180deg, rgba(180,100,255,.35), rgba(100,50,160,.55)); color: #ecd5ff; border-color: #b06aff; }
+
 /* 章バナー */
 .chapter-banner {
   width: 100%; height: 130px; border-radius: var(--radius);
