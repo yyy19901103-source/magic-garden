@@ -176,17 +176,17 @@ button, .btn, .tab-label, .tab-btn {
   font-weight: 500;
 }
 
-/* リソース表示（コイン/ジェム/スタミナ） */
+/* リソース表示（コイン/ジェム/スタミナ）v101: 枠を撤去して数字を読みやすく */
 .hd-resources span {
   font-size: 14px;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
-  background: linear-gradient(180deg, rgba(40,28,72,.6), rgba(20,12,30,.85));
-  border: 1px solid rgba(255,215,0,.3);
-  border-radius: 99px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 2px 4px rgba(0,0,0,.4);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 .hd-resources span span {
   font-family: var(--font-num);
@@ -2011,28 +2011,28 @@ body::after {
   display: inline-block;
 }
 
-/* リソースバー pill を小さく（v81 で大きすぎた） */
+/* v101: 枠なし版 — padding 0、間隔のみ */
 .hd-resources span {
-  font-size: 12px;
-  padding: 3px 8px;
-  gap: 3px;
+  font-size: 13px;
+  padding: 0;
+  gap: 4px;
   white-space: nowrap;
 }
 .hd-resources span span {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* ─── ヘッダー：小画面でさらにコンパクトに ─────────────────────────────── */
 
 @media (max-width: 480px) {
-  .game-header { padding: 8px 8px; gap: 6px; }
-  .hd-resources { gap: 4px; flex: 1 1 0; min-width: 0; overflow: hidden; }
+  .game-header { padding: 8px 8px; gap: 8px; }
+  .hd-resources { gap: 10px; flex: 1 1 0; min-width: 0; overflow: hidden; }
   .hd-resources span {
-    font-size: 10px;
-    padding: 2px 5px;
+    font-size: 12px;
+    padding: 0;
     gap: 3px;
   }
-  .hd-resources span span { font-size: 10px; }
+  .hd-resources span span { font-size: 12px; }
   .hd-resources .ui-icon-sm { width: 13px; height: 13px; }
   .st-bar-wrap { width: 28px; }
   .hd-player { max-width: 42%; flex-shrink: 0; min-width: 0; }
@@ -2044,8 +2044,8 @@ body::after {
 @media (max-width: 374px) {
   .res-coins    { font-size: 11px; }
   .res-crystals { font-size: 11px; }
-  .hd-resources { gap: 3px; }
-  .hd-resources span { padding: 2px 4px; }
+  .hd-resources { gap: 8px; }
+  .hd-resources span { padding: 0; }
   .st-bar-wrap  { width: 26px; }
   .st-label     { font-size: 11px; }
   .hd-player { max-width: 38%; }
