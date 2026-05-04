@@ -2462,7 +2462,7 @@ textarea {
 
 .hero-corner-slots {
   position: absolute;
-  top: 52px;
+  top: 96px; /* v88: hero-top-overlay 下に配置 */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -2594,10 +2594,10 @@ textarea {
     radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 35%, rgba(0,0,0,.45) 100%);
 }
 
-/* 上部オーバーレイ（名前・★） */
+/* 上部オーバーレイ（名前・★） v88: ホーム/✕ ボタン分の余白を確保 */
 .hero-top-overlay {
   position: absolute;
-  top: 10px; left: 10px; right: 50px; /* close ボタン分余白 */
+  top: 52px; left: 10px; right: 56px; /* ホーム(左)/閉じる(右) ボタン分余白 */
   z-index: 3;
   display: flex; align-items: center; gap: 8px;
   pointer-events: none;

@@ -590,8 +590,8 @@ body.opt-reduced-motion .victory-rays { display: none !important; }
 .detail-back-home:hover { filter: brightness(1.15); }
 .detail-back-home .picon { width: 16px; height: 16px; vertical-align: -3px; margin-right: 4px; }
 
-/* detail-body の上端に余白を確保してボタンとコンテンツが重ならないように */
-.detail-body { padding-top: 38px; }
+/* v88: 紫余白を完全排除。ホーム/✕ ボタンは画像の上にオーバーレイ */
+.detail-body { padding-top: 0; }
 
 /* ─── 詳細画面のキャラポートレートにタップヒント ─── */
 .detail-portrait-wrap {
