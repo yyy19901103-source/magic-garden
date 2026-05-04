@@ -337,6 +337,44 @@ const UI = (() => {
       this.renderDashboard();
       this.renderDailyTasks();
       this.renderWeeklyTasks();
+      this.renderPickup();
+    },
+
+    renderPickup() {
+      const el = $('home-pickup');
+      if (!el) return;
+      const state = Game.getState();
+      // 優先順: お気に入り → 編成1番手 → 最高レアリティ所持
+      const owned = Object.keys(state.generals || {}).filter(g => GENERALS_DATA[g]);
+      if (owned.length === 0) { el.innerHTML = ''; el.classList.add('hidden'); return; }
+      const fav = owned.find(id => state.generals[id]?.favorite);
+      const fmFirst = (state.formation || []).find(id => id && GENERALS_DATA[id]);
+      const rOrder = { LR:0, MR:1, UR:2, SSR:3, SR:4, R:5 };
+      const sorted = owned.slice().sort((a,b) => (rOrder[GENERALS_DATA[a].rarity]??9) - (rOrder[GENERALS_DATA[b].rarity]??9));
+      const id = fav || fmFirst || sorted[0];
+      const def = GENERALS_DATA[id];
+      if (!def) { el.classList.add('hidden'); return; }
+      el.classList.remove('hidden');
+      const hires = `assets/characters/hires/${id}.webp?v=${IMG_V}`;
+      const std   = `assets/characters/${id}.webp?v=${IMG_V}`;
+      const png   = `assets/characters/${id}.png?v=${IMG_V}`;
+      const errChain = `if(!this.dataset.fb){this.dataset.fb='1';this.src='${std}';}` +
+                       `else if(this.dataset.fb==='1'){this.dataset.fb='2';this.src='${png}';}` +
+                       `else{this.style.opacity='0';}`;
+      el.innerHTML = `
+        <img class="pickup-bg" src="${std}" onerror="${errChain}" alt="" aria-hidden="true">
+        <img class="pickup-main" src="${hires}" onerror="${errChain}" alt="${escapeAttr(def.name)}" data-char-id="${id}">
+        <div class="pickup-vignette"></div>
+        <div class="pickup-info">
+          <span class="pickup-rarity rarity-${def.rarity}">${def.rarity}</span>
+          <span class="pickup-name">${def.name}</span>
+          ${fav ? '<span class="pickup-fav">❤</span>' : ''}
+        </div>`;
+      el.onclick = () => {
+        if (typeof GeneralsTab !== 'undefined' && GeneralsTab.showDetail) {
+          GeneralsTab.showDetail(id);
+        }
+      };
     },
 
     renderDashboard() {
@@ -1806,10 +1844,7 @@ const UI = (() => {
           </div>`;
         })()}
 
-        <div class="detail-section">
-          <h4 class="section-label">装備</h4>
-          ${equipsHtml}
-        </div>
+        <!-- v114: 装備リストは hero-zone 左コーナーのスロットと重複するため撤去 -->
 
         `;
       // 旧テキストボタンは削除（hero-action-grid に集約）

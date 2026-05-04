@@ -892,6 +892,72 @@ body::after {
 }
 .reward-chip-fc { background: rgba(251,191,36,.15); color: var(--gold); border-color: rgba(251,191,36,.35); }
 
+/* ─── ホーム: お気に入りキャラ大写し v114 — 残り高さを flex で埋める ─── */
+#tab-home { display: flex; flex-direction: column; }
+.home-pickup {
+  flex: 1 1 0;
+  min-height: 220px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #0a0612;
+  cursor: pointer;
+  isolation: isolate;
+  border: 1px solid rgba(255,215,0,.18);
+}
+.home-pickup.hidden { display: none; }
+.home-pickup .pickup-bg {
+  position: absolute; inset: -8%;
+  width: 116%; height: 116%;
+  object-fit: cover; object-position: center;
+  filter: blur(20px) brightness(.5) saturate(1.2);
+  z-index: 0;
+}
+.home-pickup .pickup-main {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain; object-position: center;
+  z-index: 1;
+}
+.home-pickup .pickup-vignette {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 30%,
+    rgba(0,0,0,0) 70%, rgba(0,0,0,.85) 100%);
+  pointer-events: none;
+}
+.home-pickup .pickup-info {
+  position: absolute; left: 12px; right: 12px; bottom: 10px;
+  z-index: 3;
+  display: flex; align-items: center; gap: 8px;
+  pointer-events: none;
+}
+.home-pickup .pickup-rarity {
+  font-family: var(--font-num);
+  font-weight: 900; font-size: 11px;
+  padding: 2px 8px; border-radius: 4px;
+  background: linear-gradient(135deg,#ffd700,#ff8c00);
+  color: #1a0a00;
+  box-shadow: 0 1px 3px rgba(0,0,0,.6);
+}
+.home-pickup .pickup-rarity.rarity-LR { background: linear-gradient(135deg,#ff00cc,#ffd700,#00ccff); color: #000; }
+.home-pickup .pickup-rarity.rarity-MR { background: linear-gradient(135deg,#6600cc,#cc00ff,#9900bb); color: #fff; }
+.home-pickup .pickup-rarity.rarity-UR { background: linear-gradient(135deg,#cc2200,#ff6600,#ff8800); color: #fff; }
+.home-pickup .pickup-rarity.rarity-SR { background: linear-gradient(135deg,#60a5fa,#2563eb); color: #fff; }
+.home-pickup .pickup-rarity.rarity-R  { background: #4b5563; color: #d1d5db; }
+.home-pickup .pickup-name {
+  font-family: var(--font-title);
+  font-size: 16px; font-weight: 700;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0,0,0,.85);
+  letter-spacing: .04em;
+}
+.home-pickup .pickup-fav {
+  margin-left: auto;
+  font-size: 18px;
+  filter: drop-shadow(0 0 6px rgba(255,51,102,.7));
+}
+
 /* ─── 副将タブ ──────────────────────────────────────────────────────────── */
 
 /* 副将詳細オーバーレイ */
