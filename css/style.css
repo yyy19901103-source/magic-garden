@@ -893,7 +893,8 @@ body::after {
 .reward-chip-fc { background: rgba(251,191,36,.15); color: var(--gold); border-color: rgba(251,191,36,.35); }
 
 /* ─── ホーム: お気に入りキャラ大写し v114 — 残り高さを flex で埋める ─── */
-#tab-home { display: flex; flex-direction: column; }
+/* v118: タブ非アクティブ時に display:none を保つため .active 限定にする */
+#tab-home.active { flex-direction: column; }
 .home-pickup {
   flex: 1 1 0;
   min-height: 220px;
