@@ -851,11 +851,21 @@ body::after {
   border-radius: 3px; font-size: 13px;
 }
 
-/* 章タブ */
-.chapter-tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+/* 章タブ v127: 8ボタンを画面幅にフィット — grid で均等分割 + writing-mode 横書き */
+.chapter-tabs {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+  margin-bottom: 4px;
+}
 .chapter-tab {
-  flex: 1; padding: 10px; border: 1px solid var(--border);
+  padding: 6px 0; border: 1px solid var(--border);
   border-radius: var(--radius-sm); background: var(--card);
+  writing-mode: horizontal-tb !important;
+  width: 100%; box-sizing: border-box;
+  white-space: nowrap;
+  text-align: center;
+  min-width: 0;
   color: var(--text-mid); font-size: 13px; font-weight: bold;
   font-family: inherit; cursor: pointer; transition: all .15s;
 }
@@ -1371,8 +1381,8 @@ body::after {
 }
 .loot-remaining { font-size: 12px; color: var(--text-mid); margin-top: 4px; width: 100%; }
 
-/* 章タブ（6ボタン対応でテキスト縮小） */
-.chapter-tab { font-size: 13px; padding: 8px 4px; }
+/* 章タブ（v127: 8ボタン横並び・小フォント） */
+.chapter-tab { font-size: 11px; padding: 6px 0; }
 
 /* ─── ホームダッシュボード ──────────────────────────────────────────────── */
 

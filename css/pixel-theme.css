@@ -131,7 +131,7 @@ button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.
 .btn-next:hover { filter: brightness(1.12); }
 .btn-retry { background: linear-gradient(180deg, #aac8ee 0%, #5588cc 50%, #2a4a80 100%) !important; }
 
-/* ─── タブ (上タブ・章タブ) ─── */
+/* ─── タブ (上タブ・章タブ) v127: chapter-tab は 8ボタン対応で個別管理 ─── */
 .tab-btn, .chapter-tab {
   background: var(--p-bg) !important;
   color: var(--p-text-dim) !important;
@@ -139,13 +139,13 @@ button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.
   border-bottom: none !important;
   border-radius: 0 !important;
   font-family: var(--p-font-main) !important;
-  font-size: 13px !important;
-  padding: 10px 14px !important;
-  letter-spacing: .08em;
+  letter-spacing: .04em;
   text-shadow: 0 var(--px) 0 #000;
   position: relative;
   top: var(--px);
 }
+.tab-btn { font-size: 13px !important; padding: 10px 14px !important; letter-spacing: .08em; }
+.chapter-tab { font-size: 10px !important; padding: 6px 0 !important; letter-spacing: 0 !important; }
 .tab-btn.active, .chapter-tab.active {
   background: var(--p-bg-soft) !important;
   color: var(--p-gold) !important;
