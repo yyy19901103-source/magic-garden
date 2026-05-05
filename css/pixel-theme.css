@@ -795,19 +795,20 @@ body.opt-reduced-motion .victory-rays { display: none !important; }
 
 /* カード上部左端に属性バッジ (絶対配置、formation-badge は右上なので左上) */
 .card-elem-badge {
+  /* v120: 枠/背景を撤去、属性絵文字+ラベルのみ */
   position: absolute;
   top: 4px; left: 4px;
   font-family: var(--p-font-main);
-  font-size: 9px;
-  padding: 2px 5px;
-  background: rgba(10,10,20,.8);
+  font-size: 10px;
+  padding: 0;
+  background: transparent;
   color: var(--ec, #fff);
-  border: var(--px) solid var(--ec, #888);
+  border: none;
   border-radius: 0;
   line-height: 1.2;
   pointer-events: none;
   z-index: 3;
-  text-shadow: 0 var(--px) 0 #000;
+  text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 4px rgba(0,0,0,.7);
 }
 
 /* ─── 材料アイコン (絵文字を統一ピクセル枠で囲んでアセット感を出す) ─── */
