@@ -292,13 +292,7 @@ button:not(.tab-btn):not(.chapter-tab):not(.btn-log-toggle):not(.btn-icon):not(.
     radial-gradient(ellipse at center, var(--p-bg-soft) 0%, var(--p-bg-deep) 100%),
     repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(255,255,255,.02) 3px, rgba(255,255,255,.02) 4px);
 }
-.loading-title {
-  font-family: var(--p-font-num) !important;
-  font-size: 28px !important;
-  color: var(--p-gold) !important;
-  letter-spacing: .1em;
-  text-shadow: 0 calc(var(--px)*2) 0 var(--p-gold-deep), 0 calc(var(--px)*4) 0 #000;
-}
+/* v122: ローディングタイトルはピクセル装飾を撤去（style.css のエレガント版に一任） */
 
 /* ─── ピクセルアイコン (絵文字置換用 SVG クラス) ─── */
 .picon {
@@ -775,15 +769,21 @@ body.opt-reduced-motion .victory-rays { display: none !important; }
   margin-top: 6px;
 }
 .elem-filter-btn {
+  /* v124: rarity-filter-btn と同サイズ — width:100% で全ボタン均一 */
   font-family: var(--p-font-main) !important;
   font-size: 11px !important;
-  padding: 5px 10px !important;
-  border: var(--px) solid rgba(255,255,255,.18) !important;
-  background: var(--p-bg) !important;
+  padding: 5px 0 !important;
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
   color: var(--p-text-dim) !important;
-  border-radius: 0 !important;
+  border-radius: 99px !important;
   cursor: pointer;
   transition: filter .1s;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
+  box-sizing: border-box;
 }
 .elem-filter-btn.active {
   border-color: var(--ec, var(--p-gold)) !important;
