@@ -469,8 +469,8 @@ body::after {
 
 /* タブコンテンツ */
 .tab-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
-.tab-panel   { display: none; flex-direction: column; gap: 12px; padding: 14px 12px 28px; }
-.tab-panel.active { display: flex; }
+.tab-panel   { display: none; flex-direction: column; gap: 3px; padding: 3px 6px 12px; }
+.tab-panel.active { display: flex; min-height: 100%; }
 .tab-content::-webkit-scrollbar { width: 3px; }
 .tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
@@ -514,12 +514,12 @@ body::after {
 /* ─── セクション共通 ────────────────────────────────────────────────────── */
 
 .home-section {
-  background: var(--card); border-radius: var(--radius); padding: 14px;
+  background: var(--card); border-radius: var(--radius); padding: 4px 6px 6px;
   border: 1px solid var(--border);
 }
 .section-label {
   font-size: 13px; font-weight: bold; color: var(--text-mid);
-  margin-bottom: 10px; letter-spacing: .05em;
+  margin-bottom: 2px; letter-spacing: .05em;
 }
 .toast {
   background: var(--green); color: #fff; text-align: center;
@@ -627,7 +627,7 @@ body::after {
 
 /* 編成表示 */
 .formation-display {
-  display: flex; gap: 10px; justify-content: center;
+  display: flex; gap: 6px; justify-content: center;
 }
 .formation-slot {
   flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -1352,14 +1352,14 @@ body::after {
 /* ─── ホームダッシュボード ──────────────────────────────────────────────── */
 
 .home-dashboard {
-  /* v98: 横一列に戻す — 5チップを均等配置 */
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
-  margin-bottom: 8px;
+  /* v117: ぎゅっと詰める */
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px;
+  margin-bottom: 0;
 }
 .dash-chip {
   border-radius: var(--radius-sm);
-  padding: 8px 4px 7px;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 3px 2px 2px;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
   text-align: center; border: 1px solid transparent;
   background: var(--card); position: relative; overflow: hidden;
   transition: transform .15s;
